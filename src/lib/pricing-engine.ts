@@ -17,23 +17,46 @@ import type {
 /**
  * Motor de precificação — funções puras, sem dependência de interface.
  *
- * Regras estruturais:
- *  - Tributo "incluído" já está dentro do valor informado -> NUNCA soma de novo.
- *  - Tributo "por fora" é acrescentado ao desembolso / ao preço cobrado.
- *  - Tributo "informativo" não altera desembolso nem custo (crédito só se manual).
- *  - Alíquota e direito ao crédito são independentes.
- *  - Todo o cálculo interno usa Decimal com 12 dígitos; a exibição arredonda em 2.
+ * Regras estruturais (auditadas):
+ *  - Tributo "incluído" já está dentro do valor informado -> NUNCA soma de novo
+ *    ao desembolso/preço; entra apenas como redutor do resultado.
+ *  - Tributo "por fora" é acrescentado ao desembolso / ao preço cobrado e
+ *    subtraído do resultado (efeito neutro: é repasse puro).
+ *  - Tributo "informativo" não altera desembolso, preço nem resultado.
+ *  - Alíquota e direito ao crédito são informações independentes.
+ *  - Todo o cálculo interno usa Decimal; o arredondamento (4 casas) acontece
+ *    só na fronteira de saída, e a exibição arredonda em 2.
+ *  - Existe UMA única implementação de cada fórmula. A busca binária e a
+ *    avaliação de preço consomem o mesmo núcleo (`nucleoVenda`).
  */
 
-Decimal.set({ precision: 28, rounding: Decimal.ROUND_HALF_UP });
+Decimal.set({ precision: 40, rounding: Decimal.ROUND_HALF_UP });
 
-const D = (v: number | string | Decimal) => new Decimal(v ?? 0);
 const ZERO = new Decimal(0);
 
-/** Arredonda para 4 casas (precisão interna mínima exigida). */
+/**
+ * Converte qualquer entrada em Decimal finito.
+ * NaN, Infinity, null, undefined e strings inválidas viram 0 — assim um campo
+ * corrompido nunca contamina toda a simulação com NaN.
+ */
+export function D(v: unknown): Decimal {
+  if (v instanceof Decimal) return v.isFinite() ? v : ZERO;
+  if (typeof v === "number") return Number.isFinite(v) ? new Decimal(v) : ZERO;
+  if (typeof v === "string" && v.trim() !== "") {
+    const d = new Decimal(v.trim().replace(",", "."));
+    return d.isFinite() ? d : ZERO;
+  }
+  return ZERO;
+}
+
+/** Entrada numérica é finita? (usado nas validações) */
+const finito = (v: unknown) => typeof v === "number" && Number.isFinite(v);
+
+/** Arredonda para 4 casas — apenas na saída do motor. */
 const r4 = (v: Decimal) => v.toDecimalPlaces(4, Decimal.ROUND_HALF_UP).toNumber();
 
-const pct = (v: number) => D(v).div(100);
+/** Percentual -> fator (100 -> 1). */
+const pct = (v: unknown) => D(v).div(100);
 
 /* ------------------------------------------------------------------ */
 /* Compra                                                              */
@@ -46,8 +69,8 @@ export function calcularCompra(produto: ProdutoCompra, tributos: PurchaseTax[]):
   const produtosLiquido = valorBruto.minus(desconto);
 
   const outrosCustos = D(produto.freteTotal)
-    .plus(produto.seguroTotal)
-    .plus(produto.outrasDespesas)
+    .plus(D(produto.seguroTotal))
+    .plus(D(produto.outrasDespesas))
     .plus(D(produto.embalagemPorUnidade).times(quantidade))
     .plus(D(produto.rateioPorUnidade).times(quantidade));
 
@@ -58,7 +81,7 @@ export function calcularCompra(produto: ProdutoCompra, tributos: PurchaseTax[]):
   let informativos = ZERO;
   let creditos = ZERO;
 
-  const detalhes: PurchaseTaxResult[] = tributos.map((t) => {
+  const detalhes: PurchaseTaxResult[] = (tributos ?? []).map((t) => {
     if (!t.enabled) {
       return {
         id: t.id,
@@ -76,7 +99,8 @@ export function calcularCompra(produto: ProdutoCompra, tributos: PurchaseTax[]):
     }
 
     const baseBruta = t.baseMode === "manual" ? D(t.baseManual) : produtosLiquido;
-    const base = baseBruta.times(D(1).minus(pct(t.baseReduction)));
+    const reducao = Decimal.max(0, Decimal.min(100, D(t.baseReduction)));
+    const base = baseBruta.times(D(1).minus(reducao.div(100)));
 
     const valor = t.useManualTax ? D(t.manualTaxValue) : base.times(pct(t.rate));
 
@@ -84,6 +108,7 @@ export function calcularCompra(produto: ProdutoCompra, tributos: PurchaseTax[]):
       ? "Valor destacado na nota (informado manualmente)"
       : `${formatoFormula(base)} × ${t.rate}%`;
 
+    // Tributo incluído já está dentro do valor informado: nunca soma ao desembolso.
     if (t.treatment === "porFora") porFora = porFora.plus(valor);
     else if (t.treatment === "incluido") incluidos = incluidos.plus(valor);
     else informativos = informativos.plus(valor);
@@ -99,7 +124,8 @@ export function calcularCompra(produto: ProdutoCompra, tributos: PurchaseTax[]):
       credito = valor;
       origemCredito = "100% do tributo calculado";
     } else if (t.creditMode === "parcial") {
-      credito = valor.times(pct(t.creditPercent));
+      const perc = Decimal.max(0, Decimal.min(100, D(t.creditPercent)));
+      credito = valor.times(perc.div(100));
       origemCredito = `${t.creditPercent}% do tributo calculado`;
     }
     creditos = creditos.plus(credito);
@@ -121,6 +147,7 @@ export function calcularCompra(produto: ProdutoCompra, tributos: PurchaseTax[]):
 
   const desembolso = valorBaseAquisicao.plus(porFora);
   const custoLiquidoTotal = desembolso.minus(creditos);
+  // Divisão total -> unitário só acontece aqui, uma única vez.
   const custoLiquidoUnitario = quantidade.gt(0) ? custoLiquidoTotal.div(quantidade) : ZERO;
   const valorMedioUnitario = quantidade.gt(0) ? desembolso.div(quantidade) : ZERO;
 
@@ -137,8 +164,10 @@ export function calcularCompra(produto: ProdutoCompra, tributos: PurchaseTax[]):
     creditosTotais: r4(creditos),
     custoLiquidoTotal: r4(custoLiquidoTotal),
     custoLiquidoUnitario: r4(custoLiquidoUnitario),
+    /** Custo unitário em precisão plena (string Decimal) — evita perda na venda. */
+    custoLiquidoUnitarioExato: custoLiquidoUnitario.toString(),
     valorMedioUnitario: r4(valorMedioUnitario),
-  tributos: detalhes,
+    tributos: detalhes,
   };
 }
 
@@ -147,59 +176,80 @@ function formatoFormula(base: Decimal) {
 }
 
 /* ------------------------------------------------------------------ */
-/* Venda — função pura de avaliação de um preço candidato              */
+/* Venda — núcleo único                                                */
 /* ------------------------------------------------------------------ */
 
 export interface SaleContext {
-  custoLiquidoUnitario: number;
+  /** Aceita número ou string Decimal (precisão plena). */
+  custoLiquidoUnitario: number | string;
   venda: VendaConfig;
   tributos: SaleTax[];
 }
 
+interface NucleoVenda {
+  precoBase: Decimal;
+  incluidos: Decimal;
+  porFora: Decimal;
+  informativos: Decimal;
+  precoFinal: Decimal;
+  despesasVariaveis: Decimal;
+  despesasFixas: Decimal;
+  custo: Decimal;
+  resultado: Decimal;
+  margem: Decimal;
+  detalhes: SaleTaxResult[];
+}
+
 /**
- * Avalia um preço-base candidato (valor da mercadoria antes dos tributos
- * acrescentados por fora) e devolve toda a decomposição da venda.
+ * Núcleo da venda: única implementação das fórmulas.
+ *
+ *   precoFinal      = precoBase + tributos por fora
+ *   despesasVar     = precoFinal × Σ percentuais
+ *   resultado       = precoFinal − custo − incluídos − porFora − despVar − despFixas
+ *                   = precoBase − custo − incluídos − despVar − despFixas
+ *   margem          = resultado / (precoFinal ou precoBase) × 100
+ *
+ * Tributos informativos não entram em nenhuma das linhas acima.
  */
-export function avaliarPreco(precoBase: number | Decimal, ctx: SaleContext): SaleEvaluation {
-  const p = D(precoBase);
+function nucleoVenda(precoBase: Decimal, ctx: SaleContext): NucleoVenda {
   const v = ctx.venda;
+  const p = precoBase;
 
   let incluidos = ZERO;
   let porFora = ZERO;
   let informativos = ZERO;
 
-  const detalhes: SaleTaxResult[] = ctx.tributos
-    .filter((t) => t.enabled)
-    .map((t) => {
-      const base = t.baseMode === "manual" ? D(t.baseManual) : p;
-      const valor = base.times(pct(t.rate));
-      if (t.treatment === "incluido") incluidos = incluidos.plus(valor);
-      else if (t.treatment === "porFora") porFora = porFora.plus(valor);
-      else informativos = informativos.plus(valor);
-      return {
-        id: t.id,
-        label: t.label,
-        rate: t.rate,
-        base: r4(base),
-        valor: r4(valor),
-        treatment: t.treatment,
-      };
+  const detalhes: SaleTaxResult[] = [];
+  for (const t of ctx.tributos ?? []) {
+    if (!t.enabled) continue;
+    const base = t.baseMode === "manual" ? D(t.baseManual) : p;
+    const valor = base.times(pct(t.rate));
+    if (t.treatment === "incluido") incluidos = incluidos.plus(valor);
+    else if (t.treatment === "porFora") porFora = porFora.plus(valor);
+    else informativos = informativos.plus(valor);
+    detalhes.push({
+      id: t.id,
+      label: t.label,
+      rate: t.rate,
+      base: r4(base),
+      valor: r4(valor),
+      treatment: t.treatment,
     });
+  }
 
   const precoFinal = p.plus(porFora);
 
-  // Despesas percentuais incidem sobre o preço final cobrado.
   const percentuais = D(v.comissaoPercent)
-    .plus(v.cartaoPercent)
-    .plus(v.marketplacePercent)
-    .plus(v.perdasPercent)
-    .plus(v.outrosPercent);
-  const despesasVariaveis = precoFinal.times(pct(percentuais.toNumber()));
+    .plus(D(v.cartaoPercent))
+    .plus(D(v.marketplacePercent))
+    .plus(D(v.perdasPercent))
+    .plus(D(v.outrosPercent));
+  const despesasVariaveis = precoFinal.times(percentuais.div(100));
 
   const despesasFixas = D(v.freteVendaUnidade)
-    .plus(v.embalagemVendaUnidade)
-    .plus(v.custoFixoUnidade)
-    .plus(v.outrasDespesasFixasUnidade);
+    .plus(D(v.embalagemVendaUnidade))
+    .plus(D(v.custoFixoUnidade))
+    .plus(D(v.outrasDespesasFixasUnidade));
 
   const custo = D(ctx.custoLiquidoUnitario);
 
@@ -214,69 +264,57 @@ export function avaliarPreco(precoBase: number | Decimal, ctx: SaleContext): Sal
   const denominador = baseMargem === "precoBase" ? p : precoFinal;
   const margem = denominador.gt(0) ? resultado.div(denominador).times(100) : ZERO;
 
-  const markupMult = custo.gt(0) ? precoFinal.div(custo) : ZERO;
-  const markupPct = custo.gt(0) ? markupMult.minus(1).times(100) : ZERO;
-
   return {
-    precoBase: r4(p),
-    tributosIncluidos: r4(incluidos),
-    tributosPorFora: r4(porFora),
-    tributosInformativos: r4(informativos),
-    precoFinal: r4(precoFinal),
-    despesasVariaveis: r4(despesasVariaveis),
-    despesasFixasUnidade: r4(despesasFixas),
-    custoLiquidoUnitario: r4(custo),
-    resultadoUnidade: r4(resultado),
-    margemEfetiva: r4(margem),
-    markupMultiplicador: r4(markupMult),
-    markupPercentual: r4(markupPct),
-    tributos: detalhes,
+    precoBase: p,
+    incluidos,
+    porFora,
+    informativos,
+    precoFinal,
+    despesasVariaveis,
+    despesasFixas,
+    custo,
+    resultado,
+    margem,
+    detalhes,
   };
 }
 
-/**
- * Margem exata (sem arredondamento) de um preço candidato.
- * Usada apenas pela busca binária, para não confundir uma margem
- * assintoticamente inatingível com uma margem realmente alcançada.
- */
-function margemExata(precoBase: Decimal, ctx: SaleContext): Decimal {
-  const v = ctx.venda;
-  let incluidos = ZERO;
-  let porFora = ZERO;
-  for (const t of ctx.tributos) {
-    if (!t.enabled) continue;
-    const base = t.baseMode === "manual" ? D(t.baseManual) : precoBase;
-    const valor = base.times(pct(t.rate));
-    if (t.treatment === "incluido") incluidos = incluidos.plus(valor);
-    else if (t.treatment === "porFora") porFora = porFora.plus(valor);
-  }
-  const precoFinal = precoBase.plus(porFora);
-  const percentuais = D(v.comissaoPercent)
-    .plus(v.cartaoPercent)
-    .plus(v.marketplacePercent)
-    .plus(v.perdasPercent)
-    .plus(v.outrosPercent);
-  const despesasVariaveis = precoFinal.times(pct(percentuais.toNumber()));
-  const despesasFixas = D(v.freteVendaUnidade)
-    .plus(v.embalagemVendaUnidade)
-    .plus(v.custoFixoUnidade)
-    .plus(v.outrasDespesasFixasUnidade);
-  const resultado = precoFinal
-    .minus(ctx.custoLiquidoUnitario)
-    .minus(incluidos)
-    .minus(porFora)
-    .minus(despesasVariaveis)
-    .minus(despesasFixas);
-  const denominador = v.baseMargem === "precoBase" ? precoBase : precoFinal;
-  return denominador.gt(0) ? resultado.div(denominador).times(100) : ZERO;
+/** Avalia um preço-base candidato e devolve a decomposição arredondada. */
+export function avaliarPreco(precoBase: number | string | Decimal, ctx: SaleContext): SaleEvaluation {
+  const n = nucleoVenda(D(precoBase), ctx);
+
+  const markupMult = n.custo.gt(0) ? n.precoFinal.div(n.custo) : ZERO;
+  const markupPct = n.custo.gt(0) ? markupMult.minus(1).times(100) : ZERO;
+
+  return {
+    precoBase: r4(n.precoBase),
+    tributosIncluidos: r4(n.incluidos),
+    tributosPorFora: r4(n.porFora),
+    tributosInformativos: r4(n.informativos),
+    precoFinal: r4(n.precoFinal),
+    despesasVariaveis: r4(n.despesasVariaveis),
+    despesasFixasUnidade: r4(n.despesasFixas),
+    custoLiquidoUnitario: r4(n.custo),
+    resultadoUnidade: r4(n.resultado),
+    margemEfetiva: r4(n.margem),
+    markupMultiplicador: r4(markupMult),
+    markupPercentual: r4(markupPct),
+    tributos: n.detalhes,
+  };
 }
 
-const TOLERANCIA = new Decimal("0.0001");
+/** Margem exata (sem arredondamento) — usada pela busca binária. */
+function margemExata(precoBase: Decimal, ctx: SaleContext): Decimal {
+  return nucleoVenda(precoBase, ctx).margem;
+}
+
+const TOLERANCIA = new Decimal("1e-8");
 /** Preço-base máximo considerado pela busca (evita resultados absurdos). */
 const PRECO_MAXIMO = new Decimal("1e9");
 
 /**
  * Busca binária determinística pelo preço-base que produz a margem alvo.
+ * A margem é monotônica crescente no preço, então a bisseção converge.
  * Retorna null quando a margem é matematicamente inatingível.
  */
 export function resolverPrecoPorMargem(
@@ -301,33 +339,35 @@ export function resolverPrecoPorMargem(
   }
   if (!encontrado) return null;
 
-  for (let i = 0; i < 300; i++) {
+  for (let i = 0; i < 400; i++) {
     const mid = lo.plus(hi).div(2);
-    const diff = margemExata(mid, ctx).minus(alvo);
-    if (diff.abs().lt(TOLERANCIA) && hi.minus(lo).lt(TOLERANCIA)) {
-      return avaliarPreco(mid, ctx);
-    }
-    if (diff.gt(0)) hi = mid;
+    if (hi.minus(lo).lte(hi.abs().plus(1).times(TOLERANCIA))) break;
+    if (margemExata(mid, ctx).gte(alvo)) hi = mid;
     else lo = mid;
   }
-  return avaliarPreco(lo.plus(hi).div(2), ctx);
+  return avaliarPreco(hi, ctx);
 }
 
-/** Encontra o preço-base cujo preço final cobrado é igual ao informado. */
+/**
+ * Encontra o preço-base cujo preço final cobrado é igual ao informado.
+ * Se nem o preço-base zero couber dentro do preço final desejado (tributos
+ * por fora de base fixa maiores que o alvo), devolve a avaliação em zero.
+ */
 export function resolverPrecoPorPrecoFinal(
   precoFinalDesejado: number,
   ctx: SaleContext,
 ): SaleEvaluation {
   const alvo = D(precoFinalDesejado);
+  if (alvo.lte(0)) return avaliarPreco(0, ctx);
+  if (nucleoVenda(ZERO, ctx).precoFinal.gte(alvo)) return avaliarPreco(0, ctx);
+
   let lo = new Decimal(0);
   let hi = alvo.gt(0) ? alvo.times(2).plus(1) : new Decimal(1);
 
-  for (let i = 0; i < 300; i++) {
+  for (let i = 0; i < 400; i++) {
     const mid = lo.plus(hi).div(2);
-    const ev = avaliarPreco(mid, ctx);
-    const diff = D(ev.precoFinal).minus(alvo);
-    if (diff.abs().lt(TOLERANCIA)) return ev;
-    if (diff.gt(0)) hi = mid;
+    if (hi.minus(lo).lte(alvo.abs().plus(1).times(TOLERANCIA))) break;
+    if (nucleoVenda(mid, ctx).precoFinal.gte(alvo)) hi = mid;
     else lo = mid;
   }
   return avaliarPreco(lo.plus(hi).div(2), ctx);
@@ -347,13 +387,19 @@ export function validar(state: SimulationState): ValidationIssue[] {
   if (!p.nome.trim()) {
     issues.push({ campo: "nome", mensagem: "Informe o nome do produto.", severidade: "erro" });
   }
-  if (!(p.quantidade > 0)) {
+  if (!finito(p.quantidade)) {
+    issues.push({
+      campo: "quantidade",
+      mensagem: "A quantidade informada não é um número válido.",
+      severidade: "erro",
+    });
+  } else if (!(p.quantidade > 0)) {
     issues.push({
       campo: "quantidade",
       mensagem: "A quantidade precisa ser maior que zero.",
       severidade: "erro",
     });
-  } else if (D(p.quantidade).decimalPlaces() > 4) {
+  } else if ((D(p.quantidade).decimalPlaces() ?? 0) > 4) {
     issues.push({
       campo: "quantidade",
       mensagem: "A quantidade aceita no máximo quatro casas decimais.",
@@ -371,10 +417,23 @@ export function validar(state: SimulationState): ValidationIssue[] {
     ["rateioPorUnidade", p.rateioPorUnidade, "Rateio por unidade"],
   ];
   for (const [campo, valor, rotulo] of monetarios) {
-    if (valor < 0) {
+    if (!finito(valor)) {
       issues.push({
         campo,
-        mensagem: `${rotulo} não pode ser negativo.`,
+        mensagem: `${rotulo}: informe um número válido.`,
+        severidade: "erro",
+      });
+    } else if (valor < 0) {
+      issues.push({ campo, mensagem: `${rotulo} não pode ser negativo.`, severidade: "erro" });
+    }
+  }
+
+  if (finito(p.valorUnitario) && finito(p.quantidade) && finito(p.descontoTotal)) {
+    const liquido = D(p.valorUnitario).times(D(p.quantidade)).minus(D(p.descontoTotal));
+    if (liquido.lt(0)) {
+      issues.push({
+        campo: "descontoTotal",
+        mensagem: "O desconto informado é maior que o valor bruto dos produtos.",
         severidade: "erro",
       });
     }
@@ -382,35 +441,38 @@ export function validar(state: SimulationState): ValidationIssue[] {
 
   for (const t of state.tributosCompra) {
     if (!t.enabled) continue;
-    if (t.rate < 0 || t.rate > 100) {
+    if (!finito(t.rate) || t.rate < 0 || t.rate > 100) {
       issues.push({
         campo: t.id,
         mensagem: `${t.label}: a alíquota deve ficar entre 0% e 100%.`,
         severidade: "erro",
       });
     }
-    if (t.baseReduction < 0 || t.baseReduction > 100) {
+    if (!finito(t.baseReduction) || t.baseReduction < 0 || t.baseReduction > 100) {
       issues.push({
         campo: t.id,
         mensagem: `${t.label}: a redução de base deve ficar entre 0% e 100%.`,
         severidade: "erro",
       });
     }
-    if (t.creditMode === "parcial" && (t.creditPercent < 0 || t.creditPercent > 100)) {
+    if (
+      t.creditMode === "parcial" &&
+      (!finito(t.creditPercent) || t.creditPercent < 0 || t.creditPercent > 100)
+    ) {
       issues.push({
         campo: t.id,
         mensagem: `${t.label}: o percentual de crédito deve ficar entre 0% e 100%.`,
         severidade: "erro",
       });
     }
-    if (t.creditMode === "manual" && t.creditManual < 0) {
+    if (t.creditMode === "manual" && (!finito(t.creditManual) || t.creditManual < 0)) {
       issues.push({
         campo: t.id,
         mensagem: `${t.label}: o crédito informado manualmente não pode ser negativo.`,
         severidade: "erro",
       });
     }
-    if (t.useManualTax && t.manualTaxValue < 0) {
+    if (t.useManualTax && (!finito(t.manualTaxValue) || t.manualTaxValue < 0)) {
       issues.push({
         campo: t.id,
         mensagem: `${t.label}: o valor destacado na nota não pode ser negativo.`,
@@ -426,19 +488,40 @@ export function validar(state: SimulationState): ValidationIssue[] {
     }
   }
 
+  // Soma das alíquotas incluídas na compra: acima de 100% o valor informado
+  // não comporta os tributos que supostamente estão dentro dele.
+  const somaCompraIncluida = state.tributosCompra
+    .filter((t) => t.enabled && t.treatment === "incluido" && !t.useManualTax && finito(t.rate))
+    .reduce((acc, t) => acc + t.rate, 0);
+  if (somaCompraIncluida >= 100) {
+    issues.push({
+      campo: "tributosCompra",
+      mensagem:
+        "A soma das alíquotas incluídas na compra chegou a 100% ou mais. Revise os tratamentos: um tributo por fora não deve estar marcado como incluído.",
+      severidade: "erro",
+    });
+  }
+
   for (const t of state.tributosVenda) {
     if (!t.enabled) continue;
-    if (t.rate < 0 || t.rate > 100) {
+    if (!finito(t.rate) || t.rate < 0 || t.rate > 100) {
       issues.push({
         campo: t.id,
         mensagem: `${t.label} (venda): a alíquota deve ficar entre 0% e 100%.`,
         severidade: "erro",
       });
     }
+    if (t.baseMode === "manual" && (!finito(t.baseManual) || t.baseManual < 0)) {
+      issues.push({
+        campo: t.id,
+        mensagem: `${t.label} (venda): a base informada manualmente não pode ser negativa.`,
+        severidade: "erro",
+      });
+    }
   }
 
   const v = state.venda;
-  if (v.modo === "margem" && v.margemDesejada >= 100) {
+  if (v.modo === "margem" && (!finito(v.margemDesejada) || v.margemDesejada >= 100)) {
     issues.push({
       campo: "margemDesejada",
       mensagem: "A margem desejada precisa ser menor que 100%.",
@@ -459,11 +542,41 @@ export function validar(state: SimulationState): ValidationIssue[] {
     v.perdasPercent,
     v.outrosPercent,
   ];
-  if (percentuais.some((x) => x < 0 || x > 100)) {
+  if (percentuais.some((x) => !finito(x) || x < 0 || x > 100)) {
     issues.push({
       campo: "despesasPercentuais",
       mensagem: "Os percentuais de despesa devem ficar entre 0% e 100%.",
       severidade: "erro",
+    });
+  }
+  const fixas: Array<[string, number, string]> = [
+    ["freteVendaUnidade", v.freteVendaUnidade, "Frete de venda"],
+    ["embalagemVendaUnidade", v.embalagemVendaUnidade, "Embalagem de venda"],
+    ["custoFixoUnidade", v.custoFixoUnidade, "Custo fixo por unidade"],
+    ["outrasDespesasFixasUnidade", v.outrasDespesasFixasUnidade, "Outras despesas fixas"],
+  ];
+  for (const [campo, valor, rotulo] of fixas) {
+    if (!finito(valor) || valor < 0) {
+      issues.push({
+        campo,
+        mensagem: `${rotulo}: informe um valor igual ou maior que zero.`,
+        severidade: "erro",
+      });
+    }
+  }
+
+  // Aviso antecipado de percentuais próximos de 100%.
+  const somaVenda =
+    state.tributosVenda
+      .filter((t) => t.enabled && t.treatment === "incluido" && finito(t.rate))
+      .reduce((acc, t) => acc + t.rate, 0) +
+    percentuais.filter(finito).reduce((acc, x) => acc + x, 0) +
+    (v.modo === "margem" && finito(v.margemDesejada) ? v.margemDesejada : 0);
+  if (somaVenda >= 95 && somaVenda < 100) {
+    issues.push({
+      campo: "somaPercentuais",
+      mensagem: `A soma de tributos incluídos, despesas percentuais e margem chegou a ${somaVenda.toFixed(2)}%. O preço cresce muito rápido acima de 95%.`,
+      severidade: "aviso",
     });
   }
 
@@ -488,7 +601,8 @@ export function simular(state: SimulationState): SimulationResult {
   }
 
   const ctx: SaleContext = {
-    custoLiquidoUnitario: compra.custoLiquidoUnitario,
+    // Precisão plena: a divisão total -> unitário não é arredondada aqui.
+    custoLiquidoUnitario: compra.custoLiquidoUnitarioExato,
     venda: state.venda,
     tributos: state.tributosVenda,
   };
