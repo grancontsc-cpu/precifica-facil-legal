@@ -13,6 +13,7 @@ import { Route as RedefinirSenhaRouteImport } from './routes/redefinir-senha'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as EsqueciMinhaSenhaRouteImport } from './routes/esqueci-minha-senha'
 import { Route as EntrandoRouteImport } from './routes/entrando'
+import { Route as ConfirmarEmailRouteImport } from './routes/confirmar-email'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AguardandoAprovacaoRouteImport } from './routes/aguardando-aprovacao'
 import { Route as AcessoNegadoRouteImport } from './routes/acesso-negado'
@@ -46,6 +47,11 @@ const EsqueciMinhaSenhaRoute = EsqueciMinhaSenhaRouteImport.update({
 const EntrandoRoute = EntrandoRouteImport.update({
   id: '/entrando',
   path: '/entrando',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConfirmarEmailRoute = ConfirmarEmailRouteImport.update({
+  id: '/confirmar-email',
+  path: '/confirmar-email',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -125,6 +131,7 @@ export interface FileRoutesByFullPath {
   '/acesso-negado': typeof AcessoNegadoRoute
   '/aguardando-aprovacao': typeof AguardandoAprovacaoRoute
   '/auth': typeof AuthRoute
+  '/confirmar-email': typeof ConfirmarEmailRoute
   '/entrando': typeof EntrandoRoute
   '/esqueci-minha-senha': typeof EsqueciMinhaSenhaRoute
   '/login': typeof LoginRoute
@@ -144,6 +151,7 @@ export interface FileRoutesByTo {
   '/acesso-negado': typeof AcessoNegadoRoute
   '/aguardando-aprovacao': typeof AguardandoAprovacaoRoute
   '/auth': typeof AuthRoute
+  '/confirmar-email': typeof ConfirmarEmailRoute
   '/entrando': typeof EntrandoRoute
   '/esqueci-minha-senha': typeof EsqueciMinhaSenhaRoute
   '/login': typeof LoginRoute
@@ -165,6 +173,7 @@ export interface FileRoutesById {
   '/acesso-negado': typeof AcessoNegadoRoute
   '/aguardando-aprovacao': typeof AguardandoAprovacaoRoute
   '/auth': typeof AuthRoute
+  '/confirmar-email': typeof ConfirmarEmailRoute
   '/entrando': typeof EntrandoRoute
   '/esqueci-minha-senha': typeof EsqueciMinhaSenhaRoute
   '/login': typeof LoginRoute
@@ -186,6 +195,7 @@ export interface FileRouteTypes {
     | '/acesso-negado'
     | '/aguardando-aprovacao'
     | '/auth'
+    | '/confirmar-email'
     | '/entrando'
     | '/esqueci-minha-senha'
     | '/login'
@@ -205,6 +215,7 @@ export interface FileRouteTypes {
     | '/acesso-negado'
     | '/aguardando-aprovacao'
     | '/auth'
+    | '/confirmar-email'
     | '/entrando'
     | '/esqueci-minha-senha'
     | '/login'
@@ -225,6 +236,7 @@ export interface FileRouteTypes {
     | '/acesso-negado'
     | '/aguardando-aprovacao'
     | '/auth'
+    | '/confirmar-email'
     | '/entrando'
     | '/esqueci-minha-senha'
     | '/login'
@@ -246,6 +258,7 @@ export interface RootRouteChildren {
   AcessoNegadoRoute: typeof AcessoNegadoRoute
   AguardandoAprovacaoRoute: typeof AguardandoAprovacaoRoute
   AuthRoute: typeof AuthRoute
+  ConfirmarEmailRoute: typeof ConfirmarEmailRoute
   EntrandoRoute: typeof EntrandoRoute
   EsqueciMinhaSenhaRoute: typeof EsqueciMinhaSenhaRoute
   LoginRoute: typeof LoginRoute
@@ -280,6 +293,13 @@ declare module '@tanstack/react-router' {
       path: '/entrando'
       fullPath: '/entrando'
       preLoaderRoute: typeof EntrandoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/confirmar-email': {
+      id: '/confirmar-email'
+      path: '/confirmar-email'
+      fullPath: '/confirmar-email'
+      preLoaderRoute: typeof ConfirmarEmailRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -414,6 +434,7 @@ const rootRouteChildren: RootRouteChildren = {
   AcessoNegadoRoute: AcessoNegadoRoute,
   AguardandoAprovacaoRoute: AguardandoAprovacaoRoute,
   AuthRoute: AuthRoute,
+  ConfirmarEmailRoute: ConfirmarEmailRoute,
   EntrandoRoute: EntrandoRoute,
   EsqueciMinhaSenhaRoute: EsqueciMinhaSenhaRoute,
   LoginRoute: LoginRoute,
