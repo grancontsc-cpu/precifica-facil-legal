@@ -30,6 +30,7 @@ import { Route as AuthenticatedCompararRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAuditoriaRouteImport } from './routes/_authenticated/auditoria'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authenticated/admin/usuarios'
+import { Route as AuthenticatedAdminEmpresasRouteImport } from './routes/_authenticated/admin/empresas'
 import { Route as AuthenticatedAdminConvitesRouteImport } from './routes/_authenticated/admin/convites'
 
 const RedefinirSenhaRoute = RedefinirSenhaRouteImport.update({
@@ -137,6 +138,12 @@ const AuthenticatedAdminUsuariosRoute =
     path: '/admin/usuarios',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminEmpresasRoute =
+  AuthenticatedAdminEmpresasRouteImport.update({
+    id: '/admin/empresas',
+    path: '/admin/empresas',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminConvitesRoute =
   AuthenticatedAdminConvitesRouteImport.update({
     id: '/admin/convites',
@@ -164,6 +171,7 @@ export interface FileRoutesByFullPath {
   '/simulacoes': typeof AuthenticatedSimulacoesRoute
   '/simulador': typeof AuthenticatedSimuladorRoute
   '/admin/convites': typeof AuthenticatedAdminConvitesRoute
+  '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
 }
@@ -187,6 +195,7 @@ export interface FileRoutesByTo {
   '/simulacoes': typeof AuthenticatedSimulacoesRoute
   '/simulador': typeof AuthenticatedSimuladorRoute
   '/admin/convites': typeof AuthenticatedAdminConvitesRoute
+  '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
 }
@@ -212,6 +221,7 @@ export interface FileRoutesById {
   '/_authenticated/simulacoes': typeof AuthenticatedSimulacoesRoute
   '/_authenticated/simulador': typeof AuthenticatedSimuladorRoute
   '/_authenticated/admin/convites': typeof AuthenticatedAdminConvitesRoute
+  '/_authenticated/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
   '/_authenticated/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
@@ -237,6 +247,7 @@ export interface FileRouteTypes {
     | '/simulacoes'
     | '/simulador'
     | '/admin/convites'
+    | '/admin/empresas'
     | '/admin/usuarios'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
@@ -260,6 +271,7 @@ export interface FileRouteTypes {
     | '/simulacoes'
     | '/simulador'
     | '/admin/convites'
+    | '/admin/empresas'
     | '/admin/usuarios'
     | '/admin'
   id:
@@ -284,6 +296,7 @@ export interface FileRouteTypes {
     | '/_authenticated/simulacoes'
     | '/_authenticated/simulador'
     | '/_authenticated/admin/convites'
+    | '/_authenticated/admin/empresas'
     | '/_authenticated/admin/usuarios'
     | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
@@ -452,6 +465,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminUsuariosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/empresas': {
+      id: '/_authenticated/admin/empresas'
+      path: '/admin/empresas'
+      fullPath: '/admin/empresas'
+      preLoaderRoute: typeof AuthenticatedAdminEmpresasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/convites': {
       id: '/_authenticated/admin/convites'
       path: '/admin/convites'
@@ -471,6 +491,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSimulacoesRoute: typeof AuthenticatedSimulacoesRoute
   AuthenticatedSimuladorRoute: typeof AuthenticatedSimuladorRoute
   AuthenticatedAdminConvitesRoute: typeof AuthenticatedAdminConvitesRoute
+  AuthenticatedAdminEmpresasRoute: typeof AuthenticatedAdminEmpresasRoute
   AuthenticatedAdminUsuariosRoute: typeof AuthenticatedAdminUsuariosRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
@@ -484,6 +505,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSimulacoesRoute: AuthenticatedSimulacoesRoute,
   AuthenticatedSimuladorRoute: AuthenticatedSimuladorRoute,
   AuthenticatedAdminConvitesRoute: AuthenticatedAdminConvitesRoute,
+  AuthenticatedAdminEmpresasRoute: AuthenticatedAdminEmpresasRoute,
   AuthenticatedAdminUsuariosRoute: AuthenticatedAdminUsuariosRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
