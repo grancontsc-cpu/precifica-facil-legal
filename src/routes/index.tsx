@@ -163,12 +163,12 @@ function Simulador() {
               <h1 className="truncate text-lg font-semibold tracking-tight text-foreground sm:text-xl">
                 Precifica Grancont
               </h1>
-              <p className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+              <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                 <Badge variant="outline" className="border-primary/30 text-primary">
                   {cenarioAtual?.nome ?? "Personalizado"}
                 </Badge>
                 {salvoEm ? <span>Rascunho salvo em {formatData(salvoEm)}</span> : null}
-              </p>
+              </div>
             </div>
             <div className="flex shrink-0 items-center gap-2">
               <Button variant="outline" size="sm" onClick={novaSimulacao}>
