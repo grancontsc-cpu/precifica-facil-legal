@@ -1,0 +1,52 @@
+import { useNavigate } from "@tanstack/react-router";
+import { Loader2 } from "lucide-react";
+import { useEffect, type ReactNode } from "react";
+
+import { useApp } from "@/hooks/useApp";
+
+export function Carregando({ texto = "Carregando…" }: { texto?: string }) {
+  return (
+    <div className="flex min-h-[50vh] items-center justify-center gap-2 text-sm text-muted-foreground">
+      <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+      {texto}
+    </div>
+  );
+}
+
+/** Bloqueia a renderização até resolver sessão, situação da conta e papel. */
+export function GuardaStatus({ children }: { children: ReactNode }) {
+  const { loading, accountStatus } = useApp();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (loading || !accountStatus) return;
+    if (accountStatus === "active") return;
+    const destino =
+      accountStatus === "suspended"
+        ? "/acesso-bloqueado"
+        : accountStatus === "pending_approval"
+          ? "/aguardando-aprovacao"
+          : accountStatus === "pending_email_verification" || accountStatus === "invited"
+            ? "/confirmar-email"
+            : "/acesso-negado";
+    navigate({ to: destino, replace: true });
+  }, [loading, accountStatus, navigate]);
+
+  if (loading || !accountStatus || accountStatus !== "active") return <Carregando />;
+  return <>{children}</>;
+}
+
+/** Restringe uma rota a um papel mínimo. */
+export function ExigePapel({ papel, children }: { papel: "manager" | "super_admin"; children: ReactNode }) {
+  const { loading, isSuperAdmin, memberships } = useApp();
+  const navigate = useNavigate();
+  const permitido = isSuperAdmin || (papel === "manager" && memberships.some((m) => m.role === "manager"));
+
+  useEffect(() => {
+    if (loading) return;
+    if (!permitido) navigate({ to: "/acesso-negado", replace: true });
+  }, [loading, permitido, navigate]);
+
+  if (loading || !permitido) return <Carregando />;
+  return <>{children}</>;
+}
