@@ -28,6 +28,7 @@ import { Route as AuthenticatedPerfisRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedEmpresasRouteImport } from './routes/_authenticated/empresas'
 import { Route as AuthenticatedCompararRouteImport } from './routes/_authenticated/comparar'
 import { Route as AuthenticatedAuditoriaRouteImport } from './routes/_authenticated/auditoria'
+import { Route as AuthenticatedGestaoIndexRouteImport } from './routes/_authenticated/gestao/index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authenticated/admin/usuarios'
 import { Route as AuthenticatedAdminSimulacoesRouteImport } from './routes/_authenticated/admin/simulacoes'
@@ -130,6 +131,12 @@ const AuthenticatedAuditoriaRoute = AuthenticatedAuditoriaRouteImport.update({
   path: '/auditoria',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedGestaoIndexRoute =
+  AuthenticatedGestaoIndexRouteImport.update({
+    id: '/gestao/',
+    path: '/gestao/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
@@ -198,6 +205,7 @@ export interface FileRoutesByFullPath {
   '/admin/simulacoes': typeof AuthenticatedAdminSimulacoesRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/gestao/': typeof AuthenticatedGestaoIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -225,6 +233,7 @@ export interface FileRoutesByTo {
   '/admin/simulacoes': typeof AuthenticatedAdminSimulacoesRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/gestao': typeof AuthenticatedGestaoIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -254,6 +263,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/simulacoes': typeof AuthenticatedAdminSimulacoesRoute
   '/_authenticated/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/gestao/': typeof AuthenticatedGestaoIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -283,6 +293,7 @@ export interface FileRouteTypes {
     | '/admin/simulacoes'
     | '/admin/usuarios'
     | '/admin/'
+    | '/gestao/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -310,6 +321,7 @@ export interface FileRouteTypes {
     | '/admin/simulacoes'
     | '/admin/usuarios'
     | '/admin'
+    | '/gestao'
   id:
     | '__root__'
     | '/'
@@ -338,6 +350,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/simulacoes'
     | '/_authenticated/admin/usuarios'
     | '/_authenticated/admin/'
+    | '/_authenticated/gestao/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -490,6 +503,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAuditoriaRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/gestao/': {
+      id: '/_authenticated/gestao/'
+      path: '/gestao'
+      fullPath: '/gestao/'
+      preLoaderRoute: typeof AuthenticatedGestaoIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
       path: '/admin'
@@ -557,6 +577,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminSimulacoesRoute: typeof AuthenticatedAdminSimulacoesRoute
   AuthenticatedAdminUsuariosRoute: typeof AuthenticatedAdminUsuariosRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+  AuthenticatedGestaoIndexRoute: typeof AuthenticatedGestaoIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -575,6 +596,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminSimulacoesRoute: AuthenticatedAdminSimulacoesRoute,
   AuthenticatedAdminUsuariosRoute: AuthenticatedAdminUsuariosRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+  AuthenticatedGestaoIndexRoute: AuthenticatedGestaoIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
