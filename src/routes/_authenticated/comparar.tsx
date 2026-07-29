@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Plus, RotateCcw, Sparkles } from "lucide-react";
@@ -21,6 +21,7 @@ import { useApp } from "@/hooks/useApp";
 import { supabase } from "@/integrations/supabase/client";
 import { alternativaVazia, exemploComparacao } from "@/lib/comparison-defaults";
 import { compararFornecedores } from "@/lib/supplier-comparison";
+import { guardarComparacao } from "@/lib/comparison-storage";
 import { MAX_ALTERNATIVAS, type SupplierAlternative } from "@/types/comparison";
 import type { PurchaseTax } from "@/types/pricing";
 
@@ -69,6 +70,10 @@ function CompararPage() {
     () => compararFornecedores(alternativas, produto?.nome ?? ""),
     [alternativas, produto?.nome],
   );
+
+  useEffect(() => {
+    guardarComparacao(produto?.nome ?? "", comparacao);
+  }, [produto?.nome, comparacao]);
 
   const atualizar = (id: string, patch: Partial<SupplierAlternative>) =>
     setAlternativas((prev) => prev.map((a) => (a.id === id ? { ...a, ...patch } : a)));

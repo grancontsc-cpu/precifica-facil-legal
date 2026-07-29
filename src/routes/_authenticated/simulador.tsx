@@ -27,6 +27,8 @@ import { simular } from "@/lib/pricing-engine";
 import { CENARIOS, aplicarCenario, estadoExemplo, estadoInicial } from "@/lib/pricing-defaults";
 import { formatBRL, formatData } from "@/lib/format";
 import { BarraSimulacao } from "@/components/app/BarraSimulacao";
+import { ExportarSimulacao } from "@/components/report/ExportarSimulacao";
+import { comparacaoSalva } from "@/lib/comparison-storage";
 import { useApp } from "@/hooks/useApp";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -57,7 +59,7 @@ const ROTULOS_BLOQUEIO: Record<string, string> = {
 };
 
 export const Route = createFileRoute("/_authenticated/simulador")({
-  validateSearch: (search: Record<string, unknown>) => ({
+  validateSearch: (search: Record<string, unknown>): { simulacao?: string; produto?: string } => ({
     simulacao: typeof search.simulacao === "string" ? search.simulacao : undefined,
     produto: typeof search.produto === "string" ? search.produto : undefined,
   }),
@@ -110,7 +112,7 @@ function Secao({
 }
 
 function Simulador() {
-  const { orgId, canEdit, userId } = useApp();
+  const { orgId, canEdit, userId, email, organizations } = useApp();
   const { simulacao: simulacaoId, produto: produtoQuery } = Route.useSearch();
   const navigate = useNavigate();
   const qc = useQueryClient();
@@ -233,6 +235,14 @@ function Simulador() {
   }, [simulacaoId]);
 
   const resultado = useMemo(() => simular(state), [state]);
+
+  const nomeEmpresa =
+    organizations?.find((o) => o.id === orgId)?.name ?? "Empresa não selecionada";
+
+  const comparacaoParaRelatorio = useMemo(
+    () => comparacaoSalva(state.produto.nome),
+    [state.produto.nome],
+  );
 
   const setProduto = (patch: Partial<ProdutoCompra>) =>
     setState((s) => ({ ...s, produto: { ...s.produto, ...patch } }));
@@ -392,6 +402,25 @@ function Simulador() {
               simulacaoSalva={!!simulacaoAtual}
               onSalvar={() => salvarNoBanco.mutate({ duplicar: false })}
               onDuplicar={() => salvarNoBanco.mutate({ duplicar: true })}
+              acoes={
+                <ExportarSimulacao
+                  state={state}
+                  resultado={resultado}
+                  comparacao={comparacaoParaRelatorio}
+                  meta={{
+                    empresa: nomeEmpresa,
+                    produto: state.produto.nome || "Produto avulso",
+                    tituloSimulacao: titulo,
+                    perfilTributario: perfilSelecionado
+                      ? `${perfilSelecionado.name} (v${perfilSelecionado.version})`
+                      : "Configuração manual",
+                    dataSimulacao: new Date(),
+                    emitidoPor: email ?? undefined,
+                    camposAlterados: alterados,
+                    camposBloqueados: camposBloqueados.map((c) => ROTULOS_BLOQUEIO[c] ?? c),
+                  }}
+                />
+              }
             />
           </div>
           <div className="grid gap-6 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] lg:items-start">

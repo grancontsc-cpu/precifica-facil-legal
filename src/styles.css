@@ -188,3 +188,45 @@
     -webkit-font-smoothing: antialiased;
   }
 }
+
+/* ---------------------------------------------------------------- */
+/* Impressão do relatório (Imprimir / Gerar PDF)                     */
+/* ---------------------------------------------------------------- */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm;
+  }
+
+  body {
+    background: #fff;
+  }
+
+  body * {
+    visibility: hidden !important;
+  }
+
+  #relatorio-impressao,
+  #relatorio-impressao * {
+    visibility: visible !important;
+  }
+
+  #relatorio-impressao {
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 100%;
+    padding: 0;
+    box-shadow: none;
+    color: #111;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .rel-nao-imprimir {
+    display: none !important;
+  }
+
+  .rel-bloco {
+    break-inside: avoid;
+  }
+}

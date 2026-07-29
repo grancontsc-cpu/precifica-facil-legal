@@ -16,6 +16,8 @@ import {
 } from "@/components/ui/select";
 import { useApp } from "@/hooks/useApp";
 import { supabase } from "@/integrations/supabase/client";
+import { ExportarSimulacao } from "@/components/report/ExportarSimulacao";
+import type { SimulationResult, SimulationState } from "@/types/pricing";
 import { formatBRL, formatPercent } from "@/lib/format";
 
 const TITULO = "Histórico de simulações — Precifica Grancont";
@@ -39,7 +41,8 @@ export const Route = createFileRoute("/_authenticated/simulacoes")({
 type Situacao = "ativas" | "arquivadas" | "todas";
 
 function SimulacoesPage() {
-  const { orgId, canEdit, userId } = useApp();
+  const { orgId, canEdit, userId, organizations } = useApp();
+  const nomeEmpresa = organizations?.find((o) => o.id === orgId)?.name ?? "Empresa";
   const qc = useQueryClient();
   const navigate = useNavigate();
   const [busca, setBusca] = useState("");
@@ -52,7 +55,7 @@ function SimulacoesPage() {
       const { data, error } = await supabase
         .from("simulations")
         .select(
-          "id, titulo, produto_nome, status, created_at, updated_at, preco_final, margem_efetiva, custo_liquido_unitario, quantidade, tax_profile_name, tax_profile_version",
+          "id, titulo, produto_nome, status, created_at, updated_at, preco_final, margem_efetiva, custo_liquido_unitario, quantidade, tax_profile_name, tax_profile_version, input_snapshot, result_snapshot, overridden_fields",
         )
         .eq("organization_id", orgId!)
         .order("updated_at", { ascending: false });
@@ -174,6 +177,24 @@ function SimulacoesPage() {
                     >
                       Abrir
                     </Button>
+                    {s.input_snapshot && s.result_snapshot ? (
+                      <ExportarSimulacao
+                        state={s.input_snapshot as unknown as SimulationState}
+                        resultado={s.result_snapshot as unknown as SimulationResult}
+                        meta={{
+                          empresa: nomeEmpresa,
+                          produto: s.produto_nome ?? "Produto avulso",
+                          tituloSimulacao: s.titulo,
+                          perfilTributario: s.tax_profile_name
+                            ? `${s.tax_profile_name}${s.tax_profile_version ? ` (v${s.tax_profile_version})` : ""}`
+                            : "Configuração manual",
+                          dataSimulacao: new Date(s.updated_at),
+                          camposAlterados: Array.isArray(s.overridden_fields)
+                            ? (s.overridden_fields as string[])
+                            : [],
+                        }}
+                      />
+                    ) : null}
                     {canEdit ? (
                       <>
                         <Button variant="ghost" size="sm" onClick={() => duplicar.mutate(s.id)}>
