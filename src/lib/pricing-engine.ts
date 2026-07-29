@@ -234,7 +234,46 @@ export function avaliarPreco(precoBase: number | Decimal, ctx: SaleContext): Sal
   };
 }
 
+/**
+ * Margem exata (sem arredondamento) de um preço candidato.
+ * Usada apenas pela busca binária, para não confundir uma margem
+ * assintoticamente inatingível com uma margem realmente alcançada.
+ */
+function margemExata(precoBase: Decimal, ctx: SaleContext): Decimal {
+  const v = ctx.venda;
+  let incluidos = ZERO;
+  let porFora = ZERO;
+  for (const t of ctx.tributos) {
+    if (!t.enabled) continue;
+    const base = t.baseMode === "manual" ? D(t.baseManual) : precoBase;
+    const valor = base.times(pct(t.rate));
+    if (t.treatment === "incluido") incluidos = incluidos.plus(valor);
+    else if (t.treatment === "porFora") porFora = porFora.plus(valor);
+  }
+  const precoFinal = precoBase.plus(porFora);
+  const percentuais = D(v.comissaoPercent)
+    .plus(v.cartaoPercent)
+    .plus(v.marketplacePercent)
+    .plus(v.perdasPercent)
+    .plus(v.outrosPercent);
+  const despesasVariaveis = precoFinal.times(pct(percentuais.toNumber()));
+  const despesasFixas = D(v.freteVendaUnidade)
+    .plus(v.embalagemVendaUnidade)
+    .plus(v.custoFixoUnidade)
+    .plus(v.outrasDespesasFixasUnidade);
+  const resultado = precoFinal
+    .minus(ctx.custoLiquidoUnitario)
+    .minus(incluidos)
+    .minus(porFora)
+    .minus(despesasVariaveis)
+    .minus(despesasFixas);
+  const denominador = v.baseMargem === "precoBase" ? precoBase : precoFinal;
+  return denominador.gt(0) ? resultado.div(denominador).times(100) : ZERO;
+}
+
 const TOLERANCIA = new Decimal("0.0001");
+/** Preço-base máximo considerado pela busca (evita resultados absurdos). */
+const PRECO_MAXIMO = new Decimal("1e9");
 
 /**
  * Busca binária determinística pelo preço-base que produz a margem alvo.
@@ -252,14 +291,13 @@ export function resolverPrecoPorMargem(
   let encontrado = false;
 
   for (let i = 0; i < 200; i++) {
-    const m = D(avaliarPreco(hi, ctx).margemEfetiva);
-    if (m.gte(alvo)) {
+    if (margemExata(hi, ctx).gte(alvo)) {
       encontrado = true;
       break;
     }
+    if (hi.gte(PRECO_MAXIMO)) break;
     lo = hi;
-    hi = hi.times(2);
-    if (hi.gt(new Decimal("1e12"))) break;
+    hi = Decimal.min(hi.times(2), PRECO_MAXIMO);
   }
   if (!encontrado) return null;
 
