@@ -1,0 +1,745 @@
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
+
+export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.15"
+  }
+  public: {
+    Tables: {
+      audit_logs: {
+        Row: {
+          action: string
+          actor_id: string | null
+          after_data: Json | null
+          before_data: Json | null
+          created_at: string
+          entity: string
+          entity_id: string | null
+          id: string
+          organization_id: string | null
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          after_data?: Json | null
+          before_data?: Json | null
+          created_at?: string
+          entity: string
+          entity_id?: string | null
+          id?: string
+          organization_id?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          after_data?: Json | null
+          before_data?: Json | null
+          created_at?: string
+          entity?: string
+          entity_id?: string | null
+          id?: string
+          organization_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_logs_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organization_members: {
+        Row: {
+          created_at: string
+          id: string
+          organization_id: string
+          role: Database["public"]["Enums"]["org_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          organization_id: string
+          role?: Database["public"]["Enums"]["org_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          organization_id?: string
+          role?: Database["public"]["Enums"]["org_role"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_members_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organizations: {
+        Row: {
+          active: boolean
+          cnpj: string | null
+          created_at: string
+          created_by: string | null
+          default_tax_profile_id: string | null
+          defaults: Json
+          id: string
+          name: string
+          regime: string | null
+          uf: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          cnpj?: string | null
+          created_at?: string
+          created_by?: string | null
+          default_tax_profile_id?: string | null
+          defaults?: Json
+          id?: string
+          name: string
+          regime?: string | null
+          uf?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          cnpj?: string | null
+          created_at?: string
+          created_by?: string | null
+          default_tax_profile_id?: string | null
+          defaults?: Json
+          id?: string
+          name?: string
+          regime?: string | null
+          uf?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organizations_default_tax_profile_fk"
+            columns: ["default_tax_profile_id"]
+            isOneToOne: false
+            referencedRelation: "tax_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      products: {
+        Row: {
+          active: boolean
+          created_at: string
+          created_by: string | null
+          defaults: Json
+          id: string
+          ncm: string | null
+          nome: string
+          organization_id: string
+          sku: string | null
+          unidade: string
+          updated_at: string
+          valor_unitario: number
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          defaults?: Json
+          id?: string
+          ncm?: string | null
+          nome: string
+          organization_id: string
+          sku?: string | null
+          unidade?: string
+          updated_at?: string
+          valor_unitario?: number
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          defaults?: Json
+          id?: string
+          ncm?: string | null
+          nome?: string
+          organization_id?: string
+          sku?: string | null
+          unidade?: string
+          updated_at?: string
+          valor_unitario?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      simulation_purchase_lines: {
+        Row: {
+          chave: string
+          created_at: string
+          descricao: string
+          id: string
+          simulation_id: string
+          valor: number
+        }
+        Insert: {
+          chave: string
+          created_at?: string
+          descricao: string
+          id?: string
+          simulation_id: string
+          valor?: number
+        }
+        Update: {
+          chave?: string
+          created_at?: string
+          descricao?: string
+          id?: string
+          simulation_id?: string
+          valor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "simulation_purchase_lines_simulation_id_fkey"
+            columns: ["simulation_id"]
+            isOneToOne: false
+            referencedRelation: "simulations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      simulation_sale_expenses: {
+        Row: {
+          chave: string
+          created_at: string
+          descricao: string
+          id: string
+          simulation_id: string
+          tipo: string
+          valor: number
+          valor_unitario: number
+        }
+        Insert: {
+          chave: string
+          created_at?: string
+          descricao: string
+          id?: string
+          simulation_id: string
+          tipo?: string
+          valor?: number
+          valor_unitario?: number
+        }
+        Update: {
+          chave?: string
+          created_at?: string
+          descricao?: string
+          id?: string
+          simulation_id?: string
+          tipo?: string
+          valor?: number
+          valor_unitario?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "simulation_sale_expenses_simulation_id_fkey"
+            columns: ["simulation_id"]
+            isOneToOne: false
+            referencedRelation: "simulations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      simulation_tax_lines: {
+        Row: {
+          base: number
+          created_at: string
+          credit_mode: string | null
+          credito: number
+          id: string
+          label: string
+          rate: number
+          side: string
+          simulation_id: string
+          tax_id: string
+          treatment: string
+          valor: number
+        }
+        Insert: {
+          base?: number
+          created_at?: string
+          credit_mode?: string | null
+          credito?: number
+          id?: string
+          label: string
+          rate?: number
+          side: string
+          simulation_id: string
+          tax_id: string
+          treatment?: string
+          valor?: number
+        }
+        Update: {
+          base?: number
+          created_at?: string
+          credit_mode?: string | null
+          credito?: number
+          id?: string
+          label?: string
+          rate?: number
+          side?: string
+          simulation_id?: string
+          tax_id?: string
+          treatment?: string
+          valor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "simulation_tax_lines_simulation_id_fkey"
+            columns: ["simulation_id"]
+            isOneToOne: false
+            referencedRelation: "simulations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      simulations: {
+        Row: {
+          calculated_at: string
+          created_at: string
+          created_by: string | null
+          custo_liquido_unitario: number | null
+          id: string
+          input_snapshot: Json
+          margem_efetiva: number | null
+          organization_id: string
+          overridden_fields: Json
+          preco_final: number | null
+          product_id: string | null
+          produto_nome: string | null
+          quantidade: number
+          result_snapshot: Json
+          status: Database["public"]["Enums"]["simulation_status"]
+          tax_profile_id: string | null
+          tax_profile_name: string | null
+          tax_profile_snapshot: Json
+          tax_profile_version: number | null
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          calculated_at?: string
+          created_at?: string
+          created_by?: string | null
+          custo_liquido_unitario?: number | null
+          id?: string
+          input_snapshot?: Json
+          margem_efetiva?: number | null
+          organization_id: string
+          overridden_fields?: Json
+          preco_final?: number | null
+          product_id?: string | null
+          produto_nome?: string | null
+          quantidade?: number
+          result_snapshot?: Json
+          status?: Database["public"]["Enums"]["simulation_status"]
+          tax_profile_id?: string | null
+          tax_profile_name?: string | null
+          tax_profile_snapshot?: Json
+          tax_profile_version?: number | null
+          titulo?: string
+          updated_at?: string
+        }
+        Update: {
+          calculated_at?: string
+          created_at?: string
+          created_by?: string | null
+          custo_liquido_unitario?: number | null
+          id?: string
+          input_snapshot?: Json
+          margem_efetiva?: number | null
+          organization_id?: string
+          overridden_fields?: Json
+          preco_final?: number | null
+          product_id?: string | null
+          produto_nome?: string | null
+          quantidade?: number
+          result_snapshot?: Json
+          status?: Database["public"]["Enums"]["simulation_status"]
+          tax_profile_id?: string | null
+          tax_profile_name?: string | null
+          tax_profile_snapshot?: Json
+          tax_profile_version?: number | null
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "simulations_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "simulations_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "simulations_tax_profile_id_fkey"
+            columns: ["tax_profile_id"]
+            isOneToOne: false
+            referencedRelation: "tax_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tax_profile_lines: {
+        Row: {
+          base_manual: number
+          base_mode: string
+          base_reduction: number
+          credit_manual: number
+          credit_mode: string
+          credit_percent: number
+          enabled: boolean
+          id: string
+          label: string
+          manual_tax_value: number
+          note: string
+          rate: number
+          side: string
+          tax_id: string
+          tax_profile_id: string
+          treatment: string
+          use_manual_tax: boolean
+        }
+        Insert: {
+          base_manual?: number
+          base_mode?: string
+          base_reduction?: number
+          credit_manual?: number
+          credit_mode?: string
+          credit_percent?: number
+          enabled?: boolean
+          id?: string
+          label: string
+          manual_tax_value?: number
+          note?: string
+          rate?: number
+          side: string
+          tax_id: string
+          tax_profile_id: string
+          treatment?: string
+          use_manual_tax?: boolean
+        }
+        Update: {
+          base_manual?: number
+          base_mode?: string
+          base_reduction?: number
+          credit_manual?: number
+          credit_mode?: string
+          credit_percent?: number
+          enabled?: boolean
+          id?: string
+          label?: string
+          manual_tax_value?: number
+          note?: string
+          rate?: number
+          side?: string
+          tax_id?: string
+          tax_profile_id?: string
+          treatment?: string
+          use_manual_tax?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tax_profile_lines_tax_profile_id_fkey"
+            columns: ["tax_profile_id"]
+            isOneToOne: false
+            referencedRelation: "tax_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tax_profiles: {
+        Row: {
+          active: boolean
+          created_at: string
+          created_by: string | null
+          id: string
+          locked_fields: Json
+          name: string
+          notes: string | null
+          organization_id: string | null
+          scenario: Database["public"]["Enums"]["tax_scenario"]
+          updated_at: string
+          valid_from: string
+          valid_to: string | null
+          version: number
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          locked_fields?: Json
+          name: string
+          notes?: string | null
+          organization_id?: string | null
+          scenario?: Database["public"]["Enums"]["tax_scenario"]
+          updated_at?: string
+          valid_from?: string
+          valid_to?: string | null
+          version?: number
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          locked_fields?: Json
+          name?: string
+          notes?: string | null
+          organization_id?: string | null
+          scenario?: Database["public"]["Enums"]["tax_scenario"]
+          updated_at?: string
+          valid_from?: string
+          valid_to?: string | null
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tax_profiles_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      bootstrap_grancont_admin: { Args: never; Returns: boolean }
+      can_read_simulation: { Args: { _sim: string }; Returns: boolean }
+      can_write_simulation: { Args: { _sim: string }; Returns: boolean }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_grancont_admin: { Args: never; Returns: boolean }
+      is_org_admin: { Args: { _org: string }; Returns: boolean }
+      is_org_member: { Args: { _org: string }; Returns: boolean }
+    }
+    Enums: {
+      app_role: "grancont_admin"
+      org_role: "org_admin" | "viewer"
+      simulation_status: "rascunho" | "salva" | "arquivada"
+      tax_scenario: "atual" | "transicao" | "novo" | "personalizado"
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
+}
+
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
+
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
+
+export const Constants = {
+  public: {
+    Enums: {
+      app_role: ["grancont_admin"],
+      org_role: ["org_admin", "viewer"],
+      simulation_status: ["rascunho", "salva", "arquivada"],
+      tax_scenario: ["atual", "transicao", "novo", "personalizado"],
+    },
+  },
+} as const

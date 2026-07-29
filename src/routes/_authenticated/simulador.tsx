@@ -1,0 +1,761 @@
+import { useEffect, useMemo, useState } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Calculator, Info, RotateCcw, Save, Sparkles, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { Toaster } from "@/components/ui/sonner";
+import { toast } from "sonner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { CampoNumero, CampoTexto, Ajuda } from "@/components/pricing/CampoNumero";
+import { CardTributoCompra } from "@/components/pricing/CardTributoCompra";
+import { CardTributoVenda } from "@/components/pricing/CardTributoVenda";
+import { PainelResultados } from "@/components/pricing/PainelResultados";
+import { EntendaOCalculo } from "@/components/pricing/EntendaOCalculo";
+import { simular } from "@/lib/pricing-engine";
+import { CENARIOS, aplicarCenario, estadoExemplo, estadoInicial } from "@/lib/pricing-defaults";
+import { formatBRL, formatData } from "@/lib/format";
+import { BarraSimulacao } from "@/components/app/BarraSimulacao";
+import { useApp } from "@/hooks/useApp";
+import { supabase } from "@/integrations/supabase/client";
+import {
+  aplicarPerfil,
+  camposAlterados,
+  lockedFieldsOf,
+  type TaxProfileLineRow,
+  type TaxProfileRow,
+} from "@/lib/tax-profiles";
+import type {
+  ProdutoCompra,
+  PurchaseTax,
+  SaleTax,
+  ScenarioId,
+  SimulationState,
+  VendaConfig,
+} from "@/types/pricing";
+
+const TITULO = "Precifica Grancont — simulador de preço de venda";
+const DESCRICAO =
+  "Calcule custo líquido de aquisição, créditos tributários e preço de venda recomendado com memória de cálculo completa e tributos totalmente configuráveis.";
+
+const ROTULOS_BLOQUEIO: Record<string, string> = {
+  tributosCompra: "Tributos da compra",
+  tributosVenda: "Tributos da venda",
+  despesasVenda: "Despesas de venda",
+  margem: "Margem desejada",
+};
+
+export const Route = createFileRoute("/_authenticated/simulador")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    simulacao: typeof search.simulacao === "string" ? search.simulacao : undefined,
+    produto: typeof search.produto === "string" ? search.produto : undefined,
+  }),
+  head: () => ({
+    meta: [
+      { title: TITULO },
+      { name: "description", content: DESCRICAO },
+      { property: "og:title", content: TITULO },
+      { property: "og:description", content: DESCRICAO },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
+  component: Simulador,
+});
+
+const STORAGE_KEY = "precifica-grancont:rascunho";
+
+const UNIDADES = ["unidade", "pacote", "caixa", "fardo", "kg", "litro", "outro"];
+
+const AVISO_RODAPE =
+  "Esta ferramenta realiza simulações gerenciais de precificação. O tratamento tributário depende do produto, NCM, CST, CFOP, origem, destino, regime tributário, benefícios fiscais e direito a crédito. Valide as configurações com sua contabilidade.";
+
+function Secao({
+  numero,
+  titulo,
+  descricao,
+  children,
+  acao,
+}: {
+  numero: string;
+  titulo: string;
+  descricao: string;
+  children: React.ReactNode;
+  acao?: React.ReactNode;
+}) {
+  return (
+    <section className="rounded-xl border border-border bg-card p-5 shadow-[var(--shadow-card)]">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
+        <div className="min-w-0">
+          <p className="text-xs font-semibold uppercase tracking-wide text-primary">{numero}</p>
+          <h2 className="mt-0.5 text-lg font-semibold text-foreground">{titulo}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{descricao}</p>
+        </div>
+        {acao ? <div className="shrink-0">{acao}</div> : null}
+      </div>
+      <div className="mt-5">{children}</div>
+    </section>
+  );
+}
+
+function Simulador() {
+  const { orgId, canEdit, userId } = useApp();
+  const { simulacao: simulacaoId, produto: produtoQuery } = Route.useSearch();
+  const navigate = useNavigate();
+  const qc = useQueryClient();
+
+  const [state, setState] = useState<SimulationState>(() => estadoInicial());
+  const [salvoEm, setSalvoEm] = useState<Date | null>(null);
+  const [carregado, setCarregado] = useState(false);
+  const [titulo, setTitulo] = useState("Nova simulação");
+  const [perfilId, setPerfilId] = useState<string | null>(null);
+  const [produtoId, setProdutoId] = useState<string | null>(produtoQuery ?? null);
+  const [baseline, setBaseline] = useState<SimulationState | null>(null);
+  const [simulacaoAtual, setSimulacaoAtual] = useState<string | null>(simulacaoId ?? null);
+
+  const perfisQuery = useQuery({
+    queryKey: ["tax_profiles", "simulador", orgId],
+    enabled: !!orgId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("tax_profiles")
+        .select("*")
+        .eq("active", true)
+        .order("name");
+      if (error) throw error;
+      return (data ?? []) as unknown as TaxProfileRow[];
+    },
+  });
+
+  const produtosQuery = useQuery({
+    queryKey: ["products", orgId],
+    enabled: !!orgId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("products")
+        .select("id, nome, sku, valor_unitario")
+        .eq("organization_id", orgId!)
+        .eq("active", true)
+        .order("nome");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const perfilSelecionado = (perfisQuery.data ?? []).find((p) => p.id === perfilId) ?? null;
+  const camposBloqueados = canEdit ? lockedFieldsOf(perfilSelecionado) : Object.keys(ROTULOS_BLOQUEIO);
+  const bloqueado = (chave: string) => camposBloqueados.includes(chave) || !canEdit;
+
+  const aplicarPerfilNoEstado = async (id: string) => {
+    if (id === "manual") {
+      setPerfilId(null);
+      setBaseline(null);
+      return;
+    }
+    const perfil = (perfisQuery.data ?? []).find((p) => p.id === id);
+    if (!perfil) return;
+    const { data, error } = await supabase.from("tax_profile_lines").select("*").eq("tax_profile_id", id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    setState((s) => {
+      const novo = aplicarPerfil(s, perfil, (data ?? []) as unknown as TaxProfileLineRow[]);
+      setBaseline(novo);
+      return novo;
+    });
+    setPerfilId(id);
+    toast.success(`Perfil "${perfil.name}" aplicado.`);
+  };
+
+  const aplicarProduto = (id: string) => {
+    if (id === "avulso") {
+      setProdutoId(null);
+      return;
+    }
+    const p = (produtosQuery.data ?? []).find((x) => x.id === id);
+    if (!p) return;
+    setProdutoId(id);
+    setState((s) => ({
+      ...s,
+      produto: { ...s.produto, nome: p.nome, valorUnitario: Number(p.valor_unitario) },
+    }));
+  };
+
+  // Carrega simulação existente
+  useEffect(() => {
+    if (!simulacaoId) return;
+    let cancelado = false;
+    void (async () => {
+      const { data, error } = await supabase.from("simulations").select("*").eq("id", simulacaoId).single();
+      if (error || cancelado || !data) return;
+      const snapshot = data.input_snapshot as unknown as SimulationState | null;
+      if (snapshot?.produto) setState(snapshot);
+      setTitulo(data.titulo);
+      setPerfilId(data.tax_profile_id);
+      setProdutoId(data.product_id);
+      setSimulacaoAtual(data.id);
+      setCarregado(true);
+    })();
+    return () => {
+      cancelado = true;
+    };
+  }, [simulacaoId]);
+
+  const alterados = baseline ? camposAlterados(baseline, state) : [];
+
+  useEffect(() => {
+    if (simulacaoId) return;
+    try {
+      const bruto = localStorage.getItem(STORAGE_KEY);
+      if (bruto) {
+        const dados = JSON.parse(bruto) as { state: SimulationState; salvoEm?: string };
+        if (dados?.state?.produto) {
+          setState(dados.state);
+          if (dados.salvoEm) setSalvoEm(new Date(dados.salvoEm));
+        }
+      }
+    } catch {
+      // rascunho inválido é simplesmente ignorado
+    }
+    setCarregado(true);
+  }, [simulacaoId]);
+
+  const resultado = useMemo(() => simular(state), [state]);
+
+  const setProduto = (patch: Partial<ProdutoCompra>) =>
+    setState((s) => ({ ...s, produto: { ...s.produto, ...patch } }));
+  const setVenda = (patch: Partial<VendaConfig>) =>
+    setState((s) => ({ ...s, venda: { ...s.venda, ...patch } }));
+  const setTributoCompra = (id: string, patch: Partial<PurchaseTax>) =>
+    setState((s) => ({
+      ...s,
+      cenario: "personalizado",
+      tributosCompra: s.tributosCompra.map((t) => (t.id === id ? { ...t, ...patch } : t)),
+    }));
+  const setTributoVenda = (id: string, patch: Partial<SaleTax>) =>
+    setState((s) => ({
+      ...s,
+      tributosVenda: s.tributosVenda.map((t) => (t.id === id ? { ...t, ...patch } : t)),
+    }));
+
+  const cenarioAtual = CENARIOS.find((c) => c.id === state.cenario);
+
+  const salvarRascunho = () => {
+    const agora = new Date();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ state, salvoEm: agora.toISOString() }));
+    setSalvoEm(agora);
+    toast.success("Rascunho salvo neste navegador.");
+  };
+
+  const novaSimulacao = () => {
+    setState(estadoInicial());
+    toast.info("Nova simulação iniciada.");
+  };
+
+  const limpar = () => {
+    localStorage.removeItem(STORAGE_KEY);
+    setState(estadoInicial());
+    setSalvoEm(null);
+    toast.info("Simulação limpa.");
+  };
+
+  const carregarExemplo = () => {
+    setState(estadoExemplo());
+    toast.info("Valores de exemplo restaurados.");
+  };
+
+  const salvarNoBanco = useMutation({
+    mutationFn: async ({ duplicar }: { duplicar: boolean }) => {
+      if (!orgId) throw new Error("Selecione uma empresa para salvar a simulação.");
+      if (!canEdit) throw new Error("Seu perfil é somente de consulta.");
+      if (!titulo.trim()) throw new Error("Informe um nome para a simulação.");
+      if (resultado.issues.some((v) => v.severidade === "erro")) {
+        throw new Error("Corrija os erros de validação antes de salvar.");
+      }
+
+      let snapshotPerfil: unknown = {};
+      if (perfilId) {
+        const { data: linhas } = await supabase
+          .from("tax_profile_lines")
+          .select("*")
+          .eq("tax_profile_id", perfilId);
+        snapshotPerfil = { perfil: perfilSelecionado, linhas: linhas ?? [] };
+      }
+
+      const registro = {
+        organization_id: orgId,
+        titulo: titulo.trim(),
+        product_id: produtoId,
+        produto_nome: state.produto.nome || null,
+        quantidade: Number(state.produto.quantidade) || 1,
+        tax_profile_id: perfilId,
+        tax_profile_name: perfilSelecionado?.name ?? null,
+        tax_profile_version: perfilSelecionado?.version ?? null,
+        tax_profile_snapshot: snapshotPerfil as never,
+        input_snapshot: state as never,
+        result_snapshot: resultado as never,
+        overridden_fields: alterados as never,
+        custo_liquido_unitario: resultado.compra.custoLiquidoUnitario,
+        preco_final: resultado.recomendado?.precoFinal ?? null,
+        margem_efetiva: resultado.recomendado?.margemEfetiva ?? null,
+        status: "salva" as const,
+        calculated_at: new Date().toISOString(),
+        created_by: userId,
+      };
+
+      if (simulacaoAtual && !duplicar) {
+        const { error } = await supabase.from("simulations").update(registro).eq("id", simulacaoAtual);
+        if (error) throw error;
+        return simulacaoAtual;
+      }
+      const { data, error } = await supabase
+        .from("simulations")
+        .insert({ ...registro, titulo: duplicar ? `${registro.titulo} (cópia)` : registro.titulo })
+        .select("id")
+        .single();
+      if (error) throw error;
+      return data.id;
+    },
+    onSuccess: (id, vars) => {
+      setSimulacaoAtual(id);
+      qc.invalidateQueries({ queryKey: ["simulations", orgId] });
+      toast.success(vars.duplicar ? "Simulação duplicada." : "Simulação salva no histórico.");
+      void navigate({ to: "/simulador", search: { simulacao: id, produto: undefined }, replace: true });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const compra = resultado.compra;
+
+  return (
+    <TooltipProvider delayDuration={150}>
+      <div className="min-h-screen bg-background pb-28 lg:pb-10">
+        <header className="sticky top-0 z-30 border-b border-border bg-card/95 backdrop-blur">
+          <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 sm:px-6">
+            <div className="min-w-0">
+              <h1 className="truncate text-lg font-semibold tracking-tight text-foreground sm:text-xl">
+                Precifica Grancont
+              </h1>
+              <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                <Badge variant="outline" className="border-primary/30 text-primary">
+                  {cenarioAtual?.nome ?? "Personalizado"}
+                </Badge>
+                {salvoEm ? <span>Rascunho salvo em {formatData(salvoEm)}</span> : null}
+              </div>
+            </div>
+            <div className="flex shrink-0 items-center gap-2">
+              <Button variant="outline" size="sm" onClick={novaSimulacao}>
+                <RotateCcw className="h-4 w-4" aria-hidden />
+                <span className="hidden sm:inline">Nova simulação</span>
+              </Button>
+              <Button size="sm" onClick={salvarRascunho}>
+                <Save className="h-4 w-4" aria-hidden />
+                <span className="hidden sm:inline">Salvar rascunho</span>
+              </Button>
+            </div>
+          </div>
+        </header>
+
+        <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
+          <div className="mb-6">
+            <BarraSimulacao
+              titulo={titulo}
+              onTitulo={setTitulo}
+              perfis={(perfisQuery.data ?? []).map((p) => ({
+                id: p.id,
+                rotulo: `${p.name} (v${p.version})`,
+              }))}
+              perfilId={perfilId}
+              onPerfil={(id) => void aplicarPerfilNoEstado(id)}
+              produtos={(produtosQuery.data ?? []).map((p) => ({
+                id: p.id,
+                rotulo: p.sku ? `${p.nome} — ${p.sku}` : p.nome,
+              }))}
+              produtoId={produtoId}
+              onProduto={aplicarProduto}
+              camposAlterados={alterados}
+              camposBloqueados={camposBloqueados.map((c) => ROTULOS_BLOQUEIO[c] ?? c)}
+              podeEditar={canEdit}
+              salvando={salvarNoBanco.isPending}
+              simulacaoSalva={!!simulacaoAtual}
+              onSalvar={() => salvarNoBanco.mutate({ duplicar: false })}
+              onDuplicar={() => salvarNoBanco.mutate({ duplicar: true })}
+            />
+          </div>
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] lg:items-start">
+            <div className="space-y-6">
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-surface px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <Switch
+                    id="modo-avancado"
+                    checked={state.modoAvancado}
+                    onCheckedChange={(v) => setState((s) => ({ ...s, modoAvancado: v }))}
+                  />
+                  <Label htmlFor="modo-avancado" className="text-sm">
+                    Modo avançado
+                  </Label>
+                  <Ajuda texto="No modo avançado você edita base de cálculo, redução de base, percentual de crédito, valores manuais e observações." />
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <Button variant="ghost" size="sm" onClick={carregarExemplo}>
+                    <Sparkles className="h-4 w-4" aria-hidden />
+                    Restaurar valores de exemplo
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={limpar}>
+                    <Trash2 className="h-4 w-4" aria-hidden />
+                    Limpar simulação
+                  </Button>
+                </div>
+              </div>
+
+              <Secao
+                numero="Seção 1"
+                titulo="Produto e compra"
+                descricao="Informe o que foi comprado e quanto foi pago ao fornecedor."
+              >
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <CampoTexto
+                    label="Nome do produto"
+                    value={state.produto.nome}
+                    onChange={(v) => setProduto({ nome: v })}
+                    placeholder="Ex.: Café torrado e moído 500g"
+                    className="sm:col-span-2"
+                  />
+                  <CampoTexto
+                    label="Código ou SKU (opcional)"
+                    value={state.produto.sku}
+                    onChange={(v) => setProduto({ sku: v })}
+                  />
+                  <CampoTexto
+                    label="NCM (opcional)"
+                    value={state.produto.ncm}
+                    onChange={(v) => setProduto({ ncm: v })}
+                    ajuda="O preenchimento do NCM não altera automaticamente os tributos nesta versão."
+                  />
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-medium text-muted-foreground">Unidade</Label>
+                    <Select
+                      value={state.produto.unidade}
+                      onValueChange={(v) => setProduto({ unidade: v })}
+                    >
+                      <SelectTrigger className="h-11" aria-label="Unidade de compra">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {UNIDADES.map((u) => (
+                          <SelectItem key={u} value={u}>
+                            {u}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <CampoNumero
+                    label="Quantidade comprada"
+                    value={state.produto.quantidade}
+                    onChange={(v) => setProduto({ quantidade: v })}
+                    ajuda="Aceita até quatro casas decimais."
+                  />
+                  <CampoNumero
+                    label="Valor unitário de compra"
+                    prefixo="R$"
+                    value={state.produto.valorUnitario}
+                    onChange={(v) => setProduto({ valorUnitario: v })}
+                  />
+                  <CampoNumero
+                    label="Desconto incondicional total"
+                    prefixo="R$"
+                    value={state.produto.descontoTotal}
+                    onChange={(v) => setProduto({ descontoTotal: v })}
+                    ajuda="Desconto que já vem aplicado na nota, sem condição futura."
+                  />
+                  <CampoNumero
+                    label="Frete de compra total"
+                    prefixo="R$"
+                    value={state.produto.freteTotal}
+                    onChange={(v) => setProduto({ freteTotal: v })}
+                  />
+                  <CampoNumero
+                    label="Seguro total"
+                    prefixo="R$"
+                    value={state.produto.seguroTotal}
+                    onChange={(v) => setProduto({ seguroTotal: v })}
+                  />
+                  <CampoNumero
+                    label="Outras despesas de compra"
+                    prefixo="R$"
+                    value={state.produto.outrasDespesas}
+                    onChange={(v) => setProduto({ outrasDespesas: v })}
+                  />
+                  <CampoNumero
+                    label="Embalagem por unidade (opcional)"
+                    prefixo="R$"
+                    value={state.produto.embalagemPorUnidade}
+                    onChange={(v) => setProduto({ embalagemPorUnidade: v })}
+                  />
+                  <CampoNumero
+                    label="Rateio de outros custos por unidade (opcional)"
+                    prefixo="R$"
+                    value={state.produto.rateioPorUnidade}
+                    onChange={(v) => setProduto({ rateioPorUnidade: v })}
+                  />
+                </div>
+
+                <dl className="mt-5 grid gap-3 rounded-lg bg-surface p-4 sm:grid-cols-3">
+                  <div>
+                    <dt className="text-xs text-muted-foreground">Valor bruto dos produtos</dt>
+                    <dd className="text-base font-semibold tabular-nums text-foreground">
+                      {formatBRL(compra.valorBrutoProdutos)}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs text-muted-foreground">Compra antes dos créditos</dt>
+                    <dd className="text-base font-semibold tabular-nums text-foreground">
+                      {formatBRL(compra.desembolsoTotal)}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs text-muted-foreground">Valor médio por unidade</dt>
+                    <dd className="text-base font-semibold tabular-nums text-foreground">
+                      {formatBRL(compra.valorMedioUnitario)}
+                    </dd>
+                  </div>
+                </dl>
+              </Secao>
+
+              <Secao
+                numero="Seção 2"
+                titulo="Cenário tributário"
+                descricao="O cenário apenas ativa ou desativa tributos. Todas as alíquotas e tratamentos continuam editáveis."
+              >
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {CENARIOS.map((c) => {
+                    const ativo = state.cenario === c.id;
+                    return (
+                      <button
+                        key={c.id}
+                        type="button"
+                        onClick={() => setState((s) => aplicarCenario(s, c.id as ScenarioId))}
+                        aria-pressed={ativo}
+                        className={`rounded-lg border p-4 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                          ativo
+                            ? "border-primary bg-brand-soft"
+                            : "border-border bg-card hover:bg-surface"
+                        }`}
+                      >
+                        <p className="text-sm font-semibold text-foreground">{c.nome}</p>
+                        <p className="mt-1 text-xs text-muted-foreground">{c.descricao}</p>
+                      </button>
+                    );
+                  })}
+                </div>
+                {state.cenario === "transicao2026" ? (
+                  <Alert className="mt-4">
+                    <Info className="h-4 w-4" aria-hidden />
+                    <AlertDescription className="text-sm">
+                      Perfil de referência. Confirme o tratamento aplicável com a contabilidade. O
+                      IBS (0,10%) e a CBS (0,90%) iniciam como informativos e não alteram custo nem
+                      preço até que você mude o tratamento.
+                    </AlertDescription>
+                  </Alert>
+                ) : null}
+              </Secao>
+
+              <Secao
+                numero="Seção 3"
+                titulo="Tributos da compra"
+                descricao="Alíquota e direito ao crédito são informações independentes. Configure cada tributo conforme a nota e a orientação da contabilidade."
+              >
+                <div className="space-y-3">
+                  {state.tributosCompra.map((t) => (
+                    <CardTributoCompra
+                      key={t.id}
+                      tributo={t}
+                      avancado={state.modoAvancado}
+                      resultado={compra.tributos.find((r) => r.id === t.id)}
+                      onChange={(patch) => setTributoCompra(t.id, patch)}
+                    />
+                  ))}
+                </div>
+              </Secao>
+
+              <Secao
+                numero="Seção 4"
+                titulo="Venda e margem"
+                descricao="Calcule o preço a partir da margem desejada ou analise a margem de um preço já praticado."
+              >
+                <Tabs
+                  value={state.venda.modo}
+                  onValueChange={(v) => setVenda({ modo: v as VendaConfig["modo"] })}
+                >
+                  <TabsList className="w-full">
+                    <TabsTrigger value="margem" className="flex-1">
+                      Calcular preço pela margem
+                    </TabsTrigger>
+                    <TabsTrigger value="analise" className="flex-1">
+                      Analisar preço informado
+                    </TabsTrigger>
+                  </TabsList>
+                </Tabs>
+
+                <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                  {state.venda.modo === "margem" ? (
+                    <CampoNumero
+                      label="Margem desejada"
+                      sufixo="%"
+                      value={state.venda.margemDesejada}
+                      onChange={(v) => setVenda({ margemDesejada: v })}
+                      ajuda="Margem: percentual que sobra da venda depois do custo do produto, tributos e despesas variáveis."
+                    />
+                  ) : (
+                    <CampoNumero
+                      label="Preço de venda informado"
+                      prefixo="R$"
+                      value={state.venda.precoInformado}
+                      onChange={(v) => setVenda({ precoInformado: v })}
+                      ajuda="Preço final cobrado do cliente, incluindo tributos acrescentados por fora."
+                    />
+                  )}
+                  <CampoNumero
+                    label="Comissão"
+                    sufixo="%"
+                    value={state.venda.comissaoPercent}
+                    onChange={(v) => setVenda({ comissaoPercent: v })}
+                  />
+                  <CampoNumero
+                    label="Taxa de cartão"
+                    sufixo="%"
+                    value={state.venda.cartaoPercent}
+                    onChange={(v) => setVenda({ cartaoPercent: v })}
+                  />
+                  <CampoNumero
+                    label="Taxa de marketplace"
+                    sufixo="%"
+                    value={state.venda.marketplacePercent}
+                    onChange={(v) => setVenda({ marketplacePercent: v })}
+                  />
+                  <CampoNumero
+                    label="Perdas estimadas"
+                    sufixo="%"
+                    value={state.venda.perdasPercent}
+                    onChange={(v) => setVenda({ perdasPercent: v })}
+                  />
+                  <CampoNumero
+                    label="Outros percentuais sobre a venda"
+                    sufixo="%"
+                    value={state.venda.outrosPercent}
+                    onChange={(v) => setVenda({ outrosPercent: v })}
+                  />
+                  <CampoNumero
+                    label="Frete de venda por unidade"
+                    prefixo="R$"
+                    value={state.venda.freteVendaUnidade}
+                    onChange={(v) => setVenda({ freteVendaUnidade: v })}
+                  />
+                  <CampoNumero
+                    label="Embalagem de venda por unidade"
+                    prefixo="R$"
+                    value={state.venda.embalagemVendaUnidade}
+                    onChange={(v) => setVenda({ embalagemVendaUnidade: v })}
+                  />
+                  <CampoNumero
+                    label="Rateio de custo fixo por unidade (opcional)"
+                    prefixo="R$"
+                    value={state.venda.custoFixoUnidade}
+                    onChange={(v) => setVenda({ custoFixoUnidade: v })}
+                  />
+                  <CampoNumero
+                    label="Outras despesas fixas por unidade"
+                    prefixo="R$"
+                    value={state.venda.outrasDespesasFixasUnidade}
+                    onChange={(v) => setVenda({ outrasDespesasFixasUnidade: v })}
+                  />
+                </div>
+
+                {state.modoAvancado ? (
+                  <div className="mt-4 space-y-1.5 rounded-lg bg-surface p-4">
+                    <div className="flex items-center gap-1.5">
+                      <Label className="text-xs font-medium text-muted-foreground">
+                        Base da margem
+                      </Label>
+                      <Ajuda texto="Por padrão a margem é calculada sobre o preço final cobrado. Você pode usar o preço antes dos tributos acrescentados por fora." />
+                    </div>
+                    <Select
+                      value={state.venda.baseMargem}
+                      onValueChange={(v) => setVenda({ baseMargem: v as VendaConfig["baseMargem"] })}
+                    >
+                      <SelectTrigger className="h-11" aria-label="Base da margem">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="precoFinal">Preço final cobrado</SelectItem>
+                        <SelectItem value="precoBase">
+                          Preço antes dos tributos acrescentados por fora
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                ) : null}
+
+                <h3 className="mt-6 text-sm font-semibold text-foreground">Tributos da venda</h3>
+                <div className="mt-3 space-y-3">
+                  {state.tributosVenda.map((t) => (
+                    <CardTributoVenda
+                      key={t.id}
+                      tributo={t}
+                      avancado={state.modoAvancado}
+                      resultado={resultado.recomendado?.tributos.find((r) => r.id === t.id)}
+                      onChange={(patch) => setTributoVenda(t.id, patch)}
+                    />
+                  ))}
+                </div>
+              </Secao>
+
+              <EntendaOCalculo state={state} resultado={resultado} />
+
+              <footer className="rounded-xl border border-border bg-surface p-4 text-xs leading-relaxed text-muted-foreground">
+                {AVISO_RODAPE}
+              </footer>
+            </div>
+
+            <div className="hidden lg:block">
+              <div className="sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto pr-1">
+                <PainelResultados resultado={resultado} />
+              </div>
+            </div>
+
+            <div id="resultados" className="lg:hidden">
+              <PainelResultados resultado={resultado} />
+            </div>
+          </div>
+        </main>
+
+        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-card/95 p-3 backdrop-blur lg:hidden">
+          <Button
+            className="h-12 w-full text-base"
+            onClick={() => {
+              document.getElementById("resultados")?.scrollIntoView({ behavior: "smooth" });
+            }}
+          >
+            <Calculator className="h-5 w-5" aria-hidden />
+            Calcular preço
+          </Button>
+        </div>
+
+        {carregado ? <Toaster position="top-center" /> : null}
+      </div>
+    </TooltipProvider>
+  );
+}
