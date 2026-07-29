@@ -105,22 +105,27 @@ export function aplicarPerfil(
 }
 
 /** Cria as linhas persistíveis a partir de um estado do simulador. */
+const num = (v: unknown): number => {
+  const n = typeof v === "number" ? v : Number(String(v ?? "").replace(",", "."));
+  return Number.isFinite(n) ? n : 0;
+};
+
 export function linhasDoEstado(state: SimulationState): Omit<TaxProfileLineRow, "id" | "tax_profile_id">[] {
   const compra = state.tributosCompra.map((t) => ({
     side: "compra" as const,
     tax_id: t.id,
     label: t.label,
     enabled: t.enabled,
-    rate: t.rate,
+    rate: num(t.rate),
     base_mode: t.baseMode,
-    base_manual: t.baseManual,
-    base_reduction: t.baseReduction,
+    base_manual: num(t.baseManual),
+    base_reduction: num(t.baseReduction),
     use_manual_tax: t.useManualTax,
-    manual_tax_value: t.manualTaxValue,
+    manual_tax_value: num(t.manualTaxValue),
     treatment: t.treatment,
     credit_mode: t.creditMode,
-    credit_percent: t.creditPercent,
-    credit_manual: t.creditManual,
+    credit_percent: num(t.creditPercent),
+    credit_manual: num(t.creditManual),
     note: t.note ?? "",
   }));
   const venda = state.tributosVenda.map((t) => ({
@@ -128,9 +133,9 @@ export function linhasDoEstado(state: SimulationState): Omit<TaxProfileLineRow, 
     tax_id: t.id,
     label: t.label,
     enabled: t.enabled,
-    rate: t.rate,
+    rate: num(t.rate),
     base_mode: t.baseMode,
-    base_manual: t.baseManual,
+    base_manual: num(t.baseManual),
     base_reduction: 0,
     use_manual_tax: false,
     manual_tax_value: 0,
