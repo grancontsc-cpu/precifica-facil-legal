@@ -52,6 +52,7 @@ export function BarraSimulacao({
   onSalvar,
   onDuplicar,
   simulacaoSalva,
+  acoes,
 }: Props) {
   return (
     <section className="rounded-xl border border-border bg-card p-4 shadow-[var(--shadow-card)]">
@@ -101,7 +102,8 @@ export function BarraSimulacao({
           </Select>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          {acoes}
           {simulacaoSalva && podeEditar ? (
             <Button variant="outline" size="sm" onClick={onDuplicar}>
               <Copy className="h-4 w-4" aria-hidden />
