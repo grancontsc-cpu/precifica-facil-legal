@@ -553,6 +553,13 @@ describe("14. convivência IBS/CBS com ICMS/PIS/Cofins", () => {
 describe("coerência da simulação completa", () => {
   it("o resultado recomposto fecha com o preço final", () => {
     const state = estadoInicial();
+    state.produto = compraSimples({
+      nome: "Café torrado e moído 500g",
+      quantidade: 120,
+      valorUnitario: 18.9,
+      descontoTotal: 90,
+      freteTotal: 180,
+    });
     const res = simular(state);
     const ev = res.recomendado!;
     const soma =
