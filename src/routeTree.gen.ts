@@ -30,6 +30,7 @@ import { Route as AuthenticatedCompararRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAuditoriaRouteImport } from './routes/_authenticated/auditoria'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authenticated/admin/usuarios'
+import { Route as AuthenticatedAdminConvitesRouteImport } from './routes/_authenticated/admin/convites'
 
 const RedefinirSenhaRoute = RedefinirSenhaRouteImport.update({
   id: '/redefinir-senha',
@@ -136,6 +137,12 @@ const AuthenticatedAdminUsuariosRoute =
     path: '/admin/usuarios',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminConvitesRoute =
+  AuthenticatedAdminConvitesRouteImport.update({
+    id: '/admin/convites',
+    path: '/admin/convites',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -156,6 +163,7 @@ export interface FileRoutesByFullPath {
   '/produtos': typeof AuthenticatedProdutosRoute
   '/simulacoes': typeof AuthenticatedSimulacoesRoute
   '/simulador': typeof AuthenticatedSimuladorRoute
+  '/admin/convites': typeof AuthenticatedAdminConvitesRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
 }
@@ -178,6 +186,7 @@ export interface FileRoutesByTo {
   '/produtos': typeof AuthenticatedProdutosRoute
   '/simulacoes': typeof AuthenticatedSimulacoesRoute
   '/simulador': typeof AuthenticatedSimuladorRoute
+  '/admin/convites': typeof AuthenticatedAdminConvitesRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
 }
@@ -202,6 +211,7 @@ export interface FileRoutesById {
   '/_authenticated/produtos': typeof AuthenticatedProdutosRoute
   '/_authenticated/simulacoes': typeof AuthenticatedSimulacoesRoute
   '/_authenticated/simulador': typeof AuthenticatedSimuladorRoute
+  '/_authenticated/admin/convites': typeof AuthenticatedAdminConvitesRoute
   '/_authenticated/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
@@ -226,6 +236,7 @@ export interface FileRouteTypes {
     | '/produtos'
     | '/simulacoes'
     | '/simulador'
+    | '/admin/convites'
     | '/admin/usuarios'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
@@ -248,6 +259,7 @@ export interface FileRouteTypes {
     | '/produtos'
     | '/simulacoes'
     | '/simulador'
+    | '/admin/convites'
     | '/admin/usuarios'
     | '/admin'
   id:
@@ -271,6 +283,7 @@ export interface FileRouteTypes {
     | '/_authenticated/produtos'
     | '/_authenticated/simulacoes'
     | '/_authenticated/simulador'
+    | '/_authenticated/admin/convites'
     | '/_authenticated/admin/usuarios'
     | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
@@ -439,6 +452,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminUsuariosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/convites': {
+      id: '/_authenticated/admin/convites'
+      path: '/admin/convites'
+      fullPath: '/admin/convites'
+      preLoaderRoute: typeof AuthenticatedAdminConvitesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -450,6 +470,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProdutosRoute: typeof AuthenticatedProdutosRoute
   AuthenticatedSimulacoesRoute: typeof AuthenticatedSimulacoesRoute
   AuthenticatedSimuladorRoute: typeof AuthenticatedSimuladorRoute
+  AuthenticatedAdminConvitesRoute: typeof AuthenticatedAdminConvitesRoute
   AuthenticatedAdminUsuariosRoute: typeof AuthenticatedAdminUsuariosRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
@@ -462,6 +483,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedProdutosRoute: AuthenticatedProdutosRoute,
   AuthenticatedSimulacoesRoute: AuthenticatedSimulacoesRoute,
   AuthenticatedSimuladorRoute: AuthenticatedSimuladorRoute,
+  AuthenticatedAdminConvitesRoute: AuthenticatedAdminConvitesRoute,
   AuthenticatedAdminUsuariosRoute: AuthenticatedAdminUsuariosRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
