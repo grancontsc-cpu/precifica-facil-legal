@@ -1,0 +1,282 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
+import { toast } from "sonner";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Toaster } from "@/components/ui/sonner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useApp } from "@/hooks/useApp";
+import { supabase } from "@/integrations/supabase/client";
+
+const TITULO = "Empresas — Precifica Grancont";
+const DESCRICAO = "Cadastro de empresas clientes, membros e perfil tributário padrão da Grancont.";
+
+export const Route = createFileRoute("/_authenticated/empresas")({
+  head: () => ({
+    meta: [
+      { title: TITULO },
+      { name: "description", content: DESCRICAO },
+      { property: "og:title", content: TITULO },
+      { property: "og:description", content: DESCRICAO },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
+  component: EmpresasPage,
+});
+
+function EmpresasPage() {
+  const { isGrancontAdmin, userId } = useApp();
+  const qc = useQueryClient();
+  const [nome, setNome] = useState("");
+  const [cnpj, setCnpj] = useState("");
+  const [selecionada, setSelecionada] = useState<string | null>(null);
+
+  const orgs = useQuery({
+    queryKey: ["organizations", "admin"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("organizations")
+        .select("id, name, cnpj, active, default_tax_profile_id, created_at")
+        .order("name");
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const perfis = useQuery({
+    queryKey: ["tax_profiles", "todos"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("tax_profiles")
+        .select("id, name, organization_id, version, active")
+        .order("name");
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const membros = useQuery({
+    queryKey: ["members", selecionada],
+    enabled: !!selecionada,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("organization_members")
+        .select("id, user_id, role, profiles:profiles(full_name, email)")
+        .eq("organization_id", selecionada!);
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const usuarios = useQuery({
+    queryKey: ["profiles", "todos"],
+    enabled: isGrancontAdmin,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("profiles").select("id, full_name, email").order("email");
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const criar = useMutation({
+    mutationFn: async () => {
+      if (!nome.trim()) throw new Error("Informe o nome da empresa.");
+      const { error } = await supabase.from("organizations").insert({
+        name: nome.trim(),
+        cnpj: cnpj.trim() || null,
+        created_by: userId,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      setNome("");
+      setCnpj("");
+      toast.success("Empresa cadastrada.");
+      qc.invalidateQueries({ queryKey: ["organizations"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const definirPerfilPadrao = useMutation({
+    mutationFn: async ({ orgId, perfilId }: { orgId: string; perfilId: string | null }) => {
+      const { error } = await supabase
+        .from("organizations")
+        .update({ default_tax_profile_id: perfilId })
+        .eq("id", orgId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Perfil tributário padrão atualizado.");
+      qc.invalidateQueries({ queryKey: ["organizations"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const adicionarMembro = useMutation({
+    mutationFn: async ({ user_id, role }: { user_id: string; role: "org_admin" | "viewer" }) => {
+      const { error } = await supabase
+        .from("organization_members")
+        .insert({ organization_id: selecionada!, user_id, role });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Usuário vinculado à empresa.");
+      qc.invalidateQueries({ queryKey: ["members", selecionada] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const removerMembro = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("organization_members").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["members", selecionada] }),
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const [novoUsuario, setNovoUsuario] = useState<string>("");
+  const [novoPapel, setNovoPapel] = useState<"org_admin" | "viewer">("viewer");
+
+  if (!isGrancontAdmin) {
+    return (
+      <main className="mx-auto max-w-3xl px-4 py-10">
+        <p className="text-sm text-muted-foreground">
+          Apenas administradores Grancont podem gerenciar empresas.
+        </p>
+      </main>
+    );
+  }
+
+  return (
+    <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
+      <Toaster />
+      <h1 className="text-xl font-semibold tracking-tight text-foreground">Empresas clientes</h1>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Cadastre clientes, vincule usuários e defina o perfil tributário padrão de cada empresa.
+      </p>
+
+      <section className="mt-6 rounded-xl border border-border bg-card p-5">
+        <h2 className="text-sm font-semibold text-foreground">Nova empresa</h2>
+        <div className="mt-3 grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
+          <div className="space-y-1.5">
+            <Label htmlFor="org-nome">Nome</Label>
+            <Input id="org-nome" value={nome} onChange={(e) => setNome(e.target.value)} maxLength={120} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="org-cnpj">CNPJ</Label>
+            <Input id="org-cnpj" value={cnpj} onChange={(e) => setCnpj(e.target.value)} maxLength={20} />
+          </div>
+          <div className="flex items-end">
+            <Button onClick={() => criar.mutate()} disabled={criar.isPending}>
+              Cadastrar
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      <section className="mt-6 space-y-3">
+        {(orgs.data ?? []).map((o) => (
+          <div key={o.id} className="rounded-xl border border-border bg-card p-4">
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="min-w-0 flex-1">
+                <p className="font-medium text-foreground">{o.name}</p>
+                <p className="text-xs text-muted-foreground">{o.cnpj ?? "sem CNPJ"}</p>
+              </div>
+              <Badge variant={o.active ? "secondary" : "outline"}>{o.active ? "Ativa" : "Inativa"}</Badge>
+              <Select
+                value={o.default_tax_profile_id ?? "nenhum"}
+                onValueChange={(v) =>
+                  definirPerfilPadrao.mutate({ orgId: o.id, perfilId: v === "nenhum" ? null : v })
+                }
+              >
+                <SelectTrigger className="h-9 w-[240px]">
+                  <SelectValue placeholder="Perfil tributário padrão" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="nenhum">Sem perfil padrão</SelectItem>
+                  {(perfis.data ?? [])
+                    .filter((p) => p.organization_id === null || p.organization_id === o.id)
+                    .map((p) => (
+                      <SelectItem key={p.id} value={p.id}>
+                        {p.name} (v{p.version})
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSelecionada(selecionada === o.id ? null : o.id)}
+              >
+                {selecionada === o.id ? "Fechar" : "Usuários"}
+              </Button>
+            </div>
+
+            {selecionada === o.id ? (
+              <div className="mt-4 border-t border-border pt-4">
+                <div className="grid gap-3 sm:grid-cols-[1fr_180px_auto]">
+                  <Select value={novoUsuario} onValueChange={setNovoUsuario}>
+                    <SelectTrigger className="h-9">
+                      <SelectValue placeholder="Selecione o usuário" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {(usuarios.data ?? []).map((u) => (
+                        <SelectItem key={u.id} value={u.id}>
+                          {u.email ?? u.full_name ?? u.id}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Select value={novoPapel} onValueChange={(v) => setNovoPapel(v as "org_admin" | "viewer")}>
+                    <SelectTrigger className="h-9">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="org_admin">Administrador da empresa</SelectItem>
+                      <SelectItem value="viewer">Visualizador</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    size="sm"
+                    onClick={() => novoUsuario && adicionarMembro.mutate({ user_id: novoUsuario, role: novoPapel })}
+                  >
+                    Vincular
+                  </Button>
+                </div>
+
+                <ul className="mt-4 space-y-2">
+                  {(membros.data ?? []).map((m) => {
+                    const p = m.profiles as { full_name: string | null; email: string | null } | null;
+                    return (
+                      <li key={m.id} className="flex items-center gap-3 text-sm">
+                        <span className="flex-1 truncate">{p?.email ?? p?.full_name ?? m.user_id}</span>
+                        <Badge variant="outline">
+                          {m.role === "org_admin" ? "Admin da empresa" : "Visualizador"}
+                        </Badge>
+                        <Button variant="ghost" size="sm" onClick={() => removerMembro.mutate(m.id)}>
+                          Remover
+                        </Button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            ) : null}
+          </div>
+        ))}
+      </section>
+    </main>
+  );
+}
