@@ -1,0 +1,143 @@
+import { useEffect, useId, useState } from "react";
+import { HelpCircle } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { parseNumeroBR } from "@/lib/format";
+import { cn } from "@/lib/utils";
+
+interface CampoNumeroProps {
+  label: string;
+  value: number;
+  onChange: (valor: number) => void;
+  ajuda?: string;
+  prefixo?: string;
+  sufixo?: string;
+  className?: string;
+  placeholder?: string;
+}
+
+/**
+ * Campo numérico com digitação livre (aceita vírgula ou ponto).
+ * O valor é normalizado antes de chegar ao estado da simulação.
+ */
+export function CampoNumero({
+  label,
+  value,
+  onChange,
+  ajuda,
+  prefixo,
+  sufixo,
+  className,
+  placeholder,
+}: CampoNumeroProps) {
+  const id = useId();
+  const [texto, setTexto] = useState(() => (value === 0 ? "" : String(value).replace(".", ",")));
+  const [focado, setFocado] = useState(false);
+
+  useEffect(() => {
+    if (!focado) {
+      setTexto(value === 0 ? "" : String(value).replace(".", ","));
+    }
+  }, [value, focado]);
+
+  return (
+    <div className={cn("space-y-1.5", className)}>
+      <div className="flex items-center gap-1.5">
+        <Label htmlFor={id} className="text-xs font-medium text-muted-foreground">
+          {label}
+        </Label>
+        {ajuda ? <Ajuda texto={ajuda} /> : null}
+      </div>
+      <div className="relative">
+        {prefixo ? (
+          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+            {prefixo}
+          </span>
+        ) : null}
+        <Input
+          id={id}
+          inputMode="decimal"
+          autoComplete="off"
+          placeholder={placeholder ?? "0,00"}
+          value={texto}
+          onFocus={() => setFocado(true)}
+          onBlur={() => {
+            setFocado(false);
+            setTexto(value === 0 ? "" : String(value).replace(".", ","));
+          }}
+          onChange={(e) => {
+            const bruto = e.target.value;
+            setTexto(bruto);
+            onChange(parseNumeroBR(bruto));
+          }}
+          className={cn(
+            "h-11 text-base tabular-nums",
+            prefixo && "pl-10",
+            sufixo && "pr-10",
+          )}
+        />
+        {sufixo ? (
+          <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+            {sufixo}
+          </span>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+interface CampoTextoProps {
+  label: string;
+  value: string;
+  onChange: (valor: string) => void;
+  ajuda?: string;
+  placeholder?: string;
+  className?: string;
+}
+
+export function CampoTexto({
+  label,
+  value,
+  onChange,
+  ajuda,
+  placeholder,
+  className,
+}: CampoTextoProps) {
+  const id = useId();
+  return (
+    <div className={cn("space-y-1.5", className)}>
+      <div className="flex items-center gap-1.5">
+        <Label htmlFor={id} className="text-xs font-medium text-muted-foreground">
+          {label}
+        </Label>
+        {ajuda ? <Ajuda texto={ajuda} /> : null}
+      </div>
+      <Input
+        id={id}
+        value={value}
+        placeholder={placeholder}
+        autoComplete="off"
+        onChange={(e) => onChange(e.target.value)}
+        className="h-11 text-base"
+      />
+    </div>
+  );
+}
+
+export function Ajuda({ texto }: { texto: string }) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <button
+          type="button"
+          aria-label={`Ajuda: ${texto}`}
+          className="rounded-full text-muted-foreground outline-none transition-colors hover:text-primary focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <HelpCircle className="h-3.5 w-3.5" aria-hidden />
+        </button>
+      </TooltipTrigger>
+      <TooltipContent className="max-w-xs text-xs leading-relaxed">{texto}</TooltipContent>
+    </Tooltip>
+  );
+}
