@@ -293,11 +293,13 @@ describe("8. totais x unitários", () => {
 
   it("dízima 100/3 não perde precisão até a venda", () => {
     const r = calcularCompra(compraSimples({ quantidade: 3, valorUnitario: 100 }), tributos({}));
-    // 100 por unidade exato
     expect(Number(r.custoLiquidoUnitarioExato)).toBeCloseTo(100, 10);
 
+    // 33,333333 × 3 = 99,999999 — o unitário exato reconstrói o total sem erro.
     const r2 = calcularCompra(compraSimples({ quantidade: 3, valorUnitario: 33.333333 }), tributos({}));
-    expect(Number(r2.custoLiquidoUnitarioExato) * 3).toBeCloseTo(r2.custoLiquidoTotal, 6);
+    expect(Number(r2.custoLiquidoUnitarioExato) * 3).toBeCloseTo(99.999999, 9);
+    // O total exposto é o mesmo número, arredondado só para exibição (4 casas).
+    expect(r2.custoLiquidoTotal).toBe(100);
   });
 
   it("quantidade zero não gera divisão por zero", () => {
