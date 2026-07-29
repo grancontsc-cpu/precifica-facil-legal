@@ -149,6 +149,8 @@ export interface PurchaseResult {
   creditosTotais: number;
   custoLiquidoTotal: number;
   custoLiquidoUnitario: number;
+  /** Custo líquido unitário em precisão plena (string Decimal), sem arredondamento. */
+  custoLiquidoUnitarioExato: string;
   valorMedioUnitario: number;
   tributos: PurchaseTaxResult[];
 }
