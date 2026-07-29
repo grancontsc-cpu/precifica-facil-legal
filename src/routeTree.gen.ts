@@ -30,6 +30,7 @@ import { Route as AuthenticatedCompararRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAuditoriaRouteImport } from './routes/_authenticated/auditoria'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authenticated/admin/usuarios'
+import { Route as AuthenticatedAdminSimulacoesRouteImport } from './routes/_authenticated/admin/simulacoes'
 import { Route as AuthenticatedAdminPerfisTributariosRouteImport } from './routes/_authenticated/admin/perfis-tributarios'
 import { Route as AuthenticatedAdminEmpresasRouteImport } from './routes/_authenticated/admin/empresas'
 import { Route as AuthenticatedAdminConvitesRouteImport } from './routes/_authenticated/admin/convites'
@@ -140,6 +141,12 @@ const AuthenticatedAdminUsuariosRoute =
     path: '/admin/usuarios',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminSimulacoesRoute =
+  AuthenticatedAdminSimulacoesRouteImport.update({
+    id: '/admin/simulacoes',
+    path: '/admin/simulacoes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminPerfisTributariosRoute =
   AuthenticatedAdminPerfisTributariosRouteImport.update({
     id: '/admin/perfis-tributarios',
@@ -188,6 +195,7 @@ export interface FileRoutesByFullPath {
   '/admin/convites': typeof AuthenticatedAdminConvitesRoute
   '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
   '/admin/perfis-tributarios': typeof AuthenticatedAdminPerfisTributariosRoute
+  '/admin/simulacoes': typeof AuthenticatedAdminSimulacoesRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
 }
@@ -214,6 +222,7 @@ export interface FileRoutesByTo {
   '/admin/convites': typeof AuthenticatedAdminConvitesRoute
   '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
   '/admin/perfis-tributarios': typeof AuthenticatedAdminPerfisTributariosRoute
+  '/admin/simulacoes': typeof AuthenticatedAdminSimulacoesRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
 }
@@ -242,6 +251,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/convites': typeof AuthenticatedAdminConvitesRoute
   '/_authenticated/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
   '/_authenticated/admin/perfis-tributarios': typeof AuthenticatedAdminPerfisTributariosRoute
+  '/_authenticated/admin/simulacoes': typeof AuthenticatedAdminSimulacoesRoute
   '/_authenticated/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
@@ -270,6 +280,7 @@ export interface FileRouteTypes {
     | '/admin/convites'
     | '/admin/empresas'
     | '/admin/perfis-tributarios'
+    | '/admin/simulacoes'
     | '/admin/usuarios'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
@@ -296,6 +307,7 @@ export interface FileRouteTypes {
     | '/admin/convites'
     | '/admin/empresas'
     | '/admin/perfis-tributarios'
+    | '/admin/simulacoes'
     | '/admin/usuarios'
     | '/admin'
   id:
@@ -323,6 +335,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/convites'
     | '/_authenticated/admin/empresas'
     | '/_authenticated/admin/perfis-tributarios'
+    | '/_authenticated/admin/simulacoes'
     | '/_authenticated/admin/usuarios'
     | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
@@ -491,6 +504,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminUsuariosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/simulacoes': {
+      id: '/_authenticated/admin/simulacoes'
+      path: '/admin/simulacoes'
+      fullPath: '/admin/simulacoes'
+      preLoaderRoute: typeof AuthenticatedAdminSimulacoesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/perfis-tributarios': {
       id: '/_authenticated/admin/perfis-tributarios'
       path: '/admin/perfis-tributarios'
@@ -534,6 +554,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminConvitesRoute: typeof AuthenticatedAdminConvitesRoute
   AuthenticatedAdminEmpresasRoute: typeof AuthenticatedAdminEmpresasRoute
   AuthenticatedAdminPerfisTributariosRoute: typeof AuthenticatedAdminPerfisTributariosRoute
+  AuthenticatedAdminSimulacoesRoute: typeof AuthenticatedAdminSimulacoesRoute
   AuthenticatedAdminUsuariosRoute: typeof AuthenticatedAdminUsuariosRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
@@ -551,6 +572,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminEmpresasRoute: AuthenticatedAdminEmpresasRoute,
   AuthenticatedAdminPerfisTributariosRoute:
     AuthenticatedAdminPerfisTributariosRoute,
+  AuthenticatedAdminSimulacoesRoute: AuthenticatedAdminSimulacoesRoute,
   AuthenticatedAdminUsuariosRoute: AuthenticatedAdminUsuariosRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
