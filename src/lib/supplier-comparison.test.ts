@@ -66,17 +66,18 @@ describe("comparação de fornecedores — exemplo RJ x BA", () => {
   });
 
   it("no ponto de equilíbrio de frete os custos ficam iguais", () => {
-    const limite = limiteFreteEquivalencia(rj(), (() => {
-      const { linhas } = compararFornecedores([rj(), ba()]);
-      return { toNumber: () => 0, ...({} as never) } as never;
-    })() as never);
-    // caminho direto: usa o comparador com o frete no ponto de equilíbrio
-    void limite;
-    const { linhas } = compararFornecedores([rj({ freteTotal: 4.65 }), ba()]);
+    const alvo = new Decimal(
+      compararFornecedores([rj(), ba()]).linhas.find((l) => l.nome === "BA")!.custoLiquidoUnitario,
+    );
+    const limite = limiteFreteEquivalencia(rj(), alvo)!;
+    expect(limite).toBeCloseTo(4.65, 2);
+
+    const { linhas } = compararFornecedores([rj({ freteTotal: limite }), ba()]);
     const a = linhas.find((l) => l.nome === "RJ")!;
     const b = linhas.find((l) => l.nome === "BA")!;
     expect(a.custoLiquidoUnitario).toBeCloseTo(b.custoLiquidoUnitario, 2);
   });
+
 
   it("com frete alto no RJ a BA passa a ser a melhor opção", () => {
     const { linhas, vencedorId } = compararFornecedores([rj({ freteTotal: 10 }), ba()]);
