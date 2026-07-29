@@ -303,10 +303,9 @@ export function resolverPrecoPorMargem(
 
   for (let i = 0; i < 300; i++) {
     const mid = lo.plus(hi).div(2);
-    const evalMid = avaliarPreco(mid, ctx);
-    const diff = D(evalMid.margemEfetiva).minus(alvo);
+    const diff = margemExata(mid, ctx).minus(alvo);
     if (diff.abs().lt(TOLERANCIA) && hi.minus(lo).lt(TOLERANCIA)) {
-      return evalMid;
+      return avaliarPreco(mid, ctx);
     }
     if (diff.gt(0)) hi = mid;
     else lo = mid;
