@@ -281,7 +281,7 @@ function Simulador() {
       if (!orgId) throw new Error("Selecione uma empresa para salvar a simulação.");
       if (!canEdit) throw new Error("Seu perfil é somente de consulta.");
       if (!titulo.trim()) throw new Error("Informe um nome para a simulação.");
-      if (resultado.validacoes.some((v) => v.nivel === "erro")) {
+      if (resultado.issues.some((v) => v.severidade === "erro")) {
         throw new Error("Corrija os erros de validação antes de salvar.");
       }
 
@@ -308,8 +308,8 @@ function Simulador() {
         result_snapshot: resultado as never,
         overridden_fields: alterados as never,
         custo_liquido_unitario: resultado.compra.custoLiquidoUnitario,
-        preco_final: resultado.venda?.precoFinal ?? null,
-        margem_efetiva: resultado.venda?.margemPercentual ?? null,
+        preco_final: resultado.recomendado?.precoFinal ?? null,
+        margem_efetiva: resultado.recomendado?.margemEfetiva ?? null,
         status: "salva" as const,
         calculated_at: new Date().toISOString(),
         created_by: userId,
