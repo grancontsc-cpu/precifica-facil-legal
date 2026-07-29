@@ -369,6 +369,31 @@ function Simulador() {
         </header>
 
         <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
+          <div className="mb-6">
+            <BarraSimulacao
+              titulo={titulo}
+              onTitulo={setTitulo}
+              perfis={(perfisQuery.data ?? []).map((p) => ({
+                id: p.id,
+                rotulo: `${p.name} (v${p.version})`,
+              }))}
+              perfilId={perfilId}
+              onPerfil={(id) => void aplicarPerfilNoEstado(id)}
+              produtos={(produtosQuery.data ?? []).map((p) => ({
+                id: p.id,
+                rotulo: p.sku ? `${p.nome} — ${p.sku}` : p.nome,
+              }))}
+              produtoId={produtoId}
+              onProduto={aplicarProduto}
+              camposAlterados={alterados}
+              camposBloqueados={camposBloqueados.map((c) => ROTULOS_BLOQUEIO[c] ?? c)}
+              podeEditar={canEdit}
+              salvando={salvarNoBanco.isPending}
+              simulacaoSalva={!!simulacaoAtual}
+              onSalvar={() => salvarNoBanco.mutate({ duplicar: false })}
+              onDuplicar={() => salvarNoBanco.mutate({ duplicar: true })}
+            />
+          </div>
           <div className="grid gap-6 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] lg:items-start">
             <div className="space-y-6">
               <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-surface px-4 py-3">
