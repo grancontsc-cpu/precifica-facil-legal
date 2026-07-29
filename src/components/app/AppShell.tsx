@@ -1,5 +1,17 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Building2, Calculator, ClipboardList, History, LogOut, Package, Percent, Scale } from "lucide-react";
+import {
+  Building2,
+  Calculator,
+  ClipboardList,
+  History,
+  LayoutDashboard,
+  LogOut,
+  MailPlus,
+  Package,
+  Percent,
+  Scale,
+  Users,
+} from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,23 +22,37 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useApp } from "@/hooks/useApp";
+import { NOME_PAPEL, useApp } from "@/hooks/useApp";
 import { cn } from "@/lib/utils";
 
-const LINKS = [
-  { to: "/simulador", label: "Simulador", icon: Calculator, adminOnly: false },
-  { to: "/comparar", label: "Comparar fornecedores", icon: Scale, adminOnly: false },
-  { to: "/simulacoes", label: "Simulações", icon: ClipboardList, adminOnly: false },
+type Acesso = "todos" | "manager" | "super_admin";
 
-  { to: "/produtos", label: "Produtos", icon: Package, adminOnly: false },
-  { to: "/perfis", label: "Perfis tributários", icon: Percent, adminOnly: false },
-  { to: "/empresas", label: "Empresas", icon: Building2, adminOnly: true },
-  { to: "/auditoria", label: "Auditoria", icon: History, adminOnly: true },
-] as const;
+const LINKS: { to: string; label: string; icon: typeof Calculator; acesso: Acesso }[] = [
+  { to: "/admin", label: "Administração", icon: LayoutDashboard, acesso: "super_admin" },
+  { to: "/gestao", label: "Gestão", icon: LayoutDashboard, acesso: "manager" },
+  { to: "/simulador", label: "Simulador", icon: Calculator, acesso: "todos" },
+  { to: "/comparar", label: "Comparar fornecedores", icon: Scale, acesso: "todos" },
+  { to: "/simulacoes", label: "Simulações", icon: ClipboardList, acesso: "todos" },
+  { to: "/produtos", label: "Produtos", icon: Package, acesso: "todos" },
+  { to: "/perfis", label: "Perfis tributários", icon: Percent, acesso: "todos" },
+  { to: "/gestao/usuarios", label: "Usuários", icon: Users, acesso: "manager" },
+  { to: "/gestao/convites", label: "Convites", icon: MailPlus, acesso: "manager" },
+  { to: "/admin/usuarios", label: "Todos os usuários", icon: Users, acesso: "super_admin" },
+  { to: "/admin/convites", label: "Todos os convites", icon: MailPlus, acesso: "super_admin" },
+  { to: "/empresas", label: "Empresas", icon: Building2, acesso: "super_admin" },
+  { to: "/auditoria", label: "Auditoria", icon: History, acesso: "super_admin" },
+];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
-  const { organizations, orgId, setOrgId, isGrancontAdmin, email, signOut, canEdit } = useApp();
+  const { organizations, orgId, setOrgId, isSuperAdmin, papel, email, signOut, memberships } = useApp();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const ehGestor = memberships.some((m) => m.role === "manager");
+
+  const visiveis = LINKS.filter((l) => {
+    if (l.acesso === "todos") return true;
+    if (l.acesso === "super_admin") return isSuperAdmin;
+    return ehGestor && !isSuperAdmin;
+  });
 
   return (
     <div className="min-h-screen bg-background">
@@ -36,13 +62,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             Precifica <span className="text-primary">Grancont</span>
           </Link>
           <Badge variant="outline" className="border-primary/30 text-primary">
-            {isGrancontAdmin ? "Admin Grancont" : canEdit ? "Admin da empresa" : "Visualizador"}
+            {NOME_PAPEL[papel]}
           </Badge>
 
           <div className="ml-auto flex items-center gap-2">
-            {organizations.length > 0 ? (
+            {organizations.length > 1 ? (
               <Select value={orgId ?? undefined} onValueChange={setOrgId}>
-                <SelectTrigger className="h-9 w-[210px]">
+                <SelectTrigger className="h-9 w-[190px] sm:w-[210px]">
                   <SelectValue placeholder="Selecione a empresa" />
                 </SelectTrigger>
                 <SelectContent>
@@ -53,6 +79,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   ))}
                 </SelectContent>
               </Select>
+            ) : organizations.length === 1 ? (
+              <span className="hidden text-xs text-muted-foreground sm:inline">{organizations[0].name}</span>
             ) : null}
             <span className="hidden text-xs text-muted-foreground md:inline">{email}</span>
             <Button variant="ghost" size="sm" onClick={() => void signOut()} aria-label="Sair">
@@ -61,9 +89,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
 
           <nav className="order-last flex w-full gap-1 overflow-x-auto pb-1">
-            {LINKS.filter((l) => !l.adminOnly || isGrancontAdmin).map((l) => {
+            {visiveis.map((l) => {
               const Icon = l.icon;
-              const ativo = pathname.startsWith(l.to);
+              const ativo = pathname === l.to || pathname.startsWith(`${l.to}/`);
               return (
                 <Link
                   key={l.to}

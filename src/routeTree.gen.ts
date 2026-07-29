@@ -9,7 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as RedefinirSenhaRouteImport } from './routes/redefinir-senha'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as EsqueciMinhaSenhaRouteImport } from './routes/esqueci-minha-senha'
+import { Route as EntrandoRouteImport } from './routes/entrando'
+import { Route as ConfirmarEmailRouteImport } from './routes/confirmar-email'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AguardandoAprovacaoRouteImport } from './routes/aguardando-aprovacao'
+import { Route as AcessoNegadoRouteImport } from './routes/acesso-negado'
+import { Route as AcessoBloqueadoRouteImport } from './routes/acesso-bloqueado'
+import { Route as AceitarConviteRouteImport } from './routes/aceitar-convite'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedSimuladorRouteImport } from './routes/_authenticated/simulador'
@@ -19,10 +28,65 @@ import { Route as AuthenticatedPerfisRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedEmpresasRouteImport } from './routes/_authenticated/empresas'
 import { Route as AuthenticatedCompararRouteImport } from './routes/_authenticated/comparar'
 import { Route as AuthenticatedAuditoriaRouteImport } from './routes/_authenticated/auditoria'
+import { Route as AuthenticatedGestaoIndexRouteImport } from './routes/_authenticated/gestao/index'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
+import { Route as AuthenticatedGestaoUsuariosRouteImport } from './routes/_authenticated/gestao/usuarios'
+import { Route as AuthenticatedGestaoConvitesRouteImport } from './routes/_authenticated/gestao/convites'
+import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authenticated/admin/usuarios'
+import { Route as AuthenticatedAdminSimulacoesRouteImport } from './routes/_authenticated/admin/simulacoes'
+import { Route as AuthenticatedAdminPerfisTributariosRouteImport } from './routes/_authenticated/admin/perfis-tributarios'
+import { Route as AuthenticatedAdminEmpresasRouteImport } from './routes/_authenticated/admin/empresas'
+import { Route as AuthenticatedAdminConvitesRouteImport } from './routes/_authenticated/admin/convites'
+import { Route as AuthenticatedAdminAuditoriaRouteImport } from './routes/_authenticated/admin/auditoria'
 
+const RedefinirSenhaRoute = RedefinirSenhaRouteImport.update({
+  id: '/redefinir-senha',
+  path: '/redefinir-senha',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EsqueciMinhaSenhaRoute = EsqueciMinhaSenhaRouteImport.update({
+  id: '/esqueci-minha-senha',
+  path: '/esqueci-minha-senha',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EntrandoRoute = EntrandoRouteImport.update({
+  id: '/entrando',
+  path: '/entrando',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConfirmarEmailRoute = ConfirmarEmailRouteImport.update({
+  id: '/confirmar-email',
+  path: '/confirmar-email',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AguardandoAprovacaoRoute = AguardandoAprovacaoRouteImport.update({
+  id: '/aguardando-aprovacao',
+  path: '/aguardando-aprovacao',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AcessoNegadoRoute = AcessoNegadoRouteImport.update({
+  id: '/acesso-negado',
+  path: '/acesso-negado',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AcessoBloqueadoRoute = AcessoBloqueadoRouteImport.update({
+  id: '/acesso-bloqueado',
+  path: '/acesso-bloqueado',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AceitarConviteRoute = AceitarConviteRouteImport.update({
+  id: '/aceitar-convite',
+  path: '/aceitar-convite',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
@@ -69,10 +133,78 @@ const AuthenticatedAuditoriaRoute = AuthenticatedAuditoriaRouteImport.update({
   path: '/auditoria',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedGestaoIndexRoute =
+  AuthenticatedGestaoIndexRouteImport.update({
+    id: '/gestao/',
+    path: '/gestao/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedGestaoUsuariosRoute =
+  AuthenticatedGestaoUsuariosRouteImport.update({
+    id: '/gestao/usuarios',
+    path: '/gestao/usuarios',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedGestaoConvitesRoute =
+  AuthenticatedGestaoConvitesRouteImport.update({
+    id: '/gestao/convites',
+    path: '/gestao/convites',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminUsuariosRoute =
+  AuthenticatedAdminUsuariosRouteImport.update({
+    id: '/admin/usuarios',
+    path: '/admin/usuarios',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminSimulacoesRoute =
+  AuthenticatedAdminSimulacoesRouteImport.update({
+    id: '/admin/simulacoes',
+    path: '/admin/simulacoes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminPerfisTributariosRoute =
+  AuthenticatedAdminPerfisTributariosRouteImport.update({
+    id: '/admin/perfis-tributarios',
+    path: '/admin/perfis-tributarios',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminEmpresasRoute =
+  AuthenticatedAdminEmpresasRouteImport.update({
+    id: '/admin/empresas',
+    path: '/admin/empresas',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminConvitesRoute =
+  AuthenticatedAdminConvitesRouteImport.update({
+    id: '/admin/convites',
+    path: '/admin/convites',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminAuditoriaRoute =
+  AuthenticatedAdminAuditoriaRouteImport.update({
+    id: '/admin/auditoria',
+    path: '/admin/auditoria',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/aceitar-convite': typeof AceitarConviteRoute
+  '/acesso-bloqueado': typeof AcessoBloqueadoRoute
+  '/acesso-negado': typeof AcessoNegadoRoute
+  '/aguardando-aprovacao': typeof AguardandoAprovacaoRoute
   '/auth': typeof AuthRoute
+  '/confirmar-email': typeof ConfirmarEmailRoute
+  '/entrando': typeof EntrandoRoute
+  '/esqueci-minha-senha': typeof EsqueciMinhaSenhaRoute
+  '/login': typeof LoginRoute
+  '/redefinir-senha': typeof RedefinirSenhaRoute
   '/auditoria': typeof AuthenticatedAuditoriaRoute
   '/comparar': typeof AuthenticatedCompararRoute
   '/empresas': typeof AuthenticatedEmpresasRoute
@@ -80,10 +212,29 @@ export interface FileRoutesByFullPath {
   '/produtos': typeof AuthenticatedProdutosRoute
   '/simulacoes': typeof AuthenticatedSimulacoesRoute
   '/simulador': typeof AuthenticatedSimuladorRoute
+  '/admin/auditoria': typeof AuthenticatedAdminAuditoriaRoute
+  '/admin/convites': typeof AuthenticatedAdminConvitesRoute
+  '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
+  '/admin/perfis-tributarios': typeof AuthenticatedAdminPerfisTributariosRoute
+  '/admin/simulacoes': typeof AuthenticatedAdminSimulacoesRoute
+  '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
+  '/gestao/convites': typeof AuthenticatedGestaoConvitesRoute
+  '/gestao/usuarios': typeof AuthenticatedGestaoUsuariosRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/gestao/': typeof AuthenticatedGestaoIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/aceitar-convite': typeof AceitarConviteRoute
+  '/acesso-bloqueado': typeof AcessoBloqueadoRoute
+  '/acesso-negado': typeof AcessoNegadoRoute
+  '/aguardando-aprovacao': typeof AguardandoAprovacaoRoute
   '/auth': typeof AuthRoute
+  '/confirmar-email': typeof ConfirmarEmailRoute
+  '/entrando': typeof EntrandoRoute
+  '/esqueci-minha-senha': typeof EsqueciMinhaSenhaRoute
+  '/login': typeof LoginRoute
+  '/redefinir-senha': typeof RedefinirSenhaRoute
   '/auditoria': typeof AuthenticatedAuditoriaRoute
   '/comparar': typeof AuthenticatedCompararRoute
   '/empresas': typeof AuthenticatedEmpresasRoute
@@ -91,12 +242,31 @@ export interface FileRoutesByTo {
   '/produtos': typeof AuthenticatedProdutosRoute
   '/simulacoes': typeof AuthenticatedSimulacoesRoute
   '/simulador': typeof AuthenticatedSimuladorRoute
+  '/admin/auditoria': typeof AuthenticatedAdminAuditoriaRoute
+  '/admin/convites': typeof AuthenticatedAdminConvitesRoute
+  '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
+  '/admin/perfis-tributarios': typeof AuthenticatedAdminPerfisTributariosRoute
+  '/admin/simulacoes': typeof AuthenticatedAdminSimulacoesRoute
+  '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
+  '/gestao/convites': typeof AuthenticatedGestaoConvitesRoute
+  '/gestao/usuarios': typeof AuthenticatedGestaoUsuariosRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
+  '/gestao': typeof AuthenticatedGestaoIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/aceitar-convite': typeof AceitarConviteRoute
+  '/acesso-bloqueado': typeof AcessoBloqueadoRoute
+  '/acesso-negado': typeof AcessoNegadoRoute
+  '/aguardando-aprovacao': typeof AguardandoAprovacaoRoute
   '/auth': typeof AuthRoute
+  '/confirmar-email': typeof ConfirmarEmailRoute
+  '/entrando': typeof EntrandoRoute
+  '/esqueci-minha-senha': typeof EsqueciMinhaSenhaRoute
+  '/login': typeof LoginRoute
+  '/redefinir-senha': typeof RedefinirSenhaRoute
   '/_authenticated/auditoria': typeof AuthenticatedAuditoriaRoute
   '/_authenticated/comparar': typeof AuthenticatedCompararRoute
   '/_authenticated/empresas': typeof AuthenticatedEmpresasRoute
@@ -104,12 +274,31 @@ export interface FileRoutesById {
   '/_authenticated/produtos': typeof AuthenticatedProdutosRoute
   '/_authenticated/simulacoes': typeof AuthenticatedSimulacoesRoute
   '/_authenticated/simulador': typeof AuthenticatedSimuladorRoute
+  '/_authenticated/admin/auditoria': typeof AuthenticatedAdminAuditoriaRoute
+  '/_authenticated/admin/convites': typeof AuthenticatedAdminConvitesRoute
+  '/_authenticated/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
+  '/_authenticated/admin/perfis-tributarios': typeof AuthenticatedAdminPerfisTributariosRoute
+  '/_authenticated/admin/simulacoes': typeof AuthenticatedAdminSimulacoesRoute
+  '/_authenticated/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
+  '/_authenticated/gestao/convites': typeof AuthenticatedGestaoConvitesRoute
+  '/_authenticated/gestao/usuarios': typeof AuthenticatedGestaoUsuariosRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/gestao/': typeof AuthenticatedGestaoIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/aceitar-convite'
+    | '/acesso-bloqueado'
+    | '/acesso-negado'
+    | '/aguardando-aprovacao'
     | '/auth'
+    | '/confirmar-email'
+    | '/entrando'
+    | '/esqueci-minha-senha'
+    | '/login'
+    | '/redefinir-senha'
     | '/auditoria'
     | '/comparar'
     | '/empresas'
@@ -117,10 +306,29 @@ export interface FileRouteTypes {
     | '/produtos'
     | '/simulacoes'
     | '/simulador'
+    | '/admin/auditoria'
+    | '/admin/convites'
+    | '/admin/empresas'
+    | '/admin/perfis-tributarios'
+    | '/admin/simulacoes'
+    | '/admin/usuarios'
+    | '/gestao/convites'
+    | '/gestao/usuarios'
+    | '/admin/'
+    | '/gestao/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/aceitar-convite'
+    | '/acesso-bloqueado'
+    | '/acesso-negado'
+    | '/aguardando-aprovacao'
     | '/auth'
+    | '/confirmar-email'
+    | '/entrando'
+    | '/esqueci-minha-senha'
+    | '/login'
+    | '/redefinir-senha'
     | '/auditoria'
     | '/comparar'
     | '/empresas'
@@ -128,11 +336,30 @@ export interface FileRouteTypes {
     | '/produtos'
     | '/simulacoes'
     | '/simulador'
+    | '/admin/auditoria'
+    | '/admin/convites'
+    | '/admin/empresas'
+    | '/admin/perfis-tributarios'
+    | '/admin/simulacoes'
+    | '/admin/usuarios'
+    | '/gestao/convites'
+    | '/gestao/usuarios'
+    | '/admin'
+    | '/gestao'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/aceitar-convite'
+    | '/acesso-bloqueado'
+    | '/acesso-negado'
+    | '/aguardando-aprovacao'
     | '/auth'
+    | '/confirmar-email'
+    | '/entrando'
+    | '/esqueci-minha-senha'
+    | '/login'
+    | '/redefinir-senha'
     | '/_authenticated/auditoria'
     | '/_authenticated/comparar'
     | '/_authenticated/empresas'
@@ -140,21 +367,103 @@ export interface FileRouteTypes {
     | '/_authenticated/produtos'
     | '/_authenticated/simulacoes'
     | '/_authenticated/simulador'
+    | '/_authenticated/admin/auditoria'
+    | '/_authenticated/admin/convites'
+    | '/_authenticated/admin/empresas'
+    | '/_authenticated/admin/perfis-tributarios'
+    | '/_authenticated/admin/simulacoes'
+    | '/_authenticated/admin/usuarios'
+    | '/_authenticated/gestao/convites'
+    | '/_authenticated/gestao/usuarios'
+    | '/_authenticated/admin/'
+    | '/_authenticated/gestao/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AceitarConviteRoute: typeof AceitarConviteRoute
+  AcessoBloqueadoRoute: typeof AcessoBloqueadoRoute
+  AcessoNegadoRoute: typeof AcessoNegadoRoute
+  AguardandoAprovacaoRoute: typeof AguardandoAprovacaoRoute
   AuthRoute: typeof AuthRoute
+  ConfirmarEmailRoute: typeof ConfirmarEmailRoute
+  EntrandoRoute: typeof EntrandoRoute
+  EsqueciMinhaSenhaRoute: typeof EsqueciMinhaSenhaRoute
+  LoginRoute: typeof LoginRoute
+  RedefinirSenhaRoute: typeof RedefinirSenhaRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/redefinir-senha': {
+      id: '/redefinir-senha'
+      path: '/redefinir-senha'
+      fullPath: '/redefinir-senha'
+      preLoaderRoute: typeof RedefinirSenhaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/esqueci-minha-senha': {
+      id: '/esqueci-minha-senha'
+      path: '/esqueci-minha-senha'
+      fullPath: '/esqueci-minha-senha'
+      preLoaderRoute: typeof EsqueciMinhaSenhaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/entrando': {
+      id: '/entrando'
+      path: '/entrando'
+      fullPath: '/entrando'
+      preLoaderRoute: typeof EntrandoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/confirmar-email': {
+      id: '/confirmar-email'
+      path: '/confirmar-email'
+      fullPath: '/confirmar-email'
+      preLoaderRoute: typeof ConfirmarEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/aguardando-aprovacao': {
+      id: '/aguardando-aprovacao'
+      path: '/aguardando-aprovacao'
+      fullPath: '/aguardando-aprovacao'
+      preLoaderRoute: typeof AguardandoAprovacaoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/acesso-negado': {
+      id: '/acesso-negado'
+      path: '/acesso-negado'
+      fullPath: '/acesso-negado'
+      preLoaderRoute: typeof AcessoNegadoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/acesso-bloqueado': {
+      id: '/acesso-bloqueado'
+      path: '/acesso-bloqueado'
+      fullPath: '/acesso-bloqueado'
+      preLoaderRoute: typeof AcessoBloqueadoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/aceitar-convite': {
+      id: '/aceitar-convite'
+      path: '/aceitar-convite'
+      fullPath: '/aceitar-convite'
+      preLoaderRoute: typeof AceitarConviteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -220,6 +529,76 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAuditoriaRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/gestao/': {
+      id: '/_authenticated/gestao/'
+      path: '/gestao'
+      fullPath: '/gestao/'
+      preLoaderRoute: typeof AuthenticatedGestaoIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/admin'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/gestao/usuarios': {
+      id: '/_authenticated/gestao/usuarios'
+      path: '/gestao/usuarios'
+      fullPath: '/gestao/usuarios'
+      preLoaderRoute: typeof AuthenticatedGestaoUsuariosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/gestao/convites': {
+      id: '/_authenticated/gestao/convites'
+      path: '/gestao/convites'
+      fullPath: '/gestao/convites'
+      preLoaderRoute: typeof AuthenticatedGestaoConvitesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/usuarios': {
+      id: '/_authenticated/admin/usuarios'
+      path: '/admin/usuarios'
+      fullPath: '/admin/usuarios'
+      preLoaderRoute: typeof AuthenticatedAdminUsuariosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/simulacoes': {
+      id: '/_authenticated/admin/simulacoes'
+      path: '/admin/simulacoes'
+      fullPath: '/admin/simulacoes'
+      preLoaderRoute: typeof AuthenticatedAdminSimulacoesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/perfis-tributarios': {
+      id: '/_authenticated/admin/perfis-tributarios'
+      path: '/admin/perfis-tributarios'
+      fullPath: '/admin/perfis-tributarios'
+      preLoaderRoute: typeof AuthenticatedAdminPerfisTributariosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/empresas': {
+      id: '/_authenticated/admin/empresas'
+      path: '/admin/empresas'
+      fullPath: '/admin/empresas'
+      preLoaderRoute: typeof AuthenticatedAdminEmpresasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/convites': {
+      id: '/_authenticated/admin/convites'
+      path: '/admin/convites'
+      fullPath: '/admin/convites'
+      preLoaderRoute: typeof AuthenticatedAdminConvitesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/auditoria': {
+      id: '/_authenticated/admin/auditoria'
+      path: '/admin/auditoria'
+      fullPath: '/admin/auditoria'
+      preLoaderRoute: typeof AuthenticatedAdminAuditoriaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -231,6 +610,16 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProdutosRoute: typeof AuthenticatedProdutosRoute
   AuthenticatedSimulacoesRoute: typeof AuthenticatedSimulacoesRoute
   AuthenticatedSimuladorRoute: typeof AuthenticatedSimuladorRoute
+  AuthenticatedAdminAuditoriaRoute: typeof AuthenticatedAdminAuditoriaRoute
+  AuthenticatedAdminConvitesRoute: typeof AuthenticatedAdminConvitesRoute
+  AuthenticatedAdminEmpresasRoute: typeof AuthenticatedAdminEmpresasRoute
+  AuthenticatedAdminPerfisTributariosRoute: typeof AuthenticatedAdminPerfisTributariosRoute
+  AuthenticatedAdminSimulacoesRoute: typeof AuthenticatedAdminSimulacoesRoute
+  AuthenticatedAdminUsuariosRoute: typeof AuthenticatedAdminUsuariosRoute
+  AuthenticatedGestaoConvitesRoute: typeof AuthenticatedGestaoConvitesRoute
+  AuthenticatedGestaoUsuariosRoute: typeof AuthenticatedGestaoUsuariosRoute
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+  AuthenticatedGestaoIndexRoute: typeof AuthenticatedGestaoIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -241,6 +630,17 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedProdutosRoute: AuthenticatedProdutosRoute,
   AuthenticatedSimulacoesRoute: AuthenticatedSimulacoesRoute,
   AuthenticatedSimuladorRoute: AuthenticatedSimuladorRoute,
+  AuthenticatedAdminAuditoriaRoute: AuthenticatedAdminAuditoriaRoute,
+  AuthenticatedAdminConvitesRoute: AuthenticatedAdminConvitesRoute,
+  AuthenticatedAdminEmpresasRoute: AuthenticatedAdminEmpresasRoute,
+  AuthenticatedAdminPerfisTributariosRoute:
+    AuthenticatedAdminPerfisTributariosRoute,
+  AuthenticatedAdminSimulacoesRoute: AuthenticatedAdminSimulacoesRoute,
+  AuthenticatedAdminUsuariosRoute: AuthenticatedAdminUsuariosRoute,
+  AuthenticatedGestaoConvitesRoute: AuthenticatedGestaoConvitesRoute,
+  AuthenticatedGestaoUsuariosRoute: AuthenticatedGestaoUsuariosRoute,
+  AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+  AuthenticatedGestaoIndexRoute: AuthenticatedGestaoIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -249,8 +649,27 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AceitarConviteRoute: AceitarConviteRoute,
+  AcessoBloqueadoRoute: AcessoBloqueadoRoute,
+  AcessoNegadoRoute: AcessoNegadoRoute,
+  AguardandoAprovacaoRoute: AguardandoAprovacaoRoute,
   AuthRoute: AuthRoute,
+  ConfirmarEmailRoute: ConfirmarEmailRoute,
+  EntrandoRoute: EntrandoRoute,
+  EsqueciMinhaSenhaRoute: EsqueciMinhaSenhaRoute,
+  LoginRoute: LoginRoute,
+  RedefinirSenhaRoute: RedefinirSenhaRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
