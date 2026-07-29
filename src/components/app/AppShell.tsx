@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Building2, Calculator, ClipboardList, History, LogOut, Package, Percent } from "lucide-react";
+import { Building2, Calculator, ClipboardList, History, LogOut, Package, Percent, Scale } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
