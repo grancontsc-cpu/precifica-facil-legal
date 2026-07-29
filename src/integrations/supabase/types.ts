@@ -58,26 +58,136 @@ export type Database = {
           },
         ]
       }
-      organization_members: {
+      bootstrap_super_admins: {
         Row: {
           created_at: string
+          email: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+        }
+        Relationships: []
+      }
+      global_user_roles: {
+        Row: {
+          created_at: string
+          granted_by: string | null
           id: string
-          organization_id: string
-          role: Database["public"]["Enums"]["org_role"]
+          role: string
           user_id: string
         }
         Insert: {
           created_at?: string
+          granted_by?: string | null
           id?: string
-          organization_id: string
-          role?: Database["public"]["Enums"]["org_role"]
+          role?: string
           user_id: string
         }
         Update: {
           created_at?: string
+          granted_by?: string | null
           id?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      invitations: {
+        Row: {
+          accepted_at: string | null
+          cancelled_at: string | null
+          created_at: string
+          email: string
+          expires_at: string
+          full_name: string | null
+          id: string
+          intended_role: string
+          invitation_status: string
+          invited_by: string | null
+          organization_id: string
+          token_hash: string | null
+          updated_at: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          cancelled_at?: string | null
+          created_at?: string
+          email: string
+          expires_at?: string
+          full_name?: string | null
+          id?: string
+          intended_role: string
+          invitation_status?: string
+          invited_by?: string | null
+          organization_id: string
+          token_hash?: string | null
+          updated_at?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          cancelled_at?: string | null
+          created_at?: string
+          email?: string
+          expires_at?: string
+          full_name?: string | null
+          id?: string
+          intended_role?: string
+          invitation_status?: string
+          invited_by?: string | null
           organization_id?: string
-          role?: Database["public"]["Enums"]["org_role"]
+          token_hash?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invitations_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organization_members: {
+        Row: {
+          approved_by: string | null
+          created_at: string
+          id: string
+          invited_by: string | null
+          joined_at: string
+          membership_status: string
+          organization_id: string
+          role: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          approved_by?: string | null
+          created_at?: string
+          id?: string
+          invited_by?: string | null
+          joined_at?: string
+          membership_status?: string
+          organization_id: string
+          role?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          approved_by?: string | null
+          created_at?: string
+          id?: string
+          invited_by?: string | null
+          joined_at?: string
+          membership_status?: string
+          organization_id?: string
+          role?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: [
@@ -93,40 +203,49 @@ export type Database = {
       organizations: {
         Row: {
           active: boolean
+          archived_at: string | null
           cnpj: string | null
           created_at: string
           created_by: string | null
           default_tax_profile_id: string | null
           defaults: Json
           id: string
+          legal_name: string | null
           name: string
           regime: string | null
+          trade_name: string | null
           uf: string | null
           updated_at: string
         }
         Insert: {
           active?: boolean
+          archived_at?: string | null
           cnpj?: string | null
           created_at?: string
           created_by?: string | null
           default_tax_profile_id?: string | null
           defaults?: Json
           id?: string
+          legal_name?: string | null
           name: string
           regime?: string | null
+          trade_name?: string | null
           uf?: string | null
           updated_at?: string
         }
         Update: {
           active?: boolean
+          archived_at?: string | null
           cnpj?: string | null
           created_at?: string
           created_by?: string | null
           default_tax_profile_id?: string | null
           defaults?: Json
           id?: string
+          legal_name?: string | null
           name?: string
           regime?: string | null
+          trade_name?: string | null
           uf?: string | null
           updated_at?: string
         }
@@ -195,24 +314,39 @@ export type Database = {
       }
       profiles: {
         Row: {
+          account_status: string
+          avatar_url: string | null
           created_at: string
           email: string | null
+          email_verified_at: string | null
           full_name: string | null
           id: string
+          last_access_at: string | null
+          phone: string | null
           updated_at: string
         }
         Insert: {
+          account_status?: string
+          avatar_url?: string | null
           created_at?: string
           email?: string | null
+          email_verified_at?: string | null
           full_name?: string | null
           id: string
+          last_access_at?: string | null
+          phone?: string | null
           updated_at?: string
         }
         Update: {
+          account_status?: string
+          avatar_url?: string | null
           created_at?: string
           email?: string | null
+          email_verified_at?: string | null
           full_name?: string | null
           id?: string
+          last_access_at?: string | null
+          phone?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -348,7 +482,9 @@ export type Database = {
       }
       simulations: {
         Row: {
+          archived_at: string | null
           calculated_at: string
+          calculation_version: string
           created_at: string
           created_by: string | null
           custo_liquido_unitario: number | null
@@ -369,9 +505,12 @@ export type Database = {
           tax_profile_version: number | null
           titulo: string
           updated_at: string
+          updated_by: string | null
         }
         Insert: {
+          archived_at?: string | null
           calculated_at?: string
+          calculation_version?: string
           created_at?: string
           created_by?: string | null
           custo_liquido_unitario?: number | null
@@ -392,9 +531,12 @@ export type Database = {
           tax_profile_version?: number | null
           titulo?: string
           updated_at?: string
+          updated_by?: string | null
         }
         Update: {
+          archived_at?: string | null
           calculated_at?: string
+          calculation_version?: string
           created_at?: string
           created_by?: string | null
           custo_liquido_unitario?: number | null
@@ -415,6 +557,7 @@ export type Database = {
           tax_profile_version?: number | null
           titulo?: string
           updated_at?: string
+          updated_by?: string | null
         }
         Relationships: [
           {
@@ -591,8 +734,11 @@ export type Database = {
     }
     Functions: {
       bootstrap_grancont_admin: { Args: never; Returns: boolean }
+      can_access_simulation: { Args: { _sim: string }; Returns: boolean }
+      can_manage_org_users: { Args: { _org: string }; Returns: boolean }
       can_read_simulation: { Args: { _sim: string }; Returns: boolean }
       can_write_simulation: { Args: { _sim: string }; Returns: boolean }
+      has_org_role: { Args: { _org: string; _role: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -600,9 +746,11 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_active_user: { Args: never; Returns: boolean }
       is_grancont_admin: { Args: never; Returns: boolean }
       is_org_admin: { Args: { _org: string }; Returns: boolean }
       is_org_member: { Args: { _org: string }; Returns: boolean }
+      is_super_admin: { Args: never; Returns: boolean }
     }
     Enums: {
       app_role: "grancont_admin"
