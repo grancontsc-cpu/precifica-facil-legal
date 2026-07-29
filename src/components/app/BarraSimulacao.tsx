@@ -33,6 +33,7 @@ interface Props {
   onSalvar: () => void;
   onDuplicar: () => void;
   simulacaoSalva: boolean;
+  acoes?: React.ReactNode;
 }
 
 export function BarraSimulacao({
