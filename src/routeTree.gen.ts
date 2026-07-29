@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as EntrandoRouteImport } from './routes/entrando'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
@@ -24,6 +25,11 @@ import { Route as AuthenticatedAuditoriaRouteImport } from './routes/_authentica
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EntrandoRoute = EntrandoRouteImport.update({
+  id: '/entrando',
+  path: '/entrando',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -79,6 +85,7 @@ const AuthenticatedAuditoriaRoute = AuthenticatedAuditoriaRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/entrando': typeof EntrandoRoute
   '/login': typeof LoginRoute
   '/auditoria': typeof AuthenticatedAuditoriaRoute
   '/comparar': typeof AuthenticatedCompararRoute
@@ -91,6 +98,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/entrando': typeof EntrandoRoute
   '/login': typeof LoginRoute
   '/auditoria': typeof AuthenticatedAuditoriaRoute
   '/comparar': typeof AuthenticatedCompararRoute
@@ -105,6 +113,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/entrando': typeof EntrandoRoute
   '/login': typeof LoginRoute
   '/_authenticated/auditoria': typeof AuthenticatedAuditoriaRoute
   '/_authenticated/comparar': typeof AuthenticatedCompararRoute
@@ -119,6 +128,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/entrando'
     | '/login'
     | '/auditoria'
     | '/comparar'
@@ -131,6 +141,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/entrando'
     | '/login'
     | '/auditoria'
     | '/comparar'
@@ -144,6 +155,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/entrando'
     | '/login'
     | '/_authenticated/auditoria'
     | '/_authenticated/comparar'
@@ -158,6 +170,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  EntrandoRoute: typeof EntrandoRoute
   LoginRoute: typeof LoginRoute
 }
 
@@ -168,6 +181,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/entrando': {
+      id: '/entrando'
+      path: '/entrando'
+      fullPath: '/entrando'
+      preLoaderRoute: typeof EntrandoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -270,6 +290,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  EntrandoRoute: EntrandoRoute,
   LoginRoute: LoginRoute,
 }
 export const routeTree = rootRouteImport
