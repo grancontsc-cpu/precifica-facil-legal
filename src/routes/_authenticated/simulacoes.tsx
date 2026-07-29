@@ -55,7 +55,7 @@ function SimulacoesPage() {
       const { data, error } = await supabase
         .from("simulations")
         .select(
-          "id, titulo, produto_nome, status, created_at, updated_at, preco_final, margem_efetiva, custo_liquido_unitario, quantidade, tax_profile_name, tax_profile_version",
+          "id, titulo, produto_nome, status, created_at, updated_at, preco_final, margem_efetiva, custo_liquido_unitario, quantidade, tax_profile_name, tax_profile_version, input_snapshot, result_snapshot, overridden_fields",
         )
         .eq("organization_id", orgId!)
         .order("updated_at", { ascending: false });
