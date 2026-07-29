@@ -14,6 +14,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as EsqueciMinhaSenhaRouteImport } from './routes/esqueci-minha-senha'
 import { Route as EntrandoRouteImport } from './routes/entrando'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AcessoNegadoRouteImport } from './routes/acesso-negado'
 import { Route as AcessoBloqueadoRouteImport } from './routes/acesso-bloqueado'
 import { Route as AceitarConviteRouteImport } from './routes/aceitar-convite'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
@@ -49,6 +50,11 @@ const EntrandoRoute = EntrandoRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AcessoNegadoRoute = AcessoNegadoRouteImport.update({
+  id: '/acesso-negado',
+  path: '/acesso-negado',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AcessoBloqueadoRoute = AcessoBloqueadoRouteImport.update({
@@ -110,6 +116,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/aceitar-convite': typeof AceitarConviteRoute
   '/acesso-bloqueado': typeof AcessoBloqueadoRoute
+  '/acesso-negado': typeof AcessoNegadoRoute
   '/auth': typeof AuthRoute
   '/entrando': typeof EntrandoRoute
   '/esqueci-minha-senha': typeof EsqueciMinhaSenhaRoute
@@ -127,6 +134,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/aceitar-convite': typeof AceitarConviteRoute
   '/acesso-bloqueado': typeof AcessoBloqueadoRoute
+  '/acesso-negado': typeof AcessoNegadoRoute
   '/auth': typeof AuthRoute
   '/entrando': typeof EntrandoRoute
   '/esqueci-minha-senha': typeof EsqueciMinhaSenhaRoute
@@ -146,6 +154,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/aceitar-convite': typeof AceitarConviteRoute
   '/acesso-bloqueado': typeof AcessoBloqueadoRoute
+  '/acesso-negado': typeof AcessoNegadoRoute
   '/auth': typeof AuthRoute
   '/entrando': typeof EntrandoRoute
   '/esqueci-minha-senha': typeof EsqueciMinhaSenhaRoute
@@ -165,6 +174,7 @@ export interface FileRouteTypes {
     | '/'
     | '/aceitar-convite'
     | '/acesso-bloqueado'
+    | '/acesso-negado'
     | '/auth'
     | '/entrando'
     | '/esqueci-minha-senha'
@@ -182,6 +192,7 @@ export interface FileRouteTypes {
     | '/'
     | '/aceitar-convite'
     | '/acesso-bloqueado'
+    | '/acesso-negado'
     | '/auth'
     | '/entrando'
     | '/esqueci-minha-senha'
@@ -200,6 +211,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/aceitar-convite'
     | '/acesso-bloqueado'
+    | '/acesso-negado'
     | '/auth'
     | '/entrando'
     | '/esqueci-minha-senha'
@@ -219,6 +231,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AceitarConviteRoute: typeof AceitarConviteRoute
   AcessoBloqueadoRoute: typeof AcessoBloqueadoRoute
+  AcessoNegadoRoute: typeof AcessoNegadoRoute
   AuthRoute: typeof AuthRoute
   EntrandoRoute: typeof EntrandoRoute
   EsqueciMinhaSenhaRoute: typeof EsqueciMinhaSenhaRoute
@@ -261,6 +274,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/acesso-negado': {
+      id: '/acesso-negado'
+      path: '/acesso-negado'
+      fullPath: '/acesso-negado'
+      preLoaderRoute: typeof AcessoNegadoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/acesso-bloqueado': {
@@ -371,6 +391,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AceitarConviteRoute: AceitarConviteRoute,
   AcessoBloqueadoRoute: AcessoBloqueadoRoute,
+  AcessoNegadoRoute: AcessoNegadoRoute,
   AuthRoute: AuthRoute,
   EntrandoRoute: EntrandoRoute,
   EsqueciMinhaSenhaRoute: EsqueciMinhaSenhaRoute,
