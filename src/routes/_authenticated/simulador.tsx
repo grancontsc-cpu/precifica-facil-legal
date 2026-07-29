@@ -59,7 +59,7 @@ const ROTULOS_BLOQUEIO: Record<string, string> = {
 };
 
 export const Route = createFileRoute("/_authenticated/simulador")({
-  validateSearch: (search: Record<string, unknown>) => ({
+  validateSearch: (search: Record<string, unknown>): { simulacao?: string; produto?: string } => ({
     simulacao: typeof search.simulacao === "string" ? search.simulacao : undefined,
     produto: typeof search.produto === "string" ? search.produto : undefined,
   }),
