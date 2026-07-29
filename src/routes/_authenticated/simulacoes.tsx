@@ -16,6 +16,8 @@ import {
 } from "@/components/ui/select";
 import { useApp } from "@/hooks/useApp";
 import { supabase } from "@/integrations/supabase/client";
+import { ExportarSimulacao } from "@/components/report/ExportarSimulacao";
+import type { SimulationResult, SimulationState } from "@/types/pricing";
 import { formatBRL, formatPercent } from "@/lib/format";
 
 const TITULO = "Histórico de simulações — Precifica Grancont";
@@ -174,6 +176,24 @@ function SimulacoesPage() {
                     >
                       Abrir
                     </Button>
+                    {s.input_snapshot && s.result_snapshot ? (
+                      <ExportarSimulacao
+                        state={s.input_snapshot as unknown as SimulationState}
+                        resultado={s.result_snapshot as unknown as SimulationResult}
+                        meta={{
+                          empresa: nomeEmpresa,
+                          produto: s.produto_nome ?? "Produto avulso",
+                          tituloSimulacao: s.titulo,
+                          perfilTributario: s.tax_profile_name
+                            ? `${s.tax_profile_name}${s.tax_profile_version ? ` (v${s.tax_profile_version})` : ""}`
+                            : "Configuração manual",
+                          dataSimulacao: new Date(s.updated_at),
+                          camposAlterados: Array.isArray(s.overridden_fields)
+                            ? (s.overridden_fields as string[])
+                            : [],
+                        }}
+                      />
+                    ) : null}
                     {canEdit ? (
                       <>
                         <Button variant="ghost" size="sm" onClick={() => duplicar.mutate(s.id)}>
