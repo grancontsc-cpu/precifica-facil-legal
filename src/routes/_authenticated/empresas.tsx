@@ -124,10 +124,10 @@ function EmpresasPage() {
   });
 
   const adicionarMembro = useMutation({
-    mutationFn: async ({ user_id, role }: { user_id: string; role: "org_admin" | "viewer" }) => {
+    mutationFn: async ({ user_id, role }: { user_id: string; role: "manager" | "user" }) => {
       const { error } = await supabase
         .from("organization_members")
-        .insert({ organization_id: selecionada!, user_id, role });
+        .insert({ organization_id: selecionada!, user_id, role, membership_status: "active" });
       if (error) throw error;
     },
     onSuccess: () => {
@@ -147,7 +147,7 @@ function EmpresasPage() {
   });
 
   const [novoUsuario, setNovoUsuario] = useState<string>("");
-  const [novoPapel, setNovoPapel] = useState<"org_admin" | "viewer">("viewer");
+  const [novoPapel, setNovoPapel] = useState<"manager" | "user">("user");
 
   if (!isGrancontAdmin) {
     return (
@@ -239,13 +239,13 @@ function EmpresasPage() {
                       ))}
                     </SelectContent>
                   </Select>
-                  <Select value={novoPapel} onValueChange={(v) => setNovoPapel(v as "org_admin" | "viewer")}>
+                  <Select value={novoPapel} onValueChange={(v) => setNovoPapel(v as "manager" | "user")}>
                     <SelectTrigger className="h-9">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="org_admin">Administrador da empresa</SelectItem>
-                      <SelectItem value="viewer">Visualizador</SelectItem>
+                      <SelectItem value="manager">Gestor da empresa</SelectItem>
+                      <SelectItem value="user">Usuário</SelectItem>
                     </SelectContent>
                   </Select>
                   <Button
@@ -263,7 +263,7 @@ function EmpresasPage() {
                       <li key={m.id} className="flex items-center gap-3 text-sm">
                         <span className="flex-1 truncate">{p?.email ?? p?.full_name ?? m.user_id}</span>
                         <Badge variant="outline">
-                          {m.role === "org_admin" ? "Admin da empresa" : "Visualizador"}
+                          {m.role === "manager" ? "Gestor" : "Usuário"}
                         </Badge>
                         <Button variant="ghost" size="sm" onClick={() => removerMembro.mutate(m.id)}>
                           Remover
