@@ -13,6 +13,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedSimuladorRouteImport } from './routes/_authenticated/simulador'
+import { Route as AuthenticatedSimulacoesRouteImport } from './routes/_authenticated/simulacoes'
 import { Route as AuthenticatedProdutosRouteImport } from './routes/_authenticated/produtos'
 import { Route as AuthenticatedPerfisRouteImport } from './routes/_authenticated/perfis'
 import { Route as AuthenticatedEmpresasRouteImport } from './routes/_authenticated/empresas'
@@ -34,6 +35,11 @@ const IndexRoute = IndexRouteImport.update({
 const AuthenticatedSimuladorRoute = AuthenticatedSimuladorRouteImport.update({
   id: '/simulador',
   path: '/simulador',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSimulacoesRoute = AuthenticatedSimulacoesRouteImport.update({
+  id: '/simulacoes',
+  path: '/simulacoes',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedProdutosRoute = AuthenticatedProdutosRouteImport.update({
@@ -58,6 +64,7 @@ export interface FileRoutesByFullPath {
   '/empresas': typeof AuthenticatedEmpresasRoute
   '/perfis': typeof AuthenticatedPerfisRoute
   '/produtos': typeof AuthenticatedProdutosRoute
+  '/simulacoes': typeof AuthenticatedSimulacoesRoute
   '/simulador': typeof AuthenticatedSimuladorRoute
 }
 export interface FileRoutesByTo {
@@ -66,6 +73,7 @@ export interface FileRoutesByTo {
   '/empresas': typeof AuthenticatedEmpresasRoute
   '/perfis': typeof AuthenticatedPerfisRoute
   '/produtos': typeof AuthenticatedProdutosRoute
+  '/simulacoes': typeof AuthenticatedSimulacoesRoute
   '/simulador': typeof AuthenticatedSimuladorRoute
 }
 export interface FileRoutesById {
@@ -76,6 +84,7 @@ export interface FileRoutesById {
   '/_authenticated/empresas': typeof AuthenticatedEmpresasRoute
   '/_authenticated/perfis': typeof AuthenticatedPerfisRoute
   '/_authenticated/produtos': typeof AuthenticatedProdutosRoute
+  '/_authenticated/simulacoes': typeof AuthenticatedSimulacoesRoute
   '/_authenticated/simulador': typeof AuthenticatedSimuladorRoute
 }
 export interface FileRouteTypes {
@@ -86,9 +95,17 @@ export interface FileRouteTypes {
     | '/empresas'
     | '/perfis'
     | '/produtos'
+    | '/simulacoes'
     | '/simulador'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/empresas' | '/perfis' | '/produtos' | '/simulador'
+  to:
+    | '/'
+    | '/auth'
+    | '/empresas'
+    | '/perfis'
+    | '/produtos'
+    | '/simulacoes'
+    | '/simulador'
   id:
     | '__root__'
     | '/'
@@ -97,6 +114,7 @@ export interface FileRouteTypes {
     | '/_authenticated/empresas'
     | '/_authenticated/perfis'
     | '/_authenticated/produtos'
+    | '/_authenticated/simulacoes'
     | '/_authenticated/simulador'
   fileRoutesById: FileRoutesById
 }
@@ -136,6 +154,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSimuladorRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/simulacoes': {
+      id: '/_authenticated/simulacoes'
+      path: '/simulacoes'
+      fullPath: '/simulacoes'
+      preLoaderRoute: typeof AuthenticatedSimulacoesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/produtos': {
       id: '/_authenticated/produtos'
       path: '/produtos'
@@ -164,6 +189,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedEmpresasRoute: typeof AuthenticatedEmpresasRoute
   AuthenticatedPerfisRoute: typeof AuthenticatedPerfisRoute
   AuthenticatedProdutosRoute: typeof AuthenticatedProdutosRoute
+  AuthenticatedSimulacoesRoute: typeof AuthenticatedSimulacoesRoute
   AuthenticatedSimuladorRoute: typeof AuthenticatedSimuladorRoute
 }
 
@@ -171,6 +197,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedEmpresasRoute: AuthenticatedEmpresasRoute,
   AuthenticatedPerfisRoute: AuthenticatedPerfisRoute,
   AuthenticatedProdutosRoute: AuthenticatedProdutosRoute,
+  AuthenticatedSimulacoesRoute: AuthenticatedSimulacoesRoute,
   AuthenticatedSimuladorRoute: AuthenticatedSimuladorRoute,
 }
 
