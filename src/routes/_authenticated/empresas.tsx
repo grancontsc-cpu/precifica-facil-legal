@@ -72,7 +72,7 @@ function EmpresasPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("organization_members")
-        .select("id, user_id, role, profiles:profiles(full_name, email)")
+        .select("id, user_id, role")
         .eq("organization_id", selecionada!);
       if (error) throw error;
       return data;
@@ -258,7 +258,7 @@ function EmpresasPage() {
 
                 <ul className="mt-4 space-y-2">
                   {(membros.data ?? []).map((m) => {
-                    const p = m.profiles as { full_name: string | null; email: string | null } | null;
+                    const p = (usuarios.data ?? []).find((u) => u.id === m.user_id);
                     return (
                       <li key={m.id} className="flex items-center gap-3 text-sm">
                         <span className="flex-1 truncate">{p?.email ?? p?.full_name ?? m.user_id}</span>
