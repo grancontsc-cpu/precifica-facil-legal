@@ -169,14 +169,6 @@ const statusSchema = z.object({
   organizationId: uuid.optional(),
 });
 
-async function alterarStatus(
-  contextSupabase: never,
-  _: never,
-): Promise<never> {
-  throw new Error("não utilizado");
-}
-void alterarStatus;
-
 export const alterarStatusUsuario = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
