@@ -38,7 +38,7 @@ const TITULO = "Precifica Grancont — simulador de preço de venda";
 const DESCRICAO =
   "Calcule custo líquido de aquisição, créditos tributários e preço de venda recomendado com memória de cálculo completa e tributos totalmente configuráveis.";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/_authenticated/simulador")({
   head: () => ({
     meta: [
       { title: TITULO },
