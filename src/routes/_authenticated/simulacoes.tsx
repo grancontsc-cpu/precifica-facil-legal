@@ -52,7 +52,7 @@ function SimulacoesPage() {
       const { data, error } = await supabase
         .from("simulations")
         .select(
-          "id, nome, produto_nome, archived, created_at, updated_at, preco_final, margem_percentual, custo_liquido_unitario, quantidade, tax_profile_name, tax_profile_version",
+          "id, titulo, produto_nome, status, created_at, updated_at, preco_final, margem_efetiva, custo_liquido_unitario, quantidade, tax_profile_name, tax_profile_version",
         )
         .eq("organization_id", orgId!)
         .order("updated_at", { ascending: false });
@@ -64,16 +64,19 @@ function SimulacoesPage() {
   const lista = useMemo(() => {
     const termo = busca.trim().toLowerCase();
     return (simulacoes.data ?? []).filter((s) => {
-      if (situacao === "ativas" && s.archived) return false;
-      if (situacao === "arquivadas" && !s.archived) return false;
+      if (situacao === "ativas" && s.status === "arquivada") return false;
+      if (situacao === "arquivadas" && s.status !== "arquivada") return false;
       if (!termo) return true;
-      return `${s.nome} ${s.produto_nome ?? ""} ${s.tax_profile_name ?? ""}`.toLowerCase().includes(termo);
+      return `${s.titulo} ${s.produto_nome ?? ""} ${s.tax_profile_name ?? ""}`.toLowerCase().includes(termo);
     });
   }, [simulacoes.data, busca, situacao]);
 
   const arquivar = useMutation({
     mutationFn: async ({ id, archived }: { id: string; archived: boolean }) => {
-      const { error } = await supabase.from("simulations").update({ archived }).eq("id", id);
+      const { error } = await supabase
+        .from("simulations")
+        .update({ status: archived ? "arquivada" : "salva" })
+        .eq("id", id);
       if (error) throw error;
     },
     onSuccess: (_d, v) => {
@@ -91,8 +94,8 @@ function SimulacoesPage() {
       delete copia.id;
       delete copia.created_at;
       delete copia.updated_at;
-      copia.nome = `${data.nome} (cópia)`;
-      copia.archived = false;
+      copia.titulo = `${data.titulo} (cópia)`;
+      copia.status = "salva";
       copia.created_by = userId;
       const { error: insErr } = await supabase.from("simulations").insert(copia as never);
       if (insErr) throw insErr;
@@ -147,10 +150,10 @@ function SimulacoesPage() {
             {lista.map((s) => (
               <tr key={s.id} className="border-t border-border">
                 <td className="px-4 py-3">
-                  <p className="font-medium text-foreground">{s.nome}</p>
+                  <p className="font-medium text-foreground">{s.titulo}</p>
                   <p className="text-xs text-muted-foreground">
                     {s.produto_nome ?? "sem produto"} · {new Date(s.updated_at).toLocaleString("pt-BR")}
-                    {s.archived ? " · arquivada" : ""}
+                    {s.status === "arquivada" ? " · arquivada" : ""}
                   </p>
                 </td>
                 <td className="px-4 py-3">
@@ -161,7 +164,7 @@ function SimulacoesPage() {
                 </td>
                 <td className="px-4 py-3 text-right">{formatBRL(Number(s.custo_liquido_unitario ?? 0))}</td>
                 <td className="px-4 py-3 text-right font-medium">{formatBRL(Number(s.preco_final ?? 0))}</td>
-                <td className="px-4 py-3 text-right">{formatPercent(Number(s.margem_percentual ?? 0))}</td>
+                <td className="px-4 py-3 text-right">{formatPercent(Number(s.margem_efetiva ?? 0))}</td>
                 <td className="px-4 py-3">
                   <div className="flex justify-end gap-1">
                     <Button
@@ -179,9 +182,9 @@ function SimulacoesPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => arquivar.mutate({ id: s.id, archived: !s.archived })}
+                          onClick={() => arquivar.mutate({ id: s.id, archived: s.status !== "arquivada" })}
                         >
-                          {s.archived ? "Reativar" : "Arquivar"}
+                          {s.status === "arquivada" ? "Reativar" : "Arquivar"}
                         </Button>
                       </>
                     ) : null}

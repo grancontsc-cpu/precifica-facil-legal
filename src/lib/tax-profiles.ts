@@ -105,12 +105,7 @@ export function aplicarPerfil(
 }
 
 /** Cria as linhas persistíveis a partir de um estado do simulador. */
-const num = (v: unknown): number => {
-  const n = typeof v === "number" ? v : Number(String(v ?? "").replace(",", "."));
-  return Number.isFinite(n) ? n : 0;
-};
-
-export function linhasDoEstado(state: SimulationState): Omit<TaxProfileLineRow, "id" | "tax_profile_id">[] {
+export function linhasDoEstado(state: SimulationState) {
   const compra = state.tributosCompra.map((t) => ({
     side: "compra" as const,
     tax_id: t.id,
