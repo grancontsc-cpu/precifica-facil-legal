@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Calculator, Info, RotateCcw, Save, Sparkles, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -25,6 +26,16 @@ import { EntendaOCalculo } from "@/components/pricing/EntendaOCalculo";
 import { simular } from "@/lib/pricing-engine";
 import { CENARIOS, aplicarCenario, estadoExemplo, estadoInicial } from "@/lib/pricing-defaults";
 import { formatBRL, formatData } from "@/lib/format";
+import { BarraSimulacao } from "@/components/app/BarraSimulacao";
+import { useApp } from "@/hooks/useApp";
+import { supabase } from "@/integrations/supabase/client";
+import {
+  aplicarPerfil,
+  camposAlterados,
+  lockedFieldsOf,
+  type TaxProfileLineRow,
+  type TaxProfileRow,
+} from "@/lib/tax-profiles";
 import type {
   ProdutoCompra,
   PurchaseTax,
@@ -38,7 +49,18 @@ const TITULO = "Precifica Grancont — simulador de preço de venda";
 const DESCRICAO =
   "Calcule custo líquido de aquisição, créditos tributários e preço de venda recomendado com memória de cálculo completa e tributos totalmente configuráveis.";
 
+const ROTULOS_BLOQUEIO: Record<string, string> = {
+  tributosCompra: "Tributos da compra",
+  tributosVenda: "Tributos da venda",
+  despesasVenda: "Despesas de venda",
+  margem: "Margem desejada",
+};
+
 export const Route = createFileRoute("/_authenticated/simulador")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    simulacao: typeof search.simulacao === "string" ? search.simulacao : undefined,
+    produto: typeof search.produto === "string" ? search.produto : undefined,
+  }),
   head: () => ({
     meta: [
       { title: TITULO },
@@ -88,11 +110,113 @@ function Secao({
 }
 
 function Simulador() {
+  const { orgId, canEdit, userId } = useApp();
+  const { simulacao: simulacaoId, produto: produtoQuery } = Route.useSearch();
+  const navigate = useNavigate();
+  const qc = useQueryClient();
+
   const [state, setState] = useState<SimulationState>(() => estadoInicial());
   const [salvoEm, setSalvoEm] = useState<Date | null>(null);
   const [carregado, setCarregado] = useState(false);
+  const [titulo, setTitulo] = useState("Nova simulação");
+  const [perfilId, setPerfilId] = useState<string | null>(null);
+  const [produtoId, setProdutoId] = useState<string | null>(produtoQuery ?? null);
+  const [baseline, setBaseline] = useState<SimulationState | null>(null);
+  const [simulacaoAtual, setSimulacaoAtual] = useState<string | null>(simulacaoId ?? null);
+
+  const perfisQuery = useQuery({
+    queryKey: ["tax_profiles", "simulador", orgId],
+    enabled: !!orgId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("tax_profiles")
+        .select("*")
+        .eq("active", true)
+        .order("name");
+      if (error) throw error;
+      return (data ?? []) as unknown as TaxProfileRow[];
+    },
+  });
+
+  const produtosQuery = useQuery({
+    queryKey: ["products", orgId],
+    enabled: !!orgId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("products")
+        .select("id, nome, sku, valor_unitario")
+        .eq("organization_id", orgId!)
+        .eq("active", true)
+        .order("nome");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const perfilSelecionado = (perfisQuery.data ?? []).find((p) => p.id === perfilId) ?? null;
+  const camposBloqueados = canEdit ? lockedFieldsOf(perfilSelecionado) : Object.keys(ROTULOS_BLOQUEIO);
+  const bloqueado = (chave: string) => camposBloqueados.includes(chave) || !canEdit;
+
+  const aplicarPerfilNoEstado = async (id: string) => {
+    if (id === "manual") {
+      setPerfilId(null);
+      setBaseline(null);
+      return;
+    }
+    const perfil = (perfisQuery.data ?? []).find((p) => p.id === id);
+    if (!perfil) return;
+    const { data, error } = await supabase.from("tax_profile_lines").select("*").eq("tax_profile_id", id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    setState((s) => {
+      const novo = aplicarPerfil(s, perfil, (data ?? []) as unknown as TaxProfileLineRow[]);
+      setBaseline(novo);
+      return novo;
+    });
+    setPerfilId(id);
+    toast.success(`Perfil "${perfil.name}" aplicado.`);
+  };
+
+  const aplicarProduto = (id: string) => {
+    if (id === "avulso") {
+      setProdutoId(null);
+      return;
+    }
+    const p = (produtosQuery.data ?? []).find((x) => x.id === id);
+    if (!p) return;
+    setProdutoId(id);
+    setState((s) => ({
+      ...s,
+      produto: { ...s.produto, nome: p.nome, valorUnitario: Number(p.valor_unitario) },
+    }));
+  };
+
+  // Carrega simulação existente
+  useEffect(() => {
+    if (!simulacaoId) return;
+    let cancelado = false;
+    void (async () => {
+      const { data, error } = await supabase.from("simulations").select("*").eq("id", simulacaoId).single();
+      if (error || cancelado || !data) return;
+      const snapshot = data.input_snapshot as unknown as SimulationState | null;
+      if (snapshot?.produto) setState(snapshot);
+      setTitulo(data.titulo);
+      setPerfilId(data.tax_profile_id);
+      setProdutoId(data.product_id);
+      setSimulacaoAtual(data.id);
+      setCarregado(true);
+    })();
+    return () => {
+      cancelado = true;
+    };
+  }, [simulacaoId]);
+
+  const alterados = baseline ? camposAlterados(baseline, state) : [];
 
   useEffect(() => {
+    if (simulacaoId) return;
     try {
       const bruto = localStorage.getItem(STORAGE_KEY);
       if (bruto) {
@@ -106,7 +230,7 @@ function Simulador() {
       // rascunho inválido é simplesmente ignorado
     }
     setCarregado(true);
-  }, []);
+  }, [simulacaoId]);
 
   const resultado = useMemo(() => simular(state), [state]);
 
@@ -151,6 +275,67 @@ function Simulador() {
     setState(estadoExemplo());
     toast.info("Valores de exemplo restaurados.");
   };
+
+  const salvarNoBanco = useMutation({
+    mutationFn: async ({ duplicar }: { duplicar: boolean }) => {
+      if (!orgId) throw new Error("Selecione uma empresa para salvar a simulação.");
+      if (!canEdit) throw new Error("Seu perfil é somente de consulta.");
+      if (!titulo.trim()) throw new Error("Informe um nome para a simulação.");
+      if (resultado.validacoes.some((v) => v.nivel === "erro")) {
+        throw new Error("Corrija os erros de validação antes de salvar.");
+      }
+
+      let snapshotPerfil: unknown = {};
+      if (perfilId) {
+        const { data: linhas } = await supabase
+          .from("tax_profile_lines")
+          .select("*")
+          .eq("tax_profile_id", perfilId);
+        snapshotPerfil = { perfil: perfilSelecionado, linhas: linhas ?? [] };
+      }
+
+      const registro = {
+        organization_id: orgId,
+        titulo: titulo.trim(),
+        product_id: produtoId,
+        produto_nome: state.produto.nome || null,
+        quantidade: Number(state.produto.quantidade) || 1,
+        tax_profile_id: perfilId,
+        tax_profile_name: perfilSelecionado?.name ?? null,
+        tax_profile_version: perfilSelecionado?.version ?? null,
+        tax_profile_snapshot: snapshotPerfil as never,
+        input_snapshot: state as never,
+        result_snapshot: resultado as never,
+        overridden_fields: alterados as never,
+        custo_liquido_unitario: resultado.compra.custoLiquidoUnitario,
+        preco_final: resultado.venda?.precoFinal ?? null,
+        margem_efetiva: resultado.venda?.margemPercentual ?? null,
+        status: "salva" as const,
+        calculated_at: new Date().toISOString(),
+        created_by: userId,
+      };
+
+      if (simulacaoAtual && !duplicar) {
+        const { error } = await supabase.from("simulations").update(registro).eq("id", simulacaoAtual);
+        if (error) throw error;
+        return simulacaoAtual;
+      }
+      const { data, error } = await supabase
+        .from("simulations")
+        .insert({ ...registro, titulo: duplicar ? `${registro.titulo} (cópia)` : registro.titulo })
+        .select("id")
+        .single();
+      if (error) throw error;
+      return data.id;
+    },
+    onSuccess: (id, vars) => {
+      setSimulacaoAtual(id);
+      qc.invalidateQueries({ queryKey: ["simulations", orgId] });
+      toast.success(vars.duplicar ? "Simulação duplicada." : "Simulação salva no histórico.");
+      void navigate({ to: "/simulador", search: { simulacao: id, produto: undefined }, replace: true });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
 
   const compra = resultado.compra;
 
