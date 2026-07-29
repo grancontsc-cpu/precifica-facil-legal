@@ -14,6 +14,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as EsqueciMinhaSenhaRouteImport } from './routes/esqueci-minha-senha'
 import { Route as EntrandoRouteImport } from './routes/entrando'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AguardandoAprovacaoRouteImport } from './routes/aguardando-aprovacao'
 import { Route as AcessoNegadoRouteImport } from './routes/acesso-negado'
 import { Route as AcessoBloqueadoRouteImport } from './routes/acesso-bloqueado'
 import { Route as AceitarConviteRouteImport } from './routes/aceitar-convite'
@@ -50,6 +51,11 @@ const EntrandoRoute = EntrandoRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AguardandoAprovacaoRoute = AguardandoAprovacaoRouteImport.update({
+  id: '/aguardando-aprovacao',
+  path: '/aguardando-aprovacao',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AcessoNegadoRoute = AcessoNegadoRouteImport.update({
@@ -117,6 +123,7 @@ export interface FileRoutesByFullPath {
   '/aceitar-convite': typeof AceitarConviteRoute
   '/acesso-bloqueado': typeof AcessoBloqueadoRoute
   '/acesso-negado': typeof AcessoNegadoRoute
+  '/aguardando-aprovacao': typeof AguardandoAprovacaoRoute
   '/auth': typeof AuthRoute
   '/entrando': typeof EntrandoRoute
   '/esqueci-minha-senha': typeof EsqueciMinhaSenhaRoute
@@ -135,6 +142,7 @@ export interface FileRoutesByTo {
   '/aceitar-convite': typeof AceitarConviteRoute
   '/acesso-bloqueado': typeof AcessoBloqueadoRoute
   '/acesso-negado': typeof AcessoNegadoRoute
+  '/aguardando-aprovacao': typeof AguardandoAprovacaoRoute
   '/auth': typeof AuthRoute
   '/entrando': typeof EntrandoRoute
   '/esqueci-minha-senha': typeof EsqueciMinhaSenhaRoute
@@ -155,6 +163,7 @@ export interface FileRoutesById {
   '/aceitar-convite': typeof AceitarConviteRoute
   '/acesso-bloqueado': typeof AcessoBloqueadoRoute
   '/acesso-negado': typeof AcessoNegadoRoute
+  '/aguardando-aprovacao': typeof AguardandoAprovacaoRoute
   '/auth': typeof AuthRoute
   '/entrando': typeof EntrandoRoute
   '/esqueci-minha-senha': typeof EsqueciMinhaSenhaRoute
@@ -175,6 +184,7 @@ export interface FileRouteTypes {
     | '/aceitar-convite'
     | '/acesso-bloqueado'
     | '/acesso-negado'
+    | '/aguardando-aprovacao'
     | '/auth'
     | '/entrando'
     | '/esqueci-minha-senha'
@@ -193,6 +203,7 @@ export interface FileRouteTypes {
     | '/aceitar-convite'
     | '/acesso-bloqueado'
     | '/acesso-negado'
+    | '/aguardando-aprovacao'
     | '/auth'
     | '/entrando'
     | '/esqueci-minha-senha'
@@ -212,6 +223,7 @@ export interface FileRouteTypes {
     | '/aceitar-convite'
     | '/acesso-bloqueado'
     | '/acesso-negado'
+    | '/aguardando-aprovacao'
     | '/auth'
     | '/entrando'
     | '/esqueci-minha-senha'
@@ -232,6 +244,7 @@ export interface RootRouteChildren {
   AceitarConviteRoute: typeof AceitarConviteRoute
   AcessoBloqueadoRoute: typeof AcessoBloqueadoRoute
   AcessoNegadoRoute: typeof AcessoNegadoRoute
+  AguardandoAprovacaoRoute: typeof AguardandoAprovacaoRoute
   AuthRoute: typeof AuthRoute
   EntrandoRoute: typeof EntrandoRoute
   EsqueciMinhaSenhaRoute: typeof EsqueciMinhaSenhaRoute
@@ -274,6 +287,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/aguardando-aprovacao': {
+      id: '/aguardando-aprovacao'
+      path: '/aguardando-aprovacao'
+      fullPath: '/aguardando-aprovacao'
+      preLoaderRoute: typeof AguardandoAprovacaoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/acesso-negado': {
@@ -392,6 +412,7 @@ const rootRouteChildren: RootRouteChildren = {
   AceitarConviteRoute: AceitarConviteRoute,
   AcessoBloqueadoRoute: AcessoBloqueadoRoute,
   AcessoNegadoRoute: AcessoNegadoRoute,
+  AguardandoAprovacaoRoute: AguardandoAprovacaoRoute,
   AuthRoute: AuthRoute,
   EntrandoRoute: EntrandoRoute,
   EsqueciMinhaSenhaRoute: EsqueciMinhaSenhaRoute,
