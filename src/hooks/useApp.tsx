@@ -5,7 +5,22 @@ import type { Session } from "@supabase/supabase-js";
 
 import { supabase } from "@/integrations/supabase/client";
 
-export type OrgRole = "org_admin" | "viewer";
+export type OrgRole = "manager" | "user";
+export type PapelEfetivo = "super_admin" | "manager" | "user";
+export type StatusConta =
+  | "invited"
+  | "pending_email_verification"
+  | "pending_approval"
+  | "active"
+  | "suspended"
+  | "rejected"
+  | "archived";
+
+export const NOME_PAPEL: Record<PapelEfetivo, string> = {
+  super_admin: "Administrador Geral",
+  manager: "Gestor",
+  user: "Usuário",
+};
 
 export interface Membership {
   organization_id: string;
@@ -17,12 +32,16 @@ interface AppContextValue {
   session: Session | null;
   userId: string | null;
   email: string | null;
+  nome: string | null;
   isGrancontAdmin: boolean;
+  isSuperAdmin: boolean;
+  papel: PapelEfetivo;
+  accountStatus: StatusConta | null;
   memberships: Membership[];
   organizations: { id: string; name: string; cnpj: string | null; defaults: unknown; default_tax_profile_id: string | null }[];
   orgId: string | null;
   setOrgId: (id: string) => void;
-  /** Papel efetivo do usuário na organização selecionada. */
+  /** Pode criar/editar dados da empresa selecionada (gestor ou administrador geral). */
   canEdit: boolean;
   loading: boolean;
   signOut: () => Promise<void>;
@@ -46,17 +65,23 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const userId = session?.user?.id ?? null;
 
-  const rolesQuery = useQuery({
-    queryKey: ["me", "roles", userId],
+  const perfilQuery = useQuery({
+    queryKey: ["me", "perfil", userId],
     enabled: !!userId,
     queryFn: async () => {
-      const { data, error } = await supabase.from("user_roles").select("role").eq("user_id", userId!);
-      if (error) throw error;
-      return data.map((r) => r.role as string);
+      const [{ data: perfil }, { data: globais }] = await Promise.all([
+        supabase.from("profiles").select("id, full_name, email, account_status").eq("id", userId!).maybeSingle(),
+        supabase.from("global_user_roles").select("role").eq("user_id", userId!),
+      ]);
+      return {
+        perfil,
+        isSuperAdmin: (globais ?? []).some((g) => g.role === "super_admin"),
+      };
     },
   });
 
-  const isGrancontAdmin = (rolesQuery.data ?? []).includes("grancont_admin");
+  const isSuperAdmin = perfilQuery.data?.isSuperAdmin ?? false;
+  const accountStatus = (perfilQuery.data?.perfil?.account_status ?? null) as StatusConta | null;
 
   const membershipsQuery = useQuery({
     queryKey: ["me", "memberships", userId],
@@ -65,15 +90,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const { data, error } = await supabase
         .from("organization_members")
         .select("organization_id, role, organizations(id, name, cnpj, defaults, default_tax_profile_id)")
-        .eq("user_id", userId!);
+        .eq("user_id", userId!)
+        .eq("membership_status", "active");
       if (error) throw error;
       return (data ?? []) as unknown as Membership[];
     },
   });
 
   const orgsQuery = useQuery({
-    queryKey: ["organizations", "all", isGrancontAdmin],
-    enabled: !!userId && isGrancontAdmin,
+    queryKey: ["organizations", "all", isSuperAdmin],
+    enabled: !!userId && isSuperAdmin,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("organizations")
@@ -85,11 +111,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
   });
 
   const organizations = useMemo(() => {
-    if (isGrancontAdmin) return orgsQuery.data ?? [];
+    if (isSuperAdmin) return orgsQuery.data ?? [];
     return (membershipsQuery.data ?? [])
       .map((m) => m.organizations)
       .filter((o): o is NonNullable<Membership["organizations"]> => !!o);
-  }, [isGrancontAdmin, orgsQuery.data, membershipsQuery.data]);
+  }, [isSuperAdmin, orgsQuery.data, membershipsQuery.data]);
 
   useEffect(() => {
     if (!organizations.length) return;
@@ -108,30 +134,46 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const canEdit = useMemo(() => {
-    if (isGrancontAdmin) return true;
+  const papelNaOrg = useMemo(() => {
     const m = (membershipsQuery.data ?? []).find((x) => x.organization_id === orgId);
-    return m?.role === "org_admin";
-  }, [isGrancontAdmin, membershipsQuery.data, orgId]);
+    return m?.role ?? null;
+  }, [membershipsQuery.data, orgId]);
+
+  const papel: PapelEfetivo = isSuperAdmin
+    ? "super_admin"
+    : (membershipsQuery.data ?? []).some((m) => m.role === "manager")
+      ? "manager"
+      : "user";
+
+  const canEdit = isSuperAdmin || papelNaOrg === "manager";
 
   const signOut = async () => {
     await queryClient.cancelQueries();
     queryClient.clear();
+    try {
+      localStorage.removeItem(ORG_PREF_KEY);
+    } catch {
+      /* ignora */
+    }
     await supabase.auth.signOut();
-    navigate({ to: "/auth", replace: true });
+    navigate({ to: "/login", replace: true });
   };
 
   const value: AppContextValue = {
     session,
     userId,
     email: session?.user?.email ?? null,
-    isGrancontAdmin,
+    nome: perfilQuery.data?.perfil?.full_name ?? null,
+    isGrancontAdmin: isSuperAdmin,
+    isSuperAdmin,
+    papel,
+    accountStatus,
     memberships: membershipsQuery.data ?? [],
     organizations,
     orgId,
     setOrgId,
     canEdit,
-    loading: rolesQuery.isLoading || membershipsQuery.isLoading,
+    loading: perfilQuery.isLoading || membershipsQuery.isLoading,
     signOut,
   };
 
@@ -142,4 +184,16 @@ export function useApp() {
   const ctx = useContext(AppContext);
   if (!ctx) throw new Error("useApp precisa estar dentro de AppProvider");
   return ctx;
+}
+
+/** Destino inicial conforme papel e situação da conta. */
+export function destinoInicial(papel: PapelEfetivo, status: StatusConta | null, temVinculo: boolean) {
+  if (status === "suspended") return "/acesso-bloqueado";
+  if (status === "pending_approval") return "/aguardando-aprovacao";
+  if (status === "pending_email_verification" || status === "invited") return "/confirmar-email";
+  if (status === "rejected" || status === "archived") return "/acesso-negado";
+  if (papel === "super_admin") return "/admin";
+  if (!temVinculo) return "/acesso-negado";
+  if (papel === "manager") return "/gestao";
+  return "/simulador";
 }
