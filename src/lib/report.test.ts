@@ -101,7 +101,7 @@ describe("CSV", () => {
     const { rel } = relatorio(true);
     const csv = csvRelatorio(rel);
     expect(csv.startsWith("\uFEFF")).toBe(true);
-    expect(csv.split("\r\n")[0]).toBe('"Bloco";"Item";"Valor";"Detalhe"');
+    expect(csv.split("\r\n")[0]).toBe('\uFEFF"Bloco";"Item";"Valor";"Detalhe"');
   });
 
   it("contém identificação, todos os blocos, premissas e aviso", () => {
