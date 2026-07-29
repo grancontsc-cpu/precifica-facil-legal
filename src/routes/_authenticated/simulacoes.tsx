@@ -41,7 +41,8 @@ export const Route = createFileRoute("/_authenticated/simulacoes")({
 type Situacao = "ativas" | "arquivadas" | "todas";
 
 function SimulacoesPage() {
-  const { orgId, canEdit, userId } = useApp();
+  const { orgId, canEdit, userId, organizations } = useApp();
+  const nomeEmpresa = organizations?.find((o) => o.id === orgId)?.name ?? "Empresa";
   const qc = useQueryClient();
   const navigate = useNavigate();
   const [busca, setBusca] = useState("");
