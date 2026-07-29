@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Building2, Calculator, ClipboardList, History, LogOut, Package, Percent } from "lucide-react";
+import { Building2, Calculator, ClipboardList, History, LogOut, Package, Percent, Scale } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,9 @@ import { cn } from "@/lib/utils";
 
 const LINKS = [
   { to: "/simulador", label: "Simulador", icon: Calculator, adminOnly: false },
+  { to: "/comparar", label: "Comparar fornecedores", icon: Scale, adminOnly: false },
   { to: "/simulacoes", label: "Simulações", icon: ClipboardList, adminOnly: false },
+
   { to: "/produtos", label: "Produtos", icon: Package, adminOnly: false },
   { to: "/perfis", label: "Perfis tributários", icon: Percent, adminOnly: false },
   { to: "/empresas", label: "Empresas", icon: Building2, adminOnly: true },
