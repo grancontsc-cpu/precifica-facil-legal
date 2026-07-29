@@ -31,7 +31,7 @@ function AuditoriaPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("audit_logs")
-        .select("id, table_name, record_id, action, actor_id, created_at, old_data, new_data")
+        .select("id, entity, entity_id, action, actor_id, created_at, before_data, after_data")
         .order("created_at", { ascending: false })
         .limit(200);
       if (error) throw error;
@@ -61,23 +61,23 @@ function AuditoriaPage() {
           <details key={l.id} className="rounded-xl border border-border bg-card p-4">
             <summary className="flex cursor-pointer flex-wrap items-center gap-2 text-sm">
               <Badge variant="secondary">{l.action}</Badge>
-              <span className="font-medium text-foreground">{l.table_name}</span>
+              <span className="font-medium text-foreground">{l.entity}</span>
               <span className="text-xs text-muted-foreground">
                 {new Date(l.created_at).toLocaleString("pt-BR")}
               </span>
-              <span className="text-xs text-muted-foreground">registro {l.record_id?.slice(0, 8)}</span>
+              <span className="text-xs text-muted-foreground">registro {l.entity_id?.slice(0, 8)}</span>
             </summary>
             <div className="mt-3 grid gap-3 md:grid-cols-2">
               <div>
                 <p className="text-xs font-semibold uppercase text-muted-foreground">Antes</p>
                 <pre className="mt-1 max-h-56 overflow-auto rounded bg-surface p-3 text-xs">
-                  {JSON.stringify(l.old_data, null, 2)}
+                  {JSON.stringify(l.before_data, null, 2)}
                 </pre>
               </div>
               <div>
                 <p className="text-xs font-semibold uppercase text-muted-foreground">Depois</p>
                 <pre className="mt-1 max-h-56 overflow-auto rounded bg-surface p-3 text-xs">
-                  {JSON.stringify(l.new_data, null, 2)}
+                  {JSON.stringify(l.after_data, null, 2)}
                 </pre>
               </div>
             </div>
