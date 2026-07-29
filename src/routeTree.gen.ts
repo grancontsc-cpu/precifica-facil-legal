@@ -14,6 +14,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as EsqueciMinhaSenhaRouteImport } from './routes/esqueci-minha-senha'
 import { Route as EntrandoRouteImport } from './routes/entrando'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AceitarConviteRouteImport } from './routes/aceitar-convite'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedSimuladorRouteImport } from './routes/_authenticated/simulador'
@@ -47,6 +48,11 @@ const EntrandoRoute = EntrandoRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AceitarConviteRoute = AceitarConviteRouteImport.update({
+  id: '/aceitar-convite',
+  path: '/aceitar-convite',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
@@ -96,6 +102,7 @@ const AuthenticatedAuditoriaRoute = AuthenticatedAuditoriaRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/aceitar-convite': typeof AceitarConviteRoute
   '/auth': typeof AuthRoute
   '/entrando': typeof EntrandoRoute
   '/esqueci-minha-senha': typeof EsqueciMinhaSenhaRoute
@@ -111,6 +118,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/aceitar-convite': typeof AceitarConviteRoute
   '/auth': typeof AuthRoute
   '/entrando': typeof EntrandoRoute
   '/esqueci-minha-senha': typeof EsqueciMinhaSenhaRoute
@@ -128,6 +136,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/aceitar-convite': typeof AceitarConviteRoute
   '/auth': typeof AuthRoute
   '/entrando': typeof EntrandoRoute
   '/esqueci-minha-senha': typeof EsqueciMinhaSenhaRoute
@@ -145,6 +154,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/aceitar-convite'
     | '/auth'
     | '/entrando'
     | '/esqueci-minha-senha'
@@ -160,6 +170,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/aceitar-convite'
     | '/auth'
     | '/entrando'
     | '/esqueci-minha-senha'
@@ -176,6 +187,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/aceitar-convite'
     | '/auth'
     | '/entrando'
     | '/esqueci-minha-senha'
@@ -193,6 +205,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AceitarConviteRoute: typeof AceitarConviteRoute
   AuthRoute: typeof AuthRoute
   EntrandoRoute: typeof EntrandoRoute
   EsqueciMinhaSenhaRoute: typeof EsqueciMinhaSenhaRoute
@@ -235,6 +248,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/aceitar-convite': {
+      id: '/aceitar-convite'
+      path: '/aceitar-convite'
+      fullPath: '/aceitar-convite'
+      preLoaderRoute: typeof AceitarConviteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -329,6 +349,7 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AceitarConviteRoute: AceitarConviteRoute,
   AuthRoute: AuthRoute,
   EntrandoRoute: EntrandoRoute,
   EsqueciMinhaSenhaRoute: EsqueciMinhaSenhaRoute,
