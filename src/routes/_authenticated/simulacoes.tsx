@@ -149,7 +149,17 @@ function SimulacoesPage() {
       createdBy: string | null;
     }) => {
       const acesso = avaliarAcessoSimulacao(ctxAcesso, { organizationId, createdBy });
-      if (!acesso.podeEscrever) throw new Error(acesso.motivo ?? "Sem permissão.");
+      if (!acesso.podeEscrever) {
+        const motivo = acesso.motivo ?? "Sem permissão.";
+        registrarNegativa({
+          acao: "duplicar",
+          simulacaoId: id,
+          organizationId,
+          motivo,
+          origem: "historico",
+        });
+        throw new Error(motivo);
+      }
       const { data, error } = await supabase
         .from("simulations")
         .select("*")
