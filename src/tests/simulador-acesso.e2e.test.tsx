@@ -11,7 +11,7 @@
  */
 import type React from "react";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, waitFor, cleanup } from "@testing-library/react";
+import { render, screen, waitFor, cleanup, act } from "@testing-library/react";
 import { Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
@@ -110,8 +110,14 @@ async function abrirSimulador(simulacaoId?: string) {
       </Suspense>
     </QueryClientProvider>,
   );
-  // o componente da rota é carregado sob demanda pelo router
-  await waitFor(() => expect(screen.queryByText("carregando")).toBeNull(), { timeout: 90000, interval: 50 });
+  // o componente da rota é carregado sob demanda (code splitting do router):
+  // avança o loop de eventos dentro de act() até o Suspense resolver.
+  for (let i = 0; i < 200 && screen.queryByText("carregando"); i++) {
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 10));
+    });
+  }
+  expect(screen.queryByText("carregando")).toBeNull();
 }
 
 const simulacaoDe = (organization_id: string, created_by: string | null) => ({
