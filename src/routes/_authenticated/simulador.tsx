@@ -252,6 +252,20 @@ function Simulador() {
     setCarregado(true);
   }, [simulacaoQuery.data, acessoSimulacao?.podeLer, setOrgId]);
 
+  /**
+   * Permissão efetiva de escrita: em simulação existente vale a regra da
+   * própria simulação (autor, gestor da empresa dela ou Administrador Geral);
+   * em simulação nova vale o vínculo com a empresa selecionada.
+   */
+  const podeEditarAtual = simulacaoId
+    ? Boolean(acessoSimulacao?.podeEscrever)
+    : canEdit && podeCriarSimulacao(ctxAcesso, orgId);
+
+  const camposBloqueados = podeEditarAtual
+    ? lockedFieldsOf(perfilSelecionado)
+    : Object.keys(ROTULOS_BLOQUEIO);
+  const bloqueado = (chave: string) => camposBloqueados.includes(chave) || !podeEditarAtual;
+
 
   const alterados = baseline ? camposAlterados(baseline, state) : [];
 
