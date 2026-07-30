@@ -52,6 +52,7 @@ export const Route = createFileRoute("/_authenticated/auditoria")({
 
 function AuditoriaPage() {
   const { isGrancontAdmin } = useApp();
+  const [filtro, setFiltro] = useState<(typeof FILTROS)[number]["id"]>("todos");
 
   const logs = useQuery({
     queryKey: ["audit_logs"],
@@ -67,6 +68,33 @@ function AuditoriaPage() {
     },
   });
 
+  const autores = useQuery({
+    queryKey: ["audit_logs_autores", (logs.data ?? []).length],
+    enabled: isGrancontAdmin && (logs.data ?? []).length > 0,
+    queryFn: async () => {
+      const ids = Array.from(
+        new Set((logs.data ?? []).map((l) => l.actor_id).filter(Boolean) as string[]),
+      );
+      if (ids.length === 0) return {} as Record<string, string>;
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, full_name, email")
+        .in("id", ids);
+      if (error) throw error;
+      const mapa: Record<string, string> = {};
+      for (const p of data ?? []) mapa[p.id] = p.full_name || p.email || p.id.slice(0, 8);
+      return mapa;
+    },
+  });
+
+  const eventos = useMemo(
+    () =>
+      (logs.data ?? []).filter(
+        (l) => filtro === "todos" || grupoDaEntidade(l.entity) === filtro,
+      ),
+    [logs.data, filtro],
+  );
+
   if (!isGrancontAdmin) {
     return (
       <main className="mx-auto max-w-3xl px-4 py-10">
@@ -81,15 +109,32 @@ function AuditoriaPage() {
     <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6">
       <h1 className="text-xl font-semibold tracking-tight text-foreground">Auditoria</h1>
       <p className="mt-1 text-sm text-muted-foreground">
-        Últimos 200 eventos registrados em perfis tributários e suas linhas.
+        Últimos 200 eventos registrados em perfis tributários e em simulações (incluindo linhas de
+        compra, tributos e despesas de venda), com autor, data e valores antes/depois.
       </p>
 
+      <div className="mt-4 flex flex-wrap gap-2">
+        {FILTROS.map((f) => (
+          <Button
+            key={f.id}
+            size="sm"
+            variant={filtro === f.id ? "default" : "outline"}
+            onClick={() => setFiltro(f.id)}
+          >
+            {f.rotulo}
+          </Button>
+        ))}
+      </div>
+
       <section className="mt-6 space-y-2">
-        {(logs.data ?? []).map((l) => (
+        {eventos.map((l) => (
           <details key={l.id} className="rounded-xl border border-border bg-card p-4">
             <summary className="flex cursor-pointer flex-wrap items-center gap-2 text-sm">
-              <Badge variant="secondary">{l.action}</Badge>
-              <span className="font-medium text-foreground">{l.entity}</span>
+              <Badge variant="secondary">{ACOES[l.action] ?? l.action}</Badge>
+              <span className="font-medium text-foreground">{ROTULOS[l.entity] ?? l.entity}</span>
+              <span className="text-xs text-muted-foreground">
+                por {autores.data?.[l.actor_id ?? ""] ?? "sistema"}
+              </span>
               <span className="text-xs text-muted-foreground">
                 {new Date(l.created_at).toLocaleString("pt-BR")}
               </span>
@@ -111,7 +156,7 @@ function AuditoriaPage() {
             </div>
           </details>
         ))}
-        {!logs.isLoading && (logs.data ?? []).length === 0 ? (
+        {!logs.isLoading && eventos.length === 0 ? (
           <p className="rounded-xl border border-border bg-card p-6 text-center text-sm text-muted-foreground">
             Nenhum evento registrado ainda.
           </p>
