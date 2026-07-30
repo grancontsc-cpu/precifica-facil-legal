@@ -249,15 +249,32 @@ function SimulacoesPage() {
                         }}
                       />
                     ) : null}
-                    {canEdit ? (
+                    {podeAlterar(s) ? (
                       <>
-                        <Button variant="ghost" size="sm" onClick={() => duplicar.mutate(s.id)}>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() =>
+                            duplicar.mutate({
+                              id: s.id,
+                              organizationId: s.organization_id,
+                              createdBy: s.created_by,
+                            })
+                          }
+                        >
                           Duplicar
                         </Button>
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => arquivar.mutate({ id: s.id, archived: s.status !== "arquivada" })}
+                          onClick={() =>
+                            arquivar.mutate({
+                              id: s.id,
+                              archived: s.status !== "arquivada",
+                              organizationId: s.organization_id,
+                              createdBy: s.created_by,
+                            })
+                          }
                         >
                           {s.status === "arquivada" ? "Reativar" : "Arquivar"}
                         </Button>
