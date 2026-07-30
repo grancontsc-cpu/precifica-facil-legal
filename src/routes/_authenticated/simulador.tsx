@@ -31,6 +31,7 @@ import { ExportarSimulacao } from "@/components/report/ExportarSimulacao";
 import { comparacaoSalva } from "@/lib/comparison-storage";
 import { useApp } from "@/hooks/useApp";
 import { avaliarAcessoSimulacao, contextoDoApp, podeCriarSimulacao } from "@/lib/acesso-simulacao";
+import { registrarNegativa } from "@/lib/registro-seguranca";
 import { supabase } from "@/integrations/supabase/client";
 import {
   aplicarPerfil,
@@ -239,6 +240,20 @@ function Simulador() {
     );
   }, [simulacaoId, simulacaoQuery.isPending, simulacaoQuery.data, ctxAcesso]);
 
+  // Auditoria de segurança: tentativa de abrir simulação sem permissão.
+  useEffect(() => {
+    if (!simulacaoId || !userId) return;
+    if (!acessoSimulacao || acessoSimulacao.podeLer) return;
+    registrarNegativa({
+      acao: "carregar",
+      simulacaoId,
+      organizationId: simulacaoQuery.data?.organization_id ?? null,
+      motivo: acessoSimulacao.motivo,
+      origem: "simulador",
+    });
+  }, [simulacaoId, userId, acessoSimulacao, simulacaoQuery.data?.organization_id]);
+
+
   useEffect(() => {
     const linha = simulacaoQuery.data;
     if (!linha || !acessoSimulacao?.podeLer) return;
@@ -341,13 +356,23 @@ function Simulador() {
   const salvarNoBanco = useMutation({
     mutationFn: async ({ duplicar }: { duplicar: boolean }) => {
       if (!orgId) throw new Error("Selecione uma empresa para salvar a simulação.");
+      const negar = (motivo: string): never => {
+        registrarNegativa({
+          acao: duplicar ? "duplicar" : simulacaoAtual ? "salvar" : "criar",
+          simulacaoId: simulacaoAtual,
+          organizationId: orgId,
+          motivo,
+          origem: "simulador",
+        });
+        throw new Error(motivo);
+      };
       if (!podeCriarSimulacao(ctxAcesso, orgId)) {
-        throw new Error("Você não tem vínculo ativo com a empresa selecionada.");
+        negar("Você não tem vínculo ativo com a empresa selecionada.");
       }
       if (simulacaoAtual && !duplicar && !acessoSimulacao?.podeEscrever) {
-        throw new Error(acessoSimulacao?.motivo ?? "Você não pode alterar esta simulação.");
+        negar(acessoSimulacao?.motivo ?? "Você não pode alterar esta simulação.");
       }
-      if (!podeEditarAtual) throw new Error("Seu perfil é somente de consulta.");
+      if (!podeEditarAtual) negar("Seu perfil é somente de consulta.");
       if (!titulo.trim()) throw new Error("Informe um nome para a simulação.");
       if (resultado.issues.some((v) => v.severidade === "erro")) {
         throw new Error("Corrija os erros de validação antes de salvar.");

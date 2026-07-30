@@ -20,6 +20,7 @@ import {
   contextoDoApp,
   filtrarSimulacoesVisiveis,
 } from "@/lib/acesso-simulacao";
+import { registrarNegativa } from "@/lib/registro-seguranca";
 import { supabase } from "@/integrations/supabase/client";
 import { ExportarSimulacao } from "@/components/report/ExportarSimulacao";
 import type { SimulationResult, SimulationState } from "@/types/pricing";
@@ -112,7 +113,17 @@ function SimulacoesPage() {
       createdBy: string | null;
     }) => {
       const acesso = avaliarAcessoSimulacao(ctxAcesso, { organizationId, createdBy });
-      if (!acesso.podeEscrever) throw new Error(acesso.motivo ?? "Sem permissão.");
+      if (!acesso.podeEscrever) {
+        const motivo = acesso.motivo ?? "Sem permissão.";
+        registrarNegativa({
+          acao: "arquivar",
+          simulacaoId: id,
+          organizationId,
+          motivo,
+          origem: "historico",
+        });
+        throw new Error(motivo);
+      }
       const { error } = await supabase
         .from("simulations")
         .update({ status: archived ? "arquivada" : "salva" })
@@ -138,7 +149,17 @@ function SimulacoesPage() {
       createdBy: string | null;
     }) => {
       const acesso = avaliarAcessoSimulacao(ctxAcesso, { organizationId, createdBy });
-      if (!acesso.podeEscrever) throw new Error(acesso.motivo ?? "Sem permissão.");
+      if (!acesso.podeEscrever) {
+        const motivo = acesso.motivo ?? "Sem permissão.";
+        registrarNegativa({
+          acao: "duplicar",
+          simulacaoId: id,
+          organizationId,
+          motivo,
+          origem: "historico",
+        });
+        throw new Error(motivo);
+      }
       const { data, error } = await supabase
         .from("simulations")
         .select("*")
