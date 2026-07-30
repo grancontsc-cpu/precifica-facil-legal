@@ -413,7 +413,39 @@ function Simulador() {
 
   const compra = resultado.compra;
 
+  // Abriu com ?simulacao=<id>: aguarda a verificação e bloqueia se não houver acesso.
+  if (simulacaoId && (carregandoContexto || simulacaoQuery.isPending)) {
+    return (
+      <main className="mx-auto max-w-3xl px-4 py-16 text-center">
+        <p className="text-sm text-muted-foreground">Verificando permissões da simulação…</p>
+      </main>
+    );
+  }
+
+  if (simulacaoId && acessoSimulacao && !acessoSimulacao.podeLer) {
+    return (
+      <main className="mx-auto max-w-2xl px-4 py-16">
+        <div className="rounded-xl border border-border bg-card p-6 text-center">
+          <h1 className="text-lg font-semibold text-foreground">Simulação indisponível</h1>
+          <p className="mt-2 text-sm text-muted-foreground">{acessoSimulacao.motivo}</p>
+          <div className="mt-5 flex flex-wrap justify-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() =>
+                void navigate({ to: "/simulador", search: { simulacao: undefined, produto: undefined } })
+              }
+            >
+              Nova simulação
+            </Button>
+            <Button onClick={() => void navigate({ to: "/simulacoes" })}>Ver meu histórico</Button>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
   return (
+
     <TooltipProvider delayDuration={150}>
       <div className="min-h-screen bg-background pb-28 lg:pb-10">
         <header className="sticky top-0 z-30 border-b border-border bg-card/95 backdrop-blur">
