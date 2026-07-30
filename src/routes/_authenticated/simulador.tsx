@@ -449,25 +449,21 @@ function Simulador() {
 
   if (simulacaoId && acessoSimulacao && !acessoSimulacao.podeLer) {
     return (
-      <main className="mx-auto max-w-2xl px-4 py-16">
-        <div className="rounded-xl border border-border bg-card p-6 text-center">
-          <h1 className="text-lg font-semibold text-foreground">Simulação indisponível</h1>
-          <p className="mt-2 text-sm text-muted-foreground">{acessoSimulacao.motivo}</p>
-          <div className="mt-5 flex flex-wrap justify-center gap-2">
-            <Button
-              variant="outline"
-              onClick={() =>
-                void navigate({ to: "/simulador", search: { simulacao: undefined, produto: undefined } })
-              }
-            >
-              Nova simulação
-            </Button>
-            <Button onClick={() => void navigate({ to: "/simulacoes" })}>Ver meu histórico</Button>
-          </div>
-        </div>
-      </main>
+      <AvisoAcesso
+        codigo={acessoSimulacao.codigo ?? "sem_permissao_leitura"}
+        acoes={[
+          {
+            rotulo: "Nova simulação",
+            variante: "outline",
+            onClick: () =>
+              void navigate({ to: "/simulador", search: { simulacao: undefined, produto: undefined } }),
+          },
+          { rotulo: "Ver meu histórico", onClick: () => void navigate({ to: "/simulacoes" }) },
+        ]}
+      />
     );
   }
+
 
   return (
 
