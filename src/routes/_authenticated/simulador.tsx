@@ -174,8 +174,8 @@ function Simulador() {
   });
 
   const perfilSelecionado = (perfisQuery.data ?? []).find((p) => p.id === perfilId) ?? null;
-  const camposBloqueados = canEdit ? lockedFieldsOf(perfilSelecionado) : Object.keys(ROTULOS_BLOQUEIO);
-  const bloqueado = (chave: string) => camposBloqueados.includes(chave) || !canEdit;
+
+
 
   const aplicarPerfilNoEstado = async (id: string) => {
     if (id === "manual") {
