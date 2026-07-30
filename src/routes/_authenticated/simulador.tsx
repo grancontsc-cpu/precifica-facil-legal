@@ -112,10 +112,26 @@ function Secao({
 }
 
 function Simulador() {
-  const { orgId, canEdit, userId, email, organizations } = useApp();
+  const {
+    orgId,
+    setOrgId,
+    canEdit,
+    userId,
+    email,
+    organizations,
+    memberships,
+    isSuperAdmin,
+    accountStatus,
+    loading: carregandoContexto,
+  } = useApp();
   const { simulacao: simulacaoId, produto: produtoQuery } = Route.useSearch();
   const navigate = useNavigate();
   const qc = useQueryClient();
+
+  const ctxAcesso = useMemo(
+    () => contextoDoApp({ userId, accountStatus, isSuperAdmin, memberships }),
+    [userId, accountStatus, isSuperAdmin, memberships],
+  );
 
   const [state, setState] = useState<SimulationState>(() => estadoInicial());
   const [salvoEm, setSalvoEm] = useState<Date | null>(null);
@@ -125,6 +141,7 @@ function Simulador() {
   const [produtoId, setProdutoId] = useState<string | null>(produtoQuery ?? null);
   const [baseline, setBaseline] = useState<SimulationState | null>(null);
   const [simulacaoAtual, setSimulacaoAtual] = useState<string | null>(simulacaoId ?? null);
+
 
   const perfisQuery = useQuery({
     queryKey: ["tax_profiles", "simulador", orgId],
