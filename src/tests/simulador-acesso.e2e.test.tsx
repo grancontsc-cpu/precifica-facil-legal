@@ -11,14 +11,12 @@
  */
 import type React from "react";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, waitFor, cleanup, act } from "@testing-library/react";
-import { Suspense } from "react";
+import { render, screen, waitFor, cleanup } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // ---------------------------------------------------------------- mocks
 
-// o chunk do componente da rota é carregado sob demanda; dá folga na 1ª renderização
-vi.setConfig({ testTimeout: 120000 });
+vi.setConfig({ testTimeout: 30000 });
 
 const buscaSimulacao = vi.fn();
 const escritas: { tabela: string; operacao: string }[] = [];
@@ -88,36 +86,24 @@ vi.mock("@/hooks/useApp", () => ({ useApp: () => appState }));
 
 // ------------------------------------------------------------- helpers
 
-/** Pré-carrega o chunk do componente da rota (code splitting do router). */
-async function preCarregarComponente() {
-  try {
-    await import("@/routes/_authenticated/simulador.tsx?tsr-split=component");
-  } catch {
-    /* sem splitting neste ambiente: o componente já vem no módulo */
-  }
-}
-
+/**
+ * Renderiza o componente da rota /simulador com a URL informada.
+ * O componente vem do módulo dividido pelo router (code splitting), o que
+ * evita depender do carregamento tardio no ambiente de teste.
+ */
 async function abrirSimulador(simulacaoId?: string) {
   buscaSearch = () => ({ simulacao: simulacaoId, produto: undefined });
-  await preCarregarComponente();
-  const { Route } = await import("@/routes/_authenticated/simulador");
-  const Componente = (Route as unknown as { component: () => React.ReactElement }).component;
+  await import("@/routes/_authenticated/simulador");
+  const mod = (await import("@/routes/_authenticated/simulador.tsx?tsr-split=component")) as {
+    component: () => React.ReactElement;
+  };
+  const Componente = mod.component;
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   render(
     <QueryClientProvider client={qc}>
-      <Suspense fallback={<div>carregando</div>}>
-        <Componente />
-      </Suspense>
+      <Componente />
     </QueryClientProvider>,
   );
-  // o componente da rota é carregado sob demanda (code splitting do router):
-  // avança o loop de eventos dentro de act() até o Suspense resolver.
-  for (let i = 0; i < 200 && screen.queryByText("carregando"); i++) {
-    await act(async () => {
-      await new Promise((r) => setTimeout(r, 10));
-    });
-  }
-  expect(screen.queryByText("carregando")).toBeNull();
 }
 
 const simulacaoDe = (organization_id: string, created_by: string | null) => ({
