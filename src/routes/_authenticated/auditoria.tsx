@@ -6,7 +6,35 @@ import { useApp } from "@/hooks/useApp";
 import { supabase } from "@/integrations/supabase/client";
 
 const TITULO = "Auditoria — Precifica Grancont";
-const DESCRICAO = "Registro de alterações em perfis tributários, com autor, data e valores anteriores.";
+const DESCRICAO =
+  "Registro de alterações em perfis tributários e simulações, com autor, data e valores anteriores.";
+
+const ROTULOS: Record<string, string> = {
+  tax_profiles: "Perfil tributário",
+  tax_profile_lines: "Linha do perfil tributário",
+  simulations: "Simulação",
+  simulation_purchase_lines: "Linha de compra da simulação",
+  simulation_tax_lines: "Linha de tributo da simulação",
+  simulation_sale_expenses: "Despesa de venda da simulação",
+};
+
+const ACOES: Record<string, string> = {
+  insert: "criação",
+  update: "alteração",
+  delete: "exclusão",
+};
+
+const FILTROS = [
+  { id: "todos", rotulo: "Todos" },
+  { id: "simulacoes", rotulo: "Simulações" },
+  { id: "perfis", rotulo: "Perfis tributários" },
+] as const;
+
+function grupoDaEntidade(entidade: string) {
+  if (entidade.startsWith("simulation")) return "simulacoes";
+  if (entidade.startsWith("tax_profile")) return "perfis";
+  return "outros";
+}
 
 export const Route = createFileRoute("/_authenticated/auditoria")({
   head: () => ({
