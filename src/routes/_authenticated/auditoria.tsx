@@ -18,25 +18,34 @@ const ROTULOS: Record<string, string> = {
   simulation_purchase_lines: "Linha de compra da simulação",
   simulation_tax_lines: "Linha de tributo da simulação",
   simulation_sale_expenses: "Despesa de venda da simulação",
+  seguranca_simulacao: "Segurança — acesso a simulação",
 };
 
 const ACOES: Record<string, string> = {
   insert: "criação",
   update: "alteração",
   delete: "exclusão",
+  acesso_negado_carregar: "tentativa negada de abrir",
+  acesso_negado_salvar: "tentativa negada de salvar",
+  acesso_negado_criar: "tentativa negada de criar",
+  acesso_negado_duplicar: "tentativa negada de duplicar",
+  acesso_negado_arquivar: "tentativa negada de arquivar",
 };
 
 const FILTROS = [
   { id: "todos", rotulo: "Todos" },
   { id: "simulacoes", rotulo: "Simulações" },
   { id: "perfis", rotulo: "Perfis tributários" },
+  { id: "seguranca", rotulo: "Segurança" },
 ] as const;
 
 function grupoDaEntidade(entidade: string) {
+  if (entidade === "seguranca_simulacao") return "seguranca";
   if (entidade.startsWith("simulation")) return "simulacoes";
   if (entidade.startsWith("tax_profile")) return "perfis";
   return "outros";
 }
+
 
 export const Route = createFileRoute("/_authenticated/auditoria")({
   head: () => ({
