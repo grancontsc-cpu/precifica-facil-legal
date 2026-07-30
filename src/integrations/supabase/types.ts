@@ -14,6 +14,56 @@ export type Database = {
   }
   public: {
     Tables: {
+      access_requests: {
+        Row: {
+          contact: string | null
+          created_at: string
+          handled_at: string | null
+          handled_by: string | null
+          id: string
+          message: string
+          organization_id: string | null
+          reason_code: string
+          requester_id: string
+          simulation_id: string | null
+          status: string
+        }
+        Insert: {
+          contact?: string | null
+          created_at?: string
+          handled_at?: string | null
+          handled_by?: string | null
+          id?: string
+          message?: string
+          organization_id?: string | null
+          reason_code?: string
+          requester_id: string
+          simulation_id?: string | null
+          status?: string
+        }
+        Update: {
+          contact?: string | null
+          created_at?: string
+          handled_at?: string | null
+          handled_by?: string | null
+          id?: string
+          message?: string
+          organization_id?: string | null
+          reason_code?: string
+          requester_id?: string
+          simulation_id?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "access_requests_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_logs: {
         Row: {
           action: string
