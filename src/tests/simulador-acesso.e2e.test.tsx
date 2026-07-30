@@ -94,9 +94,10 @@ vi.mock("@/hooks/useApp", () => ({ useApp: () => appState }));
 async function abrirSimulador(simulacaoId?: string) {
   buscaSearch = () => ({ simulacao: simulacaoId, produto: undefined });
   await import("@/routes/_authenticated/simulador");
-  const mod = (await import("@/routes/_authenticated/simulador.tsx?tsr-split=component")) as {
-    component: () => React.ReactElement;
-  };
+  // o sufixo ?tsr-split é resolvido pelo plugin do router (sem tipos próprios)
+  const mod = (await import(
+    /* @vite-ignore */ "@/routes/_authenticated/simulador.tsx?tsr-split=component" as string
+  )) as { component: () => React.ReactElement };
   const Componente = mod.component;
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   render(
