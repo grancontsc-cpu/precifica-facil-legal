@@ -341,11 +341,18 @@ function Simulador() {
   const salvarNoBanco = useMutation({
     mutationFn: async ({ duplicar }: { duplicar: boolean }) => {
       if (!orgId) throw new Error("Selecione uma empresa para salvar a simulação.");
-      if (!canEdit) throw new Error("Seu perfil é somente de consulta.");
+      if (!podeCriarSimulacao(ctxAcesso, orgId)) {
+        throw new Error("Você não tem vínculo ativo com a empresa selecionada.");
+      }
+      if (simulacaoAtual && !duplicar && !acessoSimulacao?.podeEscrever) {
+        throw new Error(acessoSimulacao?.motivo ?? "Você não pode alterar esta simulação.");
+      }
+      if (!podeEditarAtual) throw new Error("Seu perfil é somente de consulta.");
       if (!titulo.trim()) throw new Error("Informe um nome para a simulação.");
       if (resultado.issues.some((v) => v.severidade === "erro")) {
         throw new Error("Corrija os erros de validação antes de salvar.");
       }
+
 
       let snapshotPerfil: unknown = {};
       if (perfilId) {
