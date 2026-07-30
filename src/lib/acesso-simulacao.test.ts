@@ -58,6 +58,7 @@ describe("avaliarAcessoSimulacao", () => {
     expect(avaliarAcessoSimulacao(ctx(), simA)).toEqual({
       podeLer: true,
       podeEscrever: true,
+      codigo: null,
       motivo: null,
     });
   });
@@ -93,13 +94,13 @@ describe("avaliarAcessoSimulacao", () => {
   it("bloqueia conta suspensa, mesmo sendo autor", () => {
     const r = avaliarAcessoSimulacao(ctx({ contaAtiva: false }), simA);
     expect(r.podeLer).toBe(false);
-    expect(r.motivo).toContain("não está ativa");
+    expect(r.codigo).toBe("conta_inativa");
   });
 
   it("bloqueia sessão sem usuário", () => {
     const r = avaliarAcessoSimulacao(ctx({ userId: null }), simA);
     expect(r.podeLer).toBe(false);
-    expect(r.motivo).toContain("Sessão");
+    expect(r.codigo).toBe("sessao_expirada");
   });
 
   it("bloqueia quando a simulação não existe ou não retornou (id adivinhado)", () => {
