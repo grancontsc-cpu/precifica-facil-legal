@@ -385,10 +385,15 @@ function Simulador() {
       };
 
       if (simulacaoAtual && !duplicar) {
-        const { error } = await supabase.from("simulations").update(registro).eq("id", simulacaoAtual);
+        const { error } = await supabase
+          .from("simulations")
+          .update(registro)
+          .eq("id", simulacaoAtual)
+          .eq("organization_id", orgId);
         if (error) throw error;
         return simulacaoAtual;
       }
+
       const { data, error } = await supabase
         .from("simulations")
         .insert({ ...registro, titulo: duplicar ? `${registro.titulo} (cópia)` : registro.titulo })
