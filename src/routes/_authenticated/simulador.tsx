@@ -30,6 +30,7 @@ import { BarraSimulacao } from "@/components/app/BarraSimulacao";
 import { ExportarSimulacao } from "@/components/report/ExportarSimulacao";
 import { comparacaoSalva } from "@/lib/comparison-storage";
 import { useApp } from "@/hooks/useApp";
+import { avaliarAcessoSimulacao, contextoDoApp, podeCriarSimulacao } from "@/lib/acesso-simulacao";
 import { supabase } from "@/integrations/supabase/client";
 import {
   aplicarPerfil,
