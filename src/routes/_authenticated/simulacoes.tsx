@@ -20,6 +20,7 @@ import {
   contextoDoApp,
   filtrarSimulacoesVisiveis,
 } from "@/lib/acesso-simulacao";
+import { registrarNegativa } from "@/lib/registro-seguranca";
 import { supabase } from "@/integrations/supabase/client";
 import { ExportarSimulacao } from "@/components/report/ExportarSimulacao";
 import type { SimulationResult, SimulationState } from "@/types/pricing";
