@@ -41,12 +41,17 @@ export const Route = createFileRoute("/_authenticated/simulacoes")({
 type Situacao = "ativas" | "arquivadas" | "todas";
 
 function SimulacoesPage() {
-  const { orgId, canEdit, userId, organizations } = useApp();
+  const { orgId, canEdit, userId, organizations, memberships, isSuperAdmin, accountStatus } = useApp();
   const nomeEmpresa = organizations?.find((o) => o.id === orgId)?.name ?? "Empresa";
   const qc = useQueryClient();
   const navigate = useNavigate();
   const [busca, setBusca] = useState("");
   const [situacao, setSituacao] = useState<Situacao>("ativas");
+
+  const ctxAcesso = useMemo(
+    () => contextoDoApp({ userId, accountStatus, isSuperAdmin, memberships }),
+    [userId, accountStatus, isSuperAdmin, memberships],
+  );
 
   const simulacoes = useQuery({
     queryKey: ["simulations", orgId],
@@ -55,7 +60,7 @@ function SimulacoesPage() {
       const { data, error } = await supabase
         .from("simulations")
         .select(
-          "id, titulo, produto_nome, status, created_at, updated_at, preco_final, margem_efetiva, custo_liquido_unitario, quantidade, tax_profile_name, tax_profile_version, input_snapshot, result_snapshot, overridden_fields",
+          "id, titulo, produto_nome, status, created_at, updated_at, organization_id, created_by, preco_final, margem_efetiva, custo_liquido_unitario, quantidade, tax_profile_name, tax_profile_version, input_snapshot, result_snapshot, overridden_fields",
         )
         .eq("organization_id", orgId!)
         .order("updated_at", { ascending: false });
@@ -66,20 +71,48 @@ function SimulacoesPage() {
 
   const lista = useMemo(() => {
     const termo = busca.trim().toLowerCase();
-    return (simulacoes.data ?? []).filter((s) => {
+    // Defesa em profundidade: além da RLS, filtra o que o usuário pode ver.
+    const visiveis = filtrarSimulacoesVisiveis(
+      ctxAcesso,
+      (simulacoes.data ?? []).map((s) => ({
+        ...s,
+        organizationId: s.organization_id,
+        createdBy: s.created_by,
+      })),
+    );
+    return visiveis.filter((s) => {
       if (situacao === "ativas" && s.status === "arquivada") return false;
       if (situacao === "arquivadas" && s.status !== "arquivada") return false;
       if (!termo) return true;
       return `${s.titulo} ${s.produto_nome ?? ""} ${s.tax_profile_name ?? ""}`.toLowerCase().includes(termo);
     });
-  }, [simulacoes.data, busca, situacao]);
+  }, [simulacoes.data, busca, situacao, ctxAcesso]);
+
+  const podeAlterar = (s: { organization_id: string; created_by: string | null }) =>
+    avaliarAcessoSimulacao(ctxAcesso, {
+      organizationId: s.organization_id,
+      createdBy: s.created_by,
+    }).podeEscrever;
 
   const arquivar = useMutation({
-    mutationFn: async ({ id, archived }: { id: string; archived: boolean }) => {
+    mutationFn: async ({
+      id,
+      archived,
+      organizationId,
+      createdBy,
+    }: {
+      id: string;
+      archived: boolean;
+      organizationId: string;
+      createdBy: string | null;
+    }) => {
+      const acesso = avaliarAcessoSimulacao(ctxAcesso, { organizationId, createdBy });
+      if (!acesso.podeEscrever) throw new Error(acesso.motivo ?? "Sem permissão.");
       const { error } = await supabase
         .from("simulations")
         .update({ status: archived ? "arquivada" : "salva" })
-        .eq("id", id);
+        .eq("id", id)
+        .eq("organization_id", organizationId);
       if (error) throw error;
     },
     onSuccess: (_d, v) => {
@@ -90,8 +123,23 @@ function SimulacoesPage() {
   });
 
   const duplicar = useMutation({
-    mutationFn: async (id: string) => {
-      const { data, error } = await supabase.from("simulations").select("*").eq("id", id).single();
+    mutationFn: async ({
+      id,
+      organizationId,
+      createdBy,
+    }: {
+      id: string;
+      organizationId: string;
+      createdBy: string | null;
+    }) => {
+      const acesso = avaliarAcessoSimulacao(ctxAcesso, { organizationId, createdBy });
+      if (!acesso.podeEscrever) throw new Error(acesso.motivo ?? "Sem permissão.");
+      const { data, error } = await supabase
+        .from("simulations")
+        .select("*")
+        .eq("id", id)
+        .eq("organization_id", organizationId)
+        .single();
       if (error) throw error;
       const copia = { ...(data as Record<string, unknown>) };
       delete copia.id;
@@ -109,6 +157,7 @@ function SimulacoesPage() {
     },
     onError: (e: Error) => toast.error(e.message),
   });
+
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
