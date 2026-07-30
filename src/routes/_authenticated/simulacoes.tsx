@@ -15,6 +15,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useApp } from "@/hooks/useApp";
+import {
+  avaliarAcessoSimulacao,
+  contextoDoApp,
+  filtrarSimulacoesVisiveis,
+} from "@/lib/acesso-simulacao";
 import { supabase } from "@/integrations/supabase/client";
 import { ExportarSimulacao } from "@/components/report/ExportarSimulacao";
 import type { SimulationResult, SimulationState } from "@/types/pricing";
