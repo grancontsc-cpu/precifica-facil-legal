@@ -493,7 +493,7 @@ function Simulador() {
               onProduto={aplicarProduto}
               camposAlterados={alterados}
               camposBloqueados={camposBloqueados.map((c) => ROTULOS_BLOQUEIO[c] ?? c)}
-              podeEditar={canEdit}
+              podeEditar={podeEditarAtual}
               salvando={salvarNoBanco.isPending}
               simulacaoSalva={!!simulacaoAtual}
               onSalvar={() => salvarNoBanco.mutate({ duplicar: false })}
