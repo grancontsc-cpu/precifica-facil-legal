@@ -239,6 +239,20 @@ function Simulador() {
     );
   }, [simulacaoId, simulacaoQuery.isPending, simulacaoQuery.data, ctxAcesso]);
 
+  // Auditoria de segurança: tentativa de abrir simulação sem permissão.
+  useEffect(() => {
+    if (!simulacaoId || !userId) return;
+    if (!acessoSimulacao || acessoSimulacao.podeLer) return;
+    registrarNegativa({
+      acao: "carregar",
+      simulacaoId,
+      organizationId: simulacaoQuery.data?.organization_id ?? null,
+      motivo: acessoSimulacao.motivo,
+      origem: "simulador",
+    });
+  }, [simulacaoId, userId, acessoSimulacao, simulacaoQuery.data?.organization_id]);
+
+
   useEffect(() => {
     const linha = simulacaoQuery.data;
     if (!linha || !acessoSimulacao?.podeLer) return;
