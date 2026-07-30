@@ -19,6 +19,7 @@ import {
   avaliarAcessoSimulacao,
   contextoDoApp,
   filtrarSimulacoesVisiveis,
+  textoAcesso,
 } from "@/lib/acesso-simulacao";
 import { registrarNegativa } from "@/lib/registro-seguranca";
 import { supabase } from "@/integrations/supabase/client";
@@ -114,7 +115,7 @@ function SimulacoesPage() {
     }) => {
       const acesso = avaliarAcessoSimulacao(ctxAcesso, { organizationId, createdBy });
       if (!acesso.podeEscrever) {
-        const motivo = acesso.motivo ?? "Sem permissão.";
+        const motivo = acesso.motivo ?? textoAcesso("sem_permissao_leitura");
         registrarNegativa({
           acao: "arquivar",
           simulacaoId: id,
@@ -150,7 +151,7 @@ function SimulacoesPage() {
     }) => {
       const acesso = avaliarAcessoSimulacao(ctxAcesso, { organizationId, createdBy });
       if (!acesso.podeEscrever) {
-        const motivo = acesso.motivo ?? "Sem permissão.";
+        const motivo = acesso.motivo ?? textoAcesso("sem_permissao_leitura");
         registrarNegativa({
           acao: "duplicar",
           simulacaoId: id,

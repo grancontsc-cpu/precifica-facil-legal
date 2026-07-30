@@ -30,7 +30,13 @@ import { BarraSimulacao } from "@/components/app/BarraSimulacao";
 import { ExportarSimulacao } from "@/components/report/ExportarSimulacao";
 import { comparacaoSalva } from "@/lib/comparison-storage";
 import { useApp } from "@/hooks/useApp";
-import { avaliarAcessoSimulacao, contextoDoApp, podeCriarSimulacao } from "@/lib/acesso-simulacao";
+import {
+  avaliarAcessoSimulacao,
+  contextoDoApp,
+  podeCriarSimulacao,
+  textoAcesso,
+} from "@/lib/acesso-simulacao";
+import { AvisoAcesso } from "@/components/app/AvisoAcesso";
 import { registrarNegativa } from "@/lib/registro-seguranca";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -367,12 +373,12 @@ function Simulador() {
         throw new Error(motivo);
       };
       if (!podeCriarSimulacao(ctxAcesso, orgId)) {
-        negar("Você não tem vínculo ativo com a empresa selecionada.");
+        negar(textoAcesso("sem_permissao_leitura"));
       }
       if (simulacaoAtual && !duplicar && !acessoSimulacao?.podeEscrever) {
-        negar(acessoSimulacao?.motivo ?? "Você não pode alterar esta simulação.");
+        negar(acessoSimulacao?.motivo ?? textoAcesso("somente_leitura"));
       }
-      if (!podeEditarAtual) negar("Seu perfil é somente de consulta.");
+      if (!podeEditarAtual) negar(textoAcesso("somente_leitura"));
       if (!titulo.trim()) throw new Error("Informe um nome para a simulação.");
       if (resultado.issues.some((v) => v.severidade === "erro")) {
         throw new Error("Corrija os erros de validação antes de salvar.");
