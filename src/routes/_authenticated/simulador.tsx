@@ -30,6 +30,7 @@ import { BarraSimulacao } from "@/components/app/BarraSimulacao";
 import { ExportarSimulacao } from "@/components/report/ExportarSimulacao";
 import { comparacaoSalva } from "@/lib/comparison-storage";
 import { useApp } from "@/hooks/useApp";
+import { avaliarAcessoSimulacao, contextoDoApp, podeCriarSimulacao } from "@/lib/acesso-simulacao";
 import { supabase } from "@/integrations/supabase/client";
 import {
   aplicarPerfil,
@@ -112,10 +113,26 @@ function Secao({
 }
 
 function Simulador() {
-  const { orgId, canEdit, userId, email, organizations } = useApp();
+  const {
+    orgId,
+    setOrgId,
+    canEdit,
+    userId,
+    email,
+    organizations,
+    memberships,
+    isSuperAdmin,
+    accountStatus,
+    loading: carregandoContexto,
+  } = useApp();
   const { simulacao: simulacaoId, produto: produtoQuery } = Route.useSearch();
   const navigate = useNavigate();
   const qc = useQueryClient();
+
+  const ctxAcesso = useMemo(
+    () => contextoDoApp({ userId, accountStatus, isSuperAdmin, memberships }),
+    [userId, accountStatus, isSuperAdmin, memberships],
+  );
 
   const [state, setState] = useState<SimulationState>(() => estadoInicial());
   const [salvoEm, setSalvoEm] = useState<Date | null>(null);
@@ -125,6 +142,7 @@ function Simulador() {
   const [produtoId, setProdutoId] = useState<string | null>(produtoQuery ?? null);
   const [baseline, setBaseline] = useState<SimulationState | null>(null);
   const [simulacaoAtual, setSimulacaoAtual] = useState<string | null>(simulacaoId ?? null);
+
 
   const perfisQuery = useQuery({
     queryKey: ["tax_profiles", "simulador", orgId],
@@ -156,8 +174,8 @@ function Simulador() {
   });
 
   const perfilSelecionado = (perfisQuery.data ?? []).find((p) => p.id === perfilId) ?? null;
-  const camposBloqueados = canEdit ? lockedFieldsOf(perfilSelecionado) : Object.keys(ROTULOS_BLOQUEIO);
-  const bloqueado = (chave: string) => camposBloqueados.includes(chave) || !canEdit;
+
+
 
   const aplicarPerfilNoEstado = async (id: string) => {
     if (id === "manual") {
@@ -195,25 +213,59 @@ function Simulador() {
     }));
   };
 
-  // Carrega simulação existente
+  // Carrega simulação existente somente se o usuário puder acessá-la.
+  const simulacaoQuery = useQuery({
+    queryKey: ["simulation", simulacaoId],
+    enabled: !!simulacaoId && !!userId && !carregandoContexto,
+    retry: false,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("simulations")
+        .select("id, organization_id, created_by, titulo, tax_profile_id, product_id, input_snapshot")
+        .eq("id", simulacaoId!)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const acessoSimulacao = useMemo(() => {
+    if (!simulacaoId) return null;
+    if (simulacaoQuery.isPending) return null;
+    const linha = simulacaoQuery.data;
+    return avaliarAcessoSimulacao(
+      ctxAcesso,
+      linha ? { organizationId: linha.organization_id, createdBy: linha.created_by } : null,
+    );
+  }, [simulacaoId, simulacaoQuery.isPending, simulacaoQuery.data, ctxAcesso]);
+
   useEffect(() => {
-    if (!simulacaoId) return;
-    let cancelado = false;
-    void (async () => {
-      const { data, error } = await supabase.from("simulations").select("*").eq("id", simulacaoId).single();
-      if (error || cancelado || !data) return;
-      const snapshot = data.input_snapshot as unknown as SimulationState | null;
-      if (snapshot?.produto) setState(snapshot);
-      setTitulo(data.titulo);
-      setPerfilId(data.tax_profile_id);
-      setProdutoId(data.product_id);
-      setSimulacaoAtual(data.id);
-      setCarregado(true);
-    })();
-    return () => {
-      cancelado = true;
-    };
-  }, [simulacaoId]);
+    const linha = simulacaoQuery.data;
+    if (!linha || !acessoSimulacao?.podeLer) return;
+    const snapshot = linha.input_snapshot as unknown as SimulationState | null;
+    if (snapshot?.produto) setState(snapshot);
+    setTitulo(linha.titulo);
+    setPerfilId(linha.tax_profile_id);
+    setProdutoId(linha.product_id);
+    setSimulacaoAtual(linha.id);
+    setOrgId(linha.organization_id);
+    setCarregado(true);
+  }, [simulacaoQuery.data, acessoSimulacao?.podeLer, setOrgId]);
+
+  /**
+   * Permissão efetiva de escrita: em simulação existente vale a regra da
+   * própria simulação (autor, gestor da empresa dela ou Administrador Geral);
+   * em simulação nova vale o vínculo com a empresa selecionada.
+   */
+  const podeEditarAtual = simulacaoId
+    ? Boolean(acessoSimulacao?.podeEscrever)
+    : canEdit && podeCriarSimulacao(ctxAcesso, orgId);
+
+  const camposBloqueados = podeEditarAtual
+    ? lockedFieldsOf(perfilSelecionado)
+    : Object.keys(ROTULOS_BLOQUEIO);
+  const bloqueado = (chave: string) => camposBloqueados.includes(chave) || !podeEditarAtual;
+
 
   const alterados = baseline ? camposAlterados(baseline, state) : [];
 
@@ -289,11 +341,18 @@ function Simulador() {
   const salvarNoBanco = useMutation({
     mutationFn: async ({ duplicar }: { duplicar: boolean }) => {
       if (!orgId) throw new Error("Selecione uma empresa para salvar a simulação.");
-      if (!canEdit) throw new Error("Seu perfil é somente de consulta.");
+      if (!podeCriarSimulacao(ctxAcesso, orgId)) {
+        throw new Error("Você não tem vínculo ativo com a empresa selecionada.");
+      }
+      if (simulacaoAtual && !duplicar && !acessoSimulacao?.podeEscrever) {
+        throw new Error(acessoSimulacao?.motivo ?? "Você não pode alterar esta simulação.");
+      }
+      if (!podeEditarAtual) throw new Error("Seu perfil é somente de consulta.");
       if (!titulo.trim()) throw new Error("Informe um nome para a simulação.");
       if (resultado.issues.some((v) => v.severidade === "erro")) {
         throw new Error("Corrija os erros de validação antes de salvar.");
       }
+
 
       let snapshotPerfil: unknown = {};
       if (perfilId) {
@@ -326,10 +385,15 @@ function Simulador() {
       };
 
       if (simulacaoAtual && !duplicar) {
-        const { error } = await supabase.from("simulations").update(registro).eq("id", simulacaoAtual);
+        const { error } = await supabase
+          .from("simulations")
+          .update(registro)
+          .eq("id", simulacaoAtual)
+          .eq("organization_id", orgId);
         if (error) throw error;
         return simulacaoAtual;
       }
+
       const { data, error } = await supabase
         .from("simulations")
         .insert({ ...registro, titulo: duplicar ? `${registro.titulo} (cópia)` : registro.titulo })
@@ -349,7 +413,39 @@ function Simulador() {
 
   const compra = resultado.compra;
 
+  // Abriu com ?simulacao=<id>: aguarda a verificação e bloqueia se não houver acesso.
+  if (simulacaoId && (carregandoContexto || simulacaoQuery.isPending)) {
+    return (
+      <main className="mx-auto max-w-3xl px-4 py-16 text-center">
+        <p className="text-sm text-muted-foreground">Verificando permissões da simulação…</p>
+      </main>
+    );
+  }
+
+  if (simulacaoId && acessoSimulacao && !acessoSimulacao.podeLer) {
+    return (
+      <main className="mx-auto max-w-2xl px-4 py-16">
+        <div className="rounded-xl border border-border bg-card p-6 text-center">
+          <h1 className="text-lg font-semibold text-foreground">Simulação indisponível</h1>
+          <p className="mt-2 text-sm text-muted-foreground">{acessoSimulacao.motivo}</p>
+          <div className="mt-5 flex flex-wrap justify-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() =>
+                void navigate({ to: "/simulador", search: { simulacao: undefined, produto: undefined } })
+              }
+            >
+              Nova simulação
+            </Button>
+            <Button onClick={() => void navigate({ to: "/simulacoes" })}>Ver meu histórico</Button>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
   return (
+
     <TooltipProvider delayDuration={150}>
       <div className="min-h-screen bg-background pb-28 lg:pb-10">
         <header className="sticky top-0 z-30 border-b border-border bg-card/95 backdrop-blur">
@@ -397,7 +493,7 @@ function Simulador() {
               onProduto={aplicarProduto}
               camposAlterados={alterados}
               camposBloqueados={camposBloqueados.map((c) => ROTULOS_BLOQUEIO[c] ?? c)}
-              podeEditar={canEdit}
+              podeEditar={podeEditarAtual}
               salvando={salvarNoBanco.isPending}
               simulacaoSalva={!!simulacaoAtual}
               onSalvar={() => salvarNoBanco.mutate({ duplicar: false })}
