@@ -195,25 +195,45 @@ function Simulador() {
     }));
   };
 
-  // Carrega simulação existente
+  // Carrega simulação existente somente se o usuário puder acessá-la.
+  const simulacaoQuery = useQuery({
+    queryKey: ["simulation", simulacaoId],
+    enabled: !!simulacaoId && !!userId && !carregandoContexto,
+    retry: false,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("simulations")
+        .select("id, organization_id, created_by, titulo, tax_profile_id, product_id, input_snapshot")
+        .eq("id", simulacaoId!)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const acessoSimulacao = useMemo(() => {
+    if (!simulacaoId) return null;
+    if (simulacaoQuery.isPending) return null;
+    const linha = simulacaoQuery.data;
+    return avaliarAcessoSimulacao(
+      ctxAcesso,
+      linha ? { organizationId: linha.organization_id, createdBy: linha.created_by } : null,
+    );
+  }, [simulacaoId, simulacaoQuery.isPending, simulacaoQuery.data, ctxAcesso]);
+
   useEffect(() => {
-    if (!simulacaoId) return;
-    let cancelado = false;
-    void (async () => {
-      const { data, error } = await supabase.from("simulations").select("*").eq("id", simulacaoId).single();
-      if (error || cancelado || !data) return;
-      const snapshot = data.input_snapshot as unknown as SimulationState | null;
-      if (snapshot?.produto) setState(snapshot);
-      setTitulo(data.titulo);
-      setPerfilId(data.tax_profile_id);
-      setProdutoId(data.product_id);
-      setSimulacaoAtual(data.id);
-      setCarregado(true);
-    })();
-    return () => {
-      cancelado = true;
-    };
-  }, [simulacaoId]);
+    const linha = simulacaoQuery.data;
+    if (!linha || !acessoSimulacao?.podeLer) return;
+    const snapshot = linha.input_snapshot as unknown as SimulationState | null;
+    if (snapshot?.produto) setState(snapshot);
+    setTitulo(linha.titulo);
+    setPerfilId(linha.tax_profile_id);
+    setProdutoId(linha.product_id);
+    setSimulacaoAtual(linha.id);
+    setOrgId(linha.organization_id);
+    setCarregado(true);
+  }, [simulacaoQuery.data, acessoSimulacao?.podeLer, setOrgId]);
+
 
   const alterados = baseline ? camposAlterados(baseline, state) : [];
 
