@@ -150,26 +150,11 @@ export function ExportarSimulacao({ state, resultado, meta, comparacao }: Props)
             <FileDown className="h-4 w-4" aria-hidden />
             Gerar PDF
           </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => {
-              eventoExportarRelatorio({ formato: "csv", comComparacao });
-              baixarArquivo(csvRelatorio(rel), nomeArquivo(rel, "csv"), "text/csv;charset=utf-8");
-              toast.success("CSV exportado.");
-            }}
-          >
+          <Button size="sm" variant="outline" onClick={exportarCsv}>
             <FileSpreadsheet className="h-4 w-4" aria-hidden />
             Exportar CSV
           </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => {
-              eventoExportarRelatorio({ formato: "whatsapp", comComparacao });
-              void copiar(whatsappRelatorio(rel), "Resumo copiado para o WhatsApp.");
-            }}
-          >
+          <Button size="sm" variant="outline" onClick={() => void exportarWhatsapp()}>
             <Copy className="h-4 w-4" aria-hidden />
             Copiar resumo WhatsApp
           </Button>
