@@ -13,6 +13,11 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { TemaProvider } from "../hooks/useTema";
+import { SITE_NOME, SITE_URL } from "../lib/seo-head";
+
+const TITULO_PADRAO = "Precifica Grancont — precificação tributária para empresas";
+const DESCRICAO_PADRAO =
+  "Simulador de precificação: custo líquido de aquisição, créditos tributários e preço de venda recomendado por regime e por estado.";
 
 function NotFoundComponent() {
   return (
@@ -81,18 +86,42 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Precifica Grancont" },
-      {
-        name: "description",
-        content:
-          "Simulador de precificação: custo líquido de aquisição, créditos tributários e preço de venda recomendado.",
-      },
+      { title: TITULO_PADRAO },
+      { name: "description", content: DESCRICAO_PADRAO },
       { name: "author", content: "Grancont" },
       { name: "google-site-verification", content: "ubZZVcdFG3gdMEA9ccegfi4H9YGjYXxiy71bmcYPplI" },
+      { name: "theme-color", content: "#1e1b4b" },
 
+      // Defaults sitewide. Cada rota folha sobrescreve título, descrição e og:*
+      // (o TanStack deduplica meta por name/property).
+      { property: "og:site_name", content: SITE_NOME },
+      { property: "og:locale", content: "pt_BR" },
       { property: "og:type", content: "website" },
+      { property: "og:title", content: TITULO_PADRAO },
+      { property: "og:description", content: DESCRICAO_PADRAO },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: TITULO_PADRAO },
+      { name: "twitter:description", content: DESCRICAO_PADRAO },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          name: SITE_NOME,
+          url: `${SITE_URL}/`,
+          applicationCategory: "FinanceApplication",
+          operatingSystem: "Web",
+          inLanguage: "pt-BR",
+          description: DESCRICAO_PADRAO,
+          publisher: {
+            "@type": "Organization",
+            name: "Grancont",
+            url: `${SITE_URL}/`,
+          },
+        }),
+      },
     ],
     links: [
       {

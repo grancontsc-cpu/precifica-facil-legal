@@ -1,3 +1,4 @@
+import { metaPagina } from "@/lib/seo-head";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { CheckCircle2, Loader2, MailCheck } from "lucide-react";
 import { useState } from "react";
@@ -22,14 +23,12 @@ const DESCRICAO =
 export const Route = createFileRoute("/cadastro")({
   validateSearch: z.object({ email: z.string().optional() }),
   head: () => ({
-    meta: [
-      { title: TITULO },
-      { name: "description", content: DESCRICAO },
-      { property: "og:title", content: TITULO },
-      { property: "og:description", content: DESCRICAO },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
+    ...metaPagina({
+      titulo: TITULO,
+      descricao: DESCRICAO,
+      caminho: "/cadastro",
+      indexavel: true,
+    }),
   }),
   ssr: false,
   component: CadastrarPage,

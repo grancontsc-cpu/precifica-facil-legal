@@ -1,3 +1,4 @@
+import { metaPagina } from "@/lib/seo-head";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Building2, Loader2, ShieldCheck } from "lucide-react";
 import { useState } from "react";
@@ -16,15 +17,11 @@ const DESCRICAO =
 
 export const Route = createFileRoute("/onboarding")({
   head: () => ({
-    meta: [
-      { title: TITULO },
-      { name: "description", content: DESCRICAO },
-      { property: "og:title", content: TITULO },
-      { property: "og:description", content: DESCRICAO },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "robots", content: "noindex" },
-    ],
+    ...metaPagina({
+      titulo: TITULO,
+      descricao: DESCRICAO,
+      caminho: "/onboarding",
+    }),
   }),
   ssr: false,
   component: OnboardingPage,

@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { metaPagina } from "@/lib/seo-head";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Check, Inbox, X } from "lucide-react";
@@ -19,15 +20,11 @@ const DESCRICAO = "Analise os pedidos de acesso administrativo enviados pelos us
 
 export const Route = createFileRoute("/_authenticated/admin/solicitacoes")({
   head: () => ({
-    meta: [
-      { title: TITULO },
-      { name: "description", content: DESCRICAO },
-      { property: "og:title", content: TITULO },
-      { property: "og:description", content: DESCRICAO },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "robots", content: "noindex" },
-    ],
+    ...metaPagina({
+      titulo: TITULO,
+      descricao: DESCRICAO,
+      caminho: "/admin/solicitacoes",
+    }),
   }),
   component: () => (
     <ExigePapel papel="super_admin">

@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { metaPagina } from "@/lib/seo-head";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 
@@ -51,14 +52,11 @@ function grupoDaEntidade(entidade: string) {
 
 export const Route = createFileRoute("/_authenticated/auditoria")({
   head: () => ({
-    meta: [
-      { title: TITULO },
-      { name: "description", content: DESCRICAO },
-      { property: "og:title", content: TITULO },
-      { property: "og:description", content: DESCRICAO },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
+    ...metaPagina({
+      titulo: TITULO,
+      descricao: DESCRICAO,
+      caminho: "/auditoria",
+    }),
   }),
   component: AuditoriaPage,
 });

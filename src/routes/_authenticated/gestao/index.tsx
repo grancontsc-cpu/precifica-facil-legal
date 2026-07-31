@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { metaPagina } from "@/lib/seo-head";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ClipboardList, MailPlus, Users } from "lucide-react";
 
@@ -11,15 +12,11 @@ const DESCRICAO = "Painel do gestor: usuários da empresa, convites e simulaçõ
 
 export const Route = createFileRoute("/_authenticated/gestao/")({
   head: () => ({
-    meta: [
-      { title: TITULO },
-      { name: "description", content: DESCRICAO },
-      { property: "og:title", content: TITULO },
-      { property: "og:description", content: DESCRICAO },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "robots", content: "noindex" },
-    ],
+    ...metaPagina({
+      titulo: TITULO,
+      descricao: DESCRICAO,
+      caminho: "/gestao",
+    }),
   }),
   component: () => (
     <ExigePapel papel="manager">

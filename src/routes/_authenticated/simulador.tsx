@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { metaPagina } from "@/lib/seo-head";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Info, RotateCcw, Save, Sparkles, Trash2 } from "lucide-react";
@@ -91,14 +92,11 @@ export const Route = createFileRoute("/_authenticated/simulador")({
     produto: typeof search.produto === "string" ? search.produto : undefined,
   }),
   head: () => ({
-    meta: [
-      { title: TITULO },
-      { name: "description", content: DESCRICAO },
-      { property: "og:title", content: TITULO },
-      { property: "og:description", content: DESCRICAO },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
+    ...metaPagina({
+      titulo: TITULO,
+      descricao: DESCRICAO,
+      caminho: "/simulador",
+    }),
   }),
   component: Simulador,
 });
