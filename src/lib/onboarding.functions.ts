@@ -41,9 +41,9 @@ export const concluirOnboarding = createServerFn({ method: "POST" })
     const { data: retorno, error } = await context.supabase.rpc("complete_customer_onboarding", {
       p_full_name: data.nomeCompleto,
       p_company_name: data.nomeEmpresa,
-      p_cnpj: data.cnpj || null,
-      p_state: data.uf || null,
-      p_city: data.cidade || null,
+      p_cnpj: data.cnpj || undefined,
+      p_state: data.uf || undefined,
+      p_city: data.cidade || undefined,
       p_terms_version: data.versaoTermos,
       p_privacy_version: data.versaoPrivacidade,
     });
@@ -69,9 +69,6 @@ export const concluirOnboarding = createServerFn({ method: "POST" })
 export const situacaoOnboarding = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { processarExpiracoes } = await import("@/lib/licencas.functions");
-    void processarExpiracoes;
-
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     await supabaseAdmin.rpc("process_expired_trials");
 

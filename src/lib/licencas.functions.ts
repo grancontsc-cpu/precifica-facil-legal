@@ -315,7 +315,7 @@ export const atualizarLicenca = createServerFn({ method: "POST" })
       entity: "licenses",
       entity_id: salva.id,
       before_data: atual ?? null,
-      after_data: salva as unknown as Record<string, unknown>,
+      after_data: salva as unknown as Record<string, never>,
     });
 
     return { ok: true as const, status: salva.status, evento };
