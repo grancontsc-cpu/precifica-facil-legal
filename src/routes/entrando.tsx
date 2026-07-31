@@ -11,8 +11,8 @@ import { avaliarLicenca, rotaBloqueio, type Licenca } from "@/lib/licencas";
 export const Route = createFileRoute("/entrando")({
   head: () => ({
     ...metaPagina({
-      titulo: TITULO,
-      descricao: DESCRICAO,
+      titulo: "Entrando — Precifica Grancont",
+      descricao: "Verificando sua conta e liberando o acesso ao Precifica Grancont.",
       caminho: "/entrando",
     }),
   }),
