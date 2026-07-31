@@ -455,6 +455,11 @@ function Simulador() {
     toast.success("Rascunho salvo neste navegador.");
   };
 
+  const ultimaAcao = useRef<{
+    tipo: Exclude<ContextoExemplo, "direto">;
+    em: number;
+  } | null>(null);
+
   const novaSimulacao = () => {
     ultimaAcao.current = { tipo: "apos_nova_simulacao", em: Date.now() };
     eventoSimulacaoIniciada({ modo, origem: "nova" });
