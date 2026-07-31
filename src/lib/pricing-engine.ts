@@ -560,6 +560,57 @@ export const MENSAGEM_IMPOSSIVEL =
 export function validar(state: SimulationState): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
   const p = state.produto;
+  const tributosCompra = tributosCompraEfetivos(state);
+  const tributosVenda = tributosVendaEfetivos(state);
+  const op = state.operacao;
+
+  if (op) {
+    if (!op.ufOrigem) {
+      issues.push({
+        campo: "ufOrigem",
+        mensagem: "Informe o estado de origem da mercadoria.",
+        severidade: "erro",
+      });
+    }
+    if (!op.ufDestino) {
+      issues.push({
+        campo: "ufDestino",
+        mensagem: "Informe o estado de destino (o estado da sua empresa).",
+        severidade: "erro",
+      });
+    }
+    const fronteira = calcularFronteira(op);
+    if (fronteira.faltaAliquota) {
+      issues.push({
+        campo: "aliquotasIcms",
+        mensagem: `${fronteira.explicacao} Cadastre a alíquota vigente ou informe o valor de fronteira manualmente.`,
+        severidade: "erro",
+      });
+    }
+    if (apuraPeloSimples(op.regime)) {
+      if (!finito(op.aliquotaSimples) || op.aliquotaSimples < 0) {
+        issues.push({
+          campo: "aliquotaSimples",
+          mensagem: "Informe a alíquota efetiva do DAS (a que aparece na sua apuração).",
+          severidade: "erro",
+        });
+      } else if (op.aliquotaSimples === 0) {
+        issues.push({
+          campo: "aliquotaSimples",
+          mensagem:
+            "A alíquota efetiva do DAS está zerada: o preço não considerará o imposto do Simples.",
+          severidade: "aviso",
+        });
+      } else if (op.aliquotaSimples > 33) {
+        issues.push({
+          campo: "aliquotaSimples",
+          mensagem: "A alíquota efetiva do DAS acima de 33% é incomum. Confira a apuração.",
+          severidade: "aviso",
+        });
+      }
+    }
+  }
+
 
   if (!p.nome.trim()) {
     issues.push({ campo: "nome", mensagem: "Informe o nome do produto.", severidade: "erro" });
