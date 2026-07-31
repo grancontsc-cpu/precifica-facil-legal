@@ -244,7 +244,9 @@ export function estadoInicial(): SimulationState {
     },
     tributosVenda: tributosVendaPadrao(),
     modoAvancado: false,
+    operacao: operacaoPadrao(),
   };
+
 }
 
 /** Simulação de exemplo com dados realistas de um comércio varejista. */
