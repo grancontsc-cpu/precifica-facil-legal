@@ -9,11 +9,15 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TesteExpiradoRouteImport } from './routes/teste-expirado'
 import { Route as RedefinirSenhaRouteImport } from './routes/redefinir-senha'
+import { Route as RecuperarSenhaRouteImport } from './routes/recuperar-senha'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as LicencaSuspensaRouteImport } from './routes/licenca-suspensa'
 import { Route as EsqueciMinhaSenhaRouteImport } from './routes/esqueci-minha-senha'
 import { Route as EntrandoRouteImport } from './routes/entrando'
 import { Route as ConfirmarEmailRouteImport } from './routes/confirmar-email'
+import { Route as CadastroRouteImport } from './routes/cadastro'
 import { Route as CadastrarRouteImport } from './routes/cadastrar'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AguardandoAprovacaoRouteImport } from './routes/aguardando-aprovacao'
@@ -22,6 +26,8 @@ import { Route as AcessoBloqueadoRouteImport } from './routes/acesso-bloqueado'
 import { Route as AceitarConviteRouteImport } from './routes/aceitar-convite'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as AppSplatRouteImport } from './routes/app.$'
 import { Route as AuthenticatedSimuladorRouteImport } from './routes/_authenticated/simulador'
 import { Route as AuthenticatedSimulacoesRouteImport } from './routes/_authenticated/simulacoes'
 import { Route as AuthenticatedProdutosRouteImport } from './routes/_authenticated/produtos'
@@ -42,14 +48,29 @@ import { Route as AuthenticatedAdminEmpresasRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminConvitesRouteImport } from './routes/_authenticated/admin/convites'
 import { Route as AuthenticatedAdminAuditoriaRouteImport } from './routes/_authenticated/admin/auditoria'
 
+const TesteExpiradoRoute = TesteExpiradoRouteImport.update({
+  id: '/teste-expirado',
+  path: '/teste-expirado',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RedefinirSenhaRoute = RedefinirSenhaRouteImport.update({
   id: '/redefinir-senha',
   path: '/redefinir-senha',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RecuperarSenhaRoute = RecuperarSenhaRouteImport.update({
+  id: '/recuperar-senha',
+  path: '/recuperar-senha',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LicencaSuspensaRoute = LicencaSuspensaRouteImport.update({
+  id: '/licenca-suspensa',
+  path: '/licenca-suspensa',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EsqueciMinhaSenhaRoute = EsqueciMinhaSenhaRouteImport.update({
@@ -65,6 +86,11 @@ const EntrandoRoute = EntrandoRouteImport.update({
 const ConfirmarEmailRoute = ConfirmarEmailRouteImport.update({
   id: '/confirmar-email',
   path: '/confirmar-email',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CadastroRoute = CadastroRouteImport.update({
+  id: '/cadastro',
+  path: '/cadastro',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CadastrarRoute = CadastrarRouteImport.update({
@@ -104,6 +130,16 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppIndexRoute = AppIndexRouteImport.update({
+  id: '/app/',
+  path: '/app/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppSplatRoute = AppSplatRouteImport.update({
+  id: '/app/$',
+  path: '/app/$',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedSimuladorRoute = AuthenticatedSimuladorRouteImport.update({
@@ -221,11 +257,15 @@ export interface FileRoutesByFullPath {
   '/aguardando-aprovacao': typeof AguardandoAprovacaoRoute
   '/auth': typeof AuthRoute
   '/cadastrar': typeof CadastrarRoute
+  '/cadastro': typeof CadastroRoute
   '/confirmar-email': typeof ConfirmarEmailRoute
   '/entrando': typeof EntrandoRoute
   '/esqueci-minha-senha': typeof EsqueciMinhaSenhaRoute
+  '/licenca-suspensa': typeof LicencaSuspensaRoute
   '/login': typeof LoginRoute
+  '/recuperar-senha': typeof RecuperarSenhaRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
+  '/teste-expirado': typeof TesteExpiradoRoute
   '/auditoria': typeof AuthenticatedAuditoriaRoute
   '/comparar': typeof AuthenticatedCompararRoute
   '/empresas': typeof AuthenticatedEmpresasRoute
@@ -233,6 +273,8 @@ export interface FileRoutesByFullPath {
   '/produtos': typeof AuthenticatedProdutosRoute
   '/simulacoes': typeof AuthenticatedSimulacoesRoute
   '/simulador': typeof AuthenticatedSimuladorRoute
+  '/app/$': typeof AppSplatRoute
+  '/app/': typeof AppIndexRoute
   '/admin/auditoria': typeof AuthenticatedAdminAuditoriaRoute
   '/admin/convites': typeof AuthenticatedAdminConvitesRoute
   '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
@@ -254,11 +296,15 @@ export interface FileRoutesByTo {
   '/aguardando-aprovacao': typeof AguardandoAprovacaoRoute
   '/auth': typeof AuthRoute
   '/cadastrar': typeof CadastrarRoute
+  '/cadastro': typeof CadastroRoute
   '/confirmar-email': typeof ConfirmarEmailRoute
   '/entrando': typeof EntrandoRoute
   '/esqueci-minha-senha': typeof EsqueciMinhaSenhaRoute
+  '/licenca-suspensa': typeof LicencaSuspensaRoute
   '/login': typeof LoginRoute
+  '/recuperar-senha': typeof RecuperarSenhaRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
+  '/teste-expirado': typeof TesteExpiradoRoute
   '/auditoria': typeof AuthenticatedAuditoriaRoute
   '/comparar': typeof AuthenticatedCompararRoute
   '/empresas': typeof AuthenticatedEmpresasRoute
@@ -266,6 +312,8 @@ export interface FileRoutesByTo {
   '/produtos': typeof AuthenticatedProdutosRoute
   '/simulacoes': typeof AuthenticatedSimulacoesRoute
   '/simulador': typeof AuthenticatedSimuladorRoute
+  '/app/$': typeof AppSplatRoute
+  '/app': typeof AppIndexRoute
   '/admin/auditoria': typeof AuthenticatedAdminAuditoriaRoute
   '/admin/convites': typeof AuthenticatedAdminConvitesRoute
   '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
@@ -289,11 +337,15 @@ export interface FileRoutesById {
   '/aguardando-aprovacao': typeof AguardandoAprovacaoRoute
   '/auth': typeof AuthRoute
   '/cadastrar': typeof CadastrarRoute
+  '/cadastro': typeof CadastroRoute
   '/confirmar-email': typeof ConfirmarEmailRoute
   '/entrando': typeof EntrandoRoute
   '/esqueci-minha-senha': typeof EsqueciMinhaSenhaRoute
+  '/licenca-suspensa': typeof LicencaSuspensaRoute
   '/login': typeof LoginRoute
+  '/recuperar-senha': typeof RecuperarSenhaRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
+  '/teste-expirado': typeof TesteExpiradoRoute
   '/_authenticated/auditoria': typeof AuthenticatedAuditoriaRoute
   '/_authenticated/comparar': typeof AuthenticatedCompararRoute
   '/_authenticated/empresas': typeof AuthenticatedEmpresasRoute
@@ -301,6 +353,8 @@ export interface FileRoutesById {
   '/_authenticated/produtos': typeof AuthenticatedProdutosRoute
   '/_authenticated/simulacoes': typeof AuthenticatedSimulacoesRoute
   '/_authenticated/simulador': typeof AuthenticatedSimuladorRoute
+  '/app/$': typeof AppSplatRoute
+  '/app/': typeof AppIndexRoute
   '/_authenticated/admin/auditoria': typeof AuthenticatedAdminAuditoriaRoute
   '/_authenticated/admin/convites': typeof AuthenticatedAdminConvitesRoute
   '/_authenticated/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
@@ -324,11 +378,15 @@ export interface FileRouteTypes {
     | '/aguardando-aprovacao'
     | '/auth'
     | '/cadastrar'
+    | '/cadastro'
     | '/confirmar-email'
     | '/entrando'
     | '/esqueci-minha-senha'
+    | '/licenca-suspensa'
     | '/login'
+    | '/recuperar-senha'
     | '/redefinir-senha'
+    | '/teste-expirado'
     | '/auditoria'
     | '/comparar'
     | '/empresas'
@@ -336,6 +394,8 @@ export interface FileRouteTypes {
     | '/produtos'
     | '/simulacoes'
     | '/simulador'
+    | '/app/$'
+    | '/app/'
     | '/admin/auditoria'
     | '/admin/convites'
     | '/admin/empresas'
@@ -357,11 +417,15 @@ export interface FileRouteTypes {
     | '/aguardando-aprovacao'
     | '/auth'
     | '/cadastrar'
+    | '/cadastro'
     | '/confirmar-email'
     | '/entrando'
     | '/esqueci-minha-senha'
+    | '/licenca-suspensa'
     | '/login'
+    | '/recuperar-senha'
     | '/redefinir-senha'
+    | '/teste-expirado'
     | '/auditoria'
     | '/comparar'
     | '/empresas'
@@ -369,6 +433,8 @@ export interface FileRouteTypes {
     | '/produtos'
     | '/simulacoes'
     | '/simulador'
+    | '/app/$'
+    | '/app'
     | '/admin/auditoria'
     | '/admin/convites'
     | '/admin/empresas'
@@ -391,11 +457,15 @@ export interface FileRouteTypes {
     | '/aguardando-aprovacao'
     | '/auth'
     | '/cadastrar'
+    | '/cadastro'
     | '/confirmar-email'
     | '/entrando'
     | '/esqueci-minha-senha'
+    | '/licenca-suspensa'
     | '/login'
+    | '/recuperar-senha'
     | '/redefinir-senha'
+    | '/teste-expirado'
     | '/_authenticated/auditoria'
     | '/_authenticated/comparar'
     | '/_authenticated/empresas'
@@ -403,6 +473,8 @@ export interface FileRouteTypes {
     | '/_authenticated/produtos'
     | '/_authenticated/simulacoes'
     | '/_authenticated/simulador'
+    | '/app/$'
+    | '/app/'
     | '/_authenticated/admin/auditoria'
     | '/_authenticated/admin/convites'
     | '/_authenticated/admin/empresas'
@@ -426,15 +498,28 @@ export interface RootRouteChildren {
   AguardandoAprovacaoRoute: typeof AguardandoAprovacaoRoute
   AuthRoute: typeof AuthRoute
   CadastrarRoute: typeof CadastrarRoute
+  CadastroRoute: typeof CadastroRoute
   ConfirmarEmailRoute: typeof ConfirmarEmailRoute
   EntrandoRoute: typeof EntrandoRoute
   EsqueciMinhaSenhaRoute: typeof EsqueciMinhaSenhaRoute
+  LicencaSuspensaRoute: typeof LicencaSuspensaRoute
   LoginRoute: typeof LoginRoute
+  RecuperarSenhaRoute: typeof RecuperarSenhaRoute
   RedefinirSenhaRoute: typeof RedefinirSenhaRoute
+  TesteExpiradoRoute: typeof TesteExpiradoRoute
+  AppSplatRoute: typeof AppSplatRoute
+  AppIndexRoute: typeof AppIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/teste-expirado': {
+      id: '/teste-expirado'
+      path: '/teste-expirado'
+      fullPath: '/teste-expirado'
+      preLoaderRoute: typeof TesteExpiradoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/redefinir-senha': {
       id: '/redefinir-senha'
       path: '/redefinir-senha'
@@ -442,11 +527,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RedefinirSenhaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/recuperar-senha': {
+      id: '/recuperar-senha'
+      path: '/recuperar-senha'
+      fullPath: '/recuperar-senha'
+      preLoaderRoute: typeof RecuperarSenhaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/licenca-suspensa': {
+      id: '/licenca-suspensa'
+      path: '/licenca-suspensa'
+      fullPath: '/licenca-suspensa'
+      preLoaderRoute: typeof LicencaSuspensaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/esqueci-minha-senha': {
@@ -468,6 +567,13 @@ declare module '@tanstack/react-router' {
       path: '/confirmar-email'
       fullPath: '/confirmar-email'
       preLoaderRoute: typeof ConfirmarEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cadastro': {
+      id: '/cadastro'
+      path: '/cadastro'
+      fullPath: '/cadastro'
+      preLoaderRoute: typeof CadastroRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cadastrar': {
@@ -524,6 +630,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/': {
+      id: '/app/'
+      path: '/app'
+      fullPath: '/app/'
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/$': {
+      id: '/app/$'
+      path: '/app/$'
+      fullPath: '/app/$'
+      preLoaderRoute: typeof AppSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/simulador': {
@@ -719,12 +839,28 @@ const rootRouteChildren: RootRouteChildren = {
   AguardandoAprovacaoRoute: AguardandoAprovacaoRoute,
   AuthRoute: AuthRoute,
   CadastrarRoute: CadastrarRoute,
+  CadastroRoute: CadastroRoute,
   ConfirmarEmailRoute: ConfirmarEmailRoute,
   EntrandoRoute: EntrandoRoute,
   EsqueciMinhaSenhaRoute: EsqueciMinhaSenhaRoute,
+  LicencaSuspensaRoute: LicencaSuspensaRoute,
   LoginRoute: LoginRoute,
+  RecuperarSenhaRoute: RecuperarSenhaRoute,
   RedefinirSenhaRoute: RedefinirSenhaRoute,
+  TesteExpiradoRoute: TesteExpiradoRoute,
+  AppSplatRoute: AppSplatRoute,
+  AppIndexRoute: AppIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

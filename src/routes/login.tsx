@@ -202,7 +202,7 @@ function LoginPage() {
               <div className="flex items-baseline justify-between">
                 <Label htmlFor="senha">Senha</Label>
                 <Link
-                  to="/esqueci-minha-senha"
+                  to="/recuperar-senha"
                   className="text-xs font-medium text-muted-foreground underline-offset-4 hover:text-primary hover:underline"
                 >
                   Esqueci minha senha
@@ -265,7 +265,7 @@ function LoginPage() {
               Crie sua conta e use o sistema completo por 30 dias, sem cartão de crédito.
             </p>
             <Button asChild variant="outline" className="mt-3 w-full">
-              <Link to="/cadastrar">Criar conta — 30 dias grátis</Link>
+              <Link to="/cadastro">Criar conta — 30 dias grátis</Link>
             </Button>
           </div>
 

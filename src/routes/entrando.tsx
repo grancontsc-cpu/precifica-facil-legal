@@ -5,7 +5,7 @@ import { Carregando } from "@/components/app/GuardaAcesso";
 import { supabase } from "@/integrations/supabase/client";
 import { provisionarConta } from "@/lib/conta.functions";
 import { processarExpiracoes } from "@/lib/licencas.functions";
-import { avaliarLicenca, type Licenca } from "@/lib/licencas";
+import { avaliarLicenca, rotaBloqueio, type Licenca } from "@/lib/licencas";
 
 export const Route = createFileRoute("/entrando")({
   head: () => ({
@@ -72,9 +72,9 @@ function Entrando() {
 
       const destino =
         status === "active" && !superAdmin && !situacao.liberado
-          ? "/acesso-bloqueado"
+          ? rotaBloqueio(situacao)
           : status === "suspended"
-          ? "/acesso-bloqueado"
+          ? "/licenca-suspensa"
           : status === "pending_approval"
             ? "/aguardando-aprovacao"
             : status === "pending_email_verification" || status === "invited"
