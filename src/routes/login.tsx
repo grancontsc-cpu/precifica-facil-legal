@@ -1,14 +1,16 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { CheckCircle2, Eye, EyeOff, Info, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { DialogoCadastrar } from "@/components/app/DialogoCadastrar";
 import { LogoGrancont } from "@/components/app/LogoGrancont";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { verificarEmailCadastrado } from "@/lib/conta.functions";
 
 const TITULO = "Entrar — Precifica Grancont";
 const DESCRICAO =
