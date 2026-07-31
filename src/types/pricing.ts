@@ -152,7 +152,10 @@ export interface SimulationState {
   venda: VendaConfig;
   tributosVenda: SaleTax[];
   modoAvancado: boolean;
+  /** Contexto fiscal (regime + UFs). Opcional para simulações salvas antes desta versão. */
+  operacao?: OperacaoFiscal;
 }
+
 
 /* ------------------------------------------------------------------ */
 /* Resultados                                                          */
