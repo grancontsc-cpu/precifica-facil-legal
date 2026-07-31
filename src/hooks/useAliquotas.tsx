@@ -21,11 +21,11 @@ export function useAliquotas() {
       const [internas, interestaduais] = await Promise.all([
         supabase
           .from("icms_aliquotas_internas")
-          .select("uf, aliquota, fcp, vigencia_inicio, vigencia_fim, fonte, observacao"),
+          .select("uf, aliquota, fcp, vigencia_inicio, vigencia_fim, fonte, observacao, updated_at"),
         supabase
           .from("icms_aliquotas_interestaduais")
           .select(
-            "uf_origem, uf_destino, aliquota, aliquota_importado, vigencia_inicio, vigencia_fim, fonte",
+            "uf_origem, uf_destino, aliquota, aliquota_importado, vigencia_inicio, vigencia_fim, fonte, updated_at",
           ),
       ]);
       if (internas.error) throw internas.error;
