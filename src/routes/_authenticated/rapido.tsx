@@ -89,6 +89,7 @@ function ModoRapido() {
   const [ufOrigem, setUfOrigem] = useState("");
   const [ufDestino, setUfDestino] = useState(empresa?.uf ?? "");
   const regime = regimeDaEmpresa(empresa?.regime);
+  const [ajustes, setAjustes] = useState<AjustesRapido>(ajustesVazios);
 
   const estado = useMemo<SimulationState>(() => {
     const base = aplicarRegime(estadoInicial(), regime);
@@ -96,18 +97,21 @@ function ModoRapido() {
       operacaoPadrao({ regime, ufOrigem, ufDestino: ufDestino || ufOrigem }),
       tabela,
     );
-    return {
-      ...base,
-      produto: {
-        ...base.produto,
-        nome: nome.trim(),
-        quantidade: quantidade || 1,
-        valorUnitario,
+    return aplicarAjustes(
+      {
+        ...base,
+        produto: {
+          ...base.produto,
+          nome: nome.trim(),
+          quantidade: quantidade || 1,
+          valorUnitario,
+        },
+        venda: { ...base.venda, margemDesejada: margem },
+        operacao,
       },
-      venda: { ...base.venda, margemDesejada: margem },
-      operacao,
-    };
-  }, [regime, ufOrigem, ufDestino, tabela, nome, quantidade, valorUnitario, margem]);
+      ajustes,
+    );
+  }, [regime, ufOrigem, ufDestino, tabela, nome, quantidade, valorUnitario, margem, ajustes]);
 
   const resultado = useMemo(() => simular(estado), [estado]);
   const recomendado = resultado.recomendado;
