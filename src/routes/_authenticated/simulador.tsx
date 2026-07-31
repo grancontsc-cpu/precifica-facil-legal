@@ -23,6 +23,7 @@ import { CardTributoCompra } from "@/components/pricing/CardTributoCompra";
 import { CardTributoVenda } from "@/components/pricing/CardTributoVenda";
 import { PainelResultados } from "@/components/pricing/PainelResultados";
 import { EntendaOCalculo } from "@/components/pricing/EntendaOCalculo";
+import { AlternadorModo } from "@/components/pricing/AlternadorModo";
 import { ResumoFlutuante } from "@/components/pricing/ResumoFlutuante";
 import { simular } from "@/lib/pricing-engine";
 import { CENARIOS, aplicarCenario, estadoExemplo, estadoInicial } from "@/lib/pricing-defaults";
