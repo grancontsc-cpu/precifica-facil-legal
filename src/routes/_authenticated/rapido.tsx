@@ -53,6 +53,37 @@ function regimeDaEmpresa(valor: string | null | undefined): Regime {
 /** Trilha visual dos passos — reforça progresso e reduz abandono. */
 function Trilha({ passo }: { passo: number }) {
   const passos = ["Produto", "Valor", "Trajeto", "Impostos", "Preço"];
+  return (
+    <ol className="flex items-center gap-2" aria-label="Progresso do modo rápido">
+      {passos.map((rotulo, i) => {
+        const atual = i + 1 === passo;
+        const concluido = i + 1 < passo;
+        return (
+          <li key={rotulo} className="flex flex-1 flex-col gap-1.5">
+            <span
+              aria-hidden
+              className={
+                "h-1.5 rounded-full transition-colors " +
+                (atual || concluido ? "bg-primary" : "bg-border")
+              }
+            />
+            <span
+              className={
+                "text-[11px] font-medium " +
+                (atual ? "text-foreground" : "text-muted-foreground")
+              }
+              aria-current={atual ? "step" : undefined}
+            >
+              {rotulo}
+            </span>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
+
 
 
 function ModoRapido() {
