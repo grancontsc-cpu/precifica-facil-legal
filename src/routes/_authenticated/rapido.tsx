@@ -56,38 +56,60 @@ function regimeDaEmpresa(valor: string | null | undefined): Regime {
   return valor && REGIMES_VALIDOS.has(valor) ? (valor as Regime) : "real";
 }
 
-/** Trilha visual dos passos — reforça progresso e reduz abandono. */
-function Trilha({ passo }: { passo: number }) {
+/** Trilha visual dos passos — reforça progresso e permite voltar para ajustar. */
+function Trilha({
+  passo,
+  maxPasso,
+  onIr,
+}: {
+  passo: number;
+  maxPasso: number;
+  onIr: (destino: number) => void;
+}) {
   const passos = ["Produto", "Valor", "Trajeto", "Impostos", "Preço"];
   return (
     <ol className="flex items-center gap-2" aria-label="Progresso do modo rápido">
       {passos.map((rotulo, i) => {
-        const atual = i + 1 === passo;
-        const concluido = i + 1 < passo;
+        const numero = i + 1;
+        const atual = numero === passo;
+        const concluido = numero < passo;
+        const liberado = numero <= maxPasso;
         return (
           <li key={rotulo} className="flex flex-1 flex-col gap-1.5">
-            <span
-              aria-hidden
-              className={
-                "h-1.5 rounded-full transition-colors " +
-                (atual || concluido ? "bg-primary" : "bg-border")
-              }
-            />
-            <span
-              className={
-                "text-[11px] font-medium " +
-                (atual ? "text-foreground" : "text-muted-foreground")
-              }
+            <button
+              type="button"
+              onClick={() => liberado && onIr(numero)}
+              disabled={!liberado}
               aria-current={atual ? "step" : undefined}
+              aria-label={`Ir para a etapa ${rotulo}`}
+              className={
+                "flex flex-col gap-1.5 text-left " +
+                (liberado ? "cursor-pointer" : "cursor-default")
+              }
             >
-              {rotulo}
-            </span>
+              <span
+                aria-hidden
+                className={
+                  "h-1.5 rounded-full transition-colors " +
+                  (atual || concluido ? "bg-primary" : liberado ? "bg-primary/30" : "bg-border")
+                }
+              />
+              <span
+                className={
+                  "text-[11px] font-medium " +
+                  (atual ? "text-foreground" : "text-muted-foreground")
+                }
+              >
+                {rotulo}
+              </span>
+            </button>
           </li>
         );
       })}
     </ol>
   );
 }
+
 
 
 
