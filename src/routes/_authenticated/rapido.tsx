@@ -18,6 +18,7 @@ import { useAliquotas } from "@/hooks/useAliquotas";
 import { sincronizarOperacao, UFS } from "@/lib/aliquotas";
 import { REGIMES, simular } from "@/lib/pricing-engine";
 import { PainelFronteira } from "@/components/pricing/PainelFronteira";
+import { AliquotasTrajeto } from "@/components/pricing/AliquotasTrajeto";
 import { aplicarRegime, estadoInicial, operacaoPadrao } from "@/lib/pricing-defaults";
 import { formatBRL } from "@/lib/format";
 import { useApp } from "@/hooks/useApp";
@@ -230,6 +231,8 @@ function ModoRapido() {
                 </Select>
               </div>
             </div>
+            <AliquotasTrajeto ufOrigem={ufOrigem} ufDestino={ufDestino} />
+
             <p className="text-xs text-muted-foreground">
               Regime considerado: {REGIMES.find((r) => r.id === regime)?.nome ?? regime}
               {empresa?.regime ? " (cadastro da empresa)" : " (padrão)"}.

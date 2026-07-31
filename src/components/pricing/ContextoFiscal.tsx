@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { CampoNumero } from "@/components/pricing/CampoNumero";
+import { AliquotasTrajeto } from "@/components/pricing/AliquotasTrajeto";
 import { UFS } from "@/lib/aliquotas";
 import { REGIMES, apuraPeloSimples, calcularFronteira } from "@/lib/pricing-engine";
 import type { OperacaoFiscal, Regime } from "@/types/pricing";
@@ -96,6 +97,12 @@ export function ContextoFiscal({
           </Select>
         </div>
       </div>
+
+      <AliquotasTrajeto
+        ufOrigem={operacao.ufOrigem}
+        ufDestino={operacao.ufDestino}
+        importada={operacao.importada}
+      />
 
       {simples ? (
         <CampoNumero
