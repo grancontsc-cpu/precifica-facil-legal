@@ -456,12 +456,14 @@ function Simulador() {
   };
 
   const novaSimulacao = () => {
+    ultimaAcao.current = { tipo: "apos_nova_simulacao", em: Date.now() };
     eventoSimulacaoIniciada({ modo, origem: "nova" });
     setState(estadoInicial());
     toast.info("Nova simulação iniciada.");
   };
 
   const limpar = () => {
+    ultimaAcao.current = { tipo: "apos_limpar", em: Date.now() };
     localStorage.removeItem(STORAGE_KEY);
     setState(estadoInicial());
     setSalvoEm(null);
@@ -469,6 +471,15 @@ function Simulador() {
   };
 
   const carregarExemplo = () => {
+    const anterior = ultimaAcao.current;
+    eventoRestaurarExemplo({
+      modo,
+      contexto: anterior?.tipo ?? "direto",
+      segundosDesdeAcao: anterior
+        ? Math.round((Date.now() - anterior.em) / 1000)
+        : undefined,
+    });
+    ultimaAcao.current = null;
     eventoSimulacaoIniciada({ modo, origem: "exemplo" });
     setState(estadoExemplo());
     toast.info("Valores de exemplo restaurados.");
