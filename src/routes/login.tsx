@@ -80,7 +80,7 @@ function LoginPage() {
       return;
     }
     setPendenteConfirmacao(null);
-    navigate({ to: "/entrando", replace: true });
+    seguir();
   };
 
   return (
