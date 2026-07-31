@@ -3,6 +3,8 @@ import { useEffect } from "react";
 
 import { Carregando } from "@/components/app/GuardaAcesso";
 import { supabase } from "@/integrations/supabase/client";
+import { provisionarConta } from "@/lib/conta.functions";
+import { avaliarLicenca, type Licenca } from "@/lib/licencas";
 
 export const Route = createFileRoute("/entrando")({
   head: () => ({
@@ -33,6 +35,12 @@ function Entrando() {
         return;
       }
 
+      try {
+        await provisionarConta({ data: undefined });
+      } catch {
+        /* provisionamento tolerante a falha: o guarda de acesso decide o destino */
+      }
+
       const [{ data: perfil }, { data: globais }, { data: vinculos }] = await Promise.all([
         supabase.from("profiles").select("account_status").eq("id", user.id).maybeSingle(),
         supabase.from("global_user_roles").select("role").eq("user_id", user.id),
@@ -43,6 +51,12 @@ function Entrando() {
           .eq("membership_status", "active"),
       ]);
 
+      const { data: licenca } = await supabase
+        .from("licenses")
+        .select("status, plan, trial_started_at, trial_ends_at, activated_at, expires_at, notes")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
       await supabase.from("profiles").update({ last_access_at: new Date().toISOString() }).eq("id", user.id);
 
       if (cancelado) return;
@@ -51,8 +65,12 @@ function Entrando() {
       const superAdmin = (globais ?? []).some((g) => g.role === "super_admin");
       const gestor = (vinculos ?? []).some((v) => v.role === "manager");
 
+      const situacao = avaliarLicenca((licenca as Licenca | null) ?? null);
+
       const destino =
-        status === "suspended"
+        status === "active" && !superAdmin && !situacao.liberado
+          ? "/acesso-bloqueado"
+          : status === "suspended"
           ? "/acesso-bloqueado"
           : status === "pending_approval"
             ? "/aguardando-aprovacao"
