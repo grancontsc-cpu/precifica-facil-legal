@@ -128,6 +128,12 @@ export function tributosVendaPadrao(): SaleTax[] {
       enabled: false,
       treatment: "porFora",
     }),
+    saleTax(
+      "dasVenda",
+      "DAS — Simples Nacional",
+      "Tributo único do Simples sobre a receita. Use a alíquota efetiva da sua apuração.",
+      { enabled: false, treatment: "incluido" },
+    ),
     saleTax("outroVenda", "Outro tributo", "Qualquer outro tributo ou encargo sobre a venda.", {
       enabled: false,
       treatment: "incluido",
@@ -135,9 +141,76 @@ export function tributosVendaPadrao(): SaleTax[] {
   ];
 }
 
+/* ------------------------------------------------------------------ */
+/* Contexto fiscal (regime + UFs)                                      */
+/* ------------------------------------------------------------------ */
+
+export function operacaoPadrao(overrides: Partial<OperacaoFiscal> = {}): OperacaoFiscal {
+  return {
+    regime: "real",
+    ufOrigem: "",
+    ufDestino: "",
+    finalidade: "revenda",
+    importada: false,
+    difalAtivo: true,
+    aliquotaInternaDestino: null,
+    aliquotaInterestadual: null,
+    difalManual: null,
+    creditarDifal: null,
+    aliquotaSimples: 0,
+    ...overrides,
+  };
+}
+
+/** Garante que simulações salvas antes desta versão tenham contexto fiscal. */
+export function garantirOperacao(state: SimulationState): SimulationState {
+  if (state.operacao) return state;
+  return { ...state, operacao: operacaoPadrao() };
+}
+
+/**
+ * Ajusta os padrões de crédito e de tributos de venda conforme o regime.
+ * São sugestões: o usuário continua podendo alterar qualquer campo.
+ */
+export function aplicarRegime(state: SimulationState, regime: Regime): SimulationState {
+  const semCredito = regime === "simples" || regime === "mei";
+  const cumulativo = regime === "presumido";
+
+  const tributosCompra = state.tributosCompra.map((t) => {
+    if (t.id === "icms") {
+      return { ...t, creditMode: semCredito ? ("nao" as const) : ("integral" as const) };
+    }
+    if (t.id === "pis" || t.id === "cofins") {
+      return {
+        ...t,
+        creditMode: semCredito || cumulativo ? ("nao" as const) : ("integral" as const),
+      };
+    }
+    if (t.id === "ipi") {
+      return { ...t, creditMode: semCredito ? ("nao" as const) : t.creditMode };
+    }
+    return t;
+  });
+
+  const tributosVenda = state.tributosVenda.map((t) => {
+    if (t.id === "dasVenda") return { ...t, enabled: semCredito };
+    if (["icmsVenda", "pisVenda", "cofinsVenda"].includes(t.id)) {
+      return { ...t, enabled: semCredito ? false : t.enabled };
+    }
+    return t;
+  });
+
+  return {
+    ...state,
+    tributosCompra,
+    tributosVenda,
+    operacao: { ...operacaoPadrao(), ...(state.operacao ?? {}), regime },
+  };
+}
+
 export function estadoInicial(): SimulationState {
   return {
-    produto: {
+
       nome: "",
       sku: "",
       ncm: "",
