@@ -23,6 +23,7 @@ import { CardTributoCompra } from "@/components/pricing/CardTributoCompra";
 import { CardTributoVenda } from "@/components/pricing/CardTributoVenda";
 import { PainelResultados } from "@/components/pricing/PainelResultados";
 import { EntendaOCalculo } from "@/components/pricing/EntendaOCalculo";
+import { PainelFronteira } from "@/components/pricing/PainelFronteira";
 import {
   AlternadorModo,
   DESCRICAO_MODO,
@@ -1007,6 +1008,8 @@ function Simulador() {
               </Secao>
                 </>
               )}
+
+              <PainelFronteira state={state} resultado={resultado} />
 
               <EntendaOCalculo state={state} resultado={resultado} />
 

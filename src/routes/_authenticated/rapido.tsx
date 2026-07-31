@@ -17,6 +17,7 @@ import { CampoNumero, CampoTexto } from "@/components/pricing/CampoNumero";
 import { useAliquotas } from "@/hooks/useAliquotas";
 import { sincronizarOperacao, UFS } from "@/lib/aliquotas";
 import { REGIMES, simular } from "@/lib/pricing-engine";
+import { PainelFronteira } from "@/components/pricing/PainelFronteira";
 import { aplicarRegime, estadoInicial, operacaoPadrao } from "@/lib/pricing-defaults";
 import { formatBRL } from "@/lib/format";
 import { useApp } from "@/hooks/useApp";
@@ -277,6 +278,8 @@ function ModoRapido() {
                 </AlertDescription>
               </Alert>
             )}
+
+            <PainelFronteira state={estado} resultado={resultado} compacto />
 
             <Alert>
               <Info className="size-4" aria-hidden />
