@@ -1007,8 +1007,11 @@ function Simulador() {
                   ))}
                 </div>
               </Secao>
+                </>
+              )}
 
               <EntendaOCalculo state={state} resultado={resultado} />
+
 
               <footer className="rounded-xl border border-border bg-surface p-4 text-xs leading-relaxed text-muted-foreground">
                 {AVISO_RODAPE}
