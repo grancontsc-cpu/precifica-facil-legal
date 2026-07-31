@@ -122,7 +122,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("organization_members")
-        .select("organization_id, role, organizations(id, name, cnpj, defaults, default_tax_profile_id)")
+        .select(`organization_id, role, organizations(${CAMPOS_ORG})`)
         .eq("user_id", userId!)
         .eq("membership_status", "active");
       if (error) throw error;
@@ -136,10 +136,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("organizations")
-        .select("id, name, cnpj, defaults, default_tax_profile_id")
+        .select(CAMPOS_ORG)
         .order("name");
       if (error) throw error;
-      return data ?? [];
+      return (data ?? []) as unknown as Empresa[];
     },
   });
 
@@ -204,6 +204,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     memberships: membershipsQuery.data ?? [],
     organizations,
     orgId,
+    empresa: organizations.find((o) => o.id === orgId) ?? null,
     setOrgId,
     canEdit,
     licenca: licencaQuery.data ?? null,
