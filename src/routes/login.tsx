@@ -1,3 +1,4 @@
+import { metaPagina } from "@/lib/seo-head";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -16,14 +17,12 @@ const DESCRICAO =
 
 export const Route = createFileRoute("/login")({
   head: () => ({
-    meta: [
-      { title: TITULO },
-      { name: "description", content: DESCRICAO },
-      { property: "og:title", content: TITULO },
-      { property: "og:description", content: DESCRICAO },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
+    ...metaPagina({
+      titulo: TITULO,
+      descricao: DESCRICAO,
+      caminho: "/login",
+      indexavel: true,
+    }),
   }),
   ssr: false,
   component: LoginPage,

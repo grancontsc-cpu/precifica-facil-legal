@@ -1,3 +1,4 @@
+import { metaPagina } from "@/lib/seo-head";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { MailCheck } from "lucide-react";
 import { toast } from "sonner";
@@ -11,15 +12,11 @@ const DESCRICAO = "Confirme seu endereço de e-mail para ativar o acesso ao Prec
 
 export const Route = createFileRoute("/confirmar-email")({
   head: () => ({
-    meta: [
-      { title: TITULO },
-      { name: "description", content: DESCRICAO },
-      { property: "og:title", content: TITULO },
-      { property: "og:description", content: DESCRICAO },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "robots", content: "noindex" },
-    ],
+    ...metaPagina({
+      titulo: TITULO,
+      descricao: DESCRICAO,
+      caminho: "/confirmar-email",
+    }),
   }),
   ssr: false,
   component: Pagina,

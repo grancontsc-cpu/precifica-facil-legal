@@ -1,3 +1,4 @@
+import { metaPagina } from "@/lib/seo-head";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 
@@ -12,15 +13,11 @@ const DESCRICAO =
 /** Rota legada: encaminha para o aviso específico (teste expirado ou licença suspensa). */
 export const Route = createFileRoute("/acesso-bloqueado")({
   head: () => ({
-    meta: [
-      { title: TITULO },
-      { name: "description", content: DESCRICAO },
-      { property: "og:title", content: TITULO },
-      { property: "og:description", content: DESCRICAO },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "robots", content: "noindex" },
-    ],
+    ...metaPagina({
+      titulo: TITULO,
+      descricao: DESCRICAO,
+      caminho: "/acesso-bloqueado",
+    }),
   }),
   ssr: false,
   component: Pagina,

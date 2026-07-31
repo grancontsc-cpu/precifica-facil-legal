@@ -1,3 +1,4 @@
+import { metaPagina } from "@/lib/seo-head";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Hourglass } from "lucide-react";
 
@@ -9,15 +10,11 @@ const DESCRICAO = "Sua conta no Precifica Grancont está aguardando aprovação 
 
 export const Route = createFileRoute("/aguardando-aprovacao")({
   head: () => ({
-    meta: [
-      { title: TITULO },
-      { name: "description", content: DESCRICAO },
-      { property: "og:title", content: TITULO },
-      { property: "og:description", content: DESCRICAO },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "robots", content: "noindex" },
-    ],
+    ...metaPagina({
+      titulo: TITULO,
+      descricao: DESCRICAO,
+      caminho: "/aguardando-aprovacao",
+    }),
   }),
   ssr: false,
   component: () => (

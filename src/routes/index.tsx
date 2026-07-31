@@ -1,3 +1,4 @@
+import { metaPagina } from "@/lib/seo-head";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -8,14 +9,12 @@ const DESCRICAO =
 
 export const Route = createFileRoute("/")({
   head: () => ({
-    meta: [
-      { title: TITULO },
-      { name: "description", content: DESCRICAO },
-      { property: "og:title", content: TITULO },
-      { property: "og:description", content: DESCRICAO },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
+    ...metaPagina({
+      titulo: TITULO,
+      descricao: DESCRICAO,
+      caminho: "/",
+      indexavel: true,
+    }),
   }),
   ssr: false,
   beforeLoad: async () => {

@@ -1,3 +1,4 @@
+import { metaPagina } from "@/lib/seo-head";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 
@@ -9,15 +10,11 @@ import { avaliarLicenca, rotaBloqueio, type Licenca } from "@/lib/licencas";
 
 export const Route = createFileRoute("/entrando")({
   head: () => ({
-    meta: [
-      { title: "Entrando — Precifica Grancont" },
-      { name: "description", content: "Verificando suas permissões no Precifica Grancont." },
-      { property: "og:title", content: "Entrando — Precifica Grancont" },
-      { property: "og:description", content: "Verificando suas permissões no Precifica Grancont." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "robots", content: "noindex" },
-    ],
+    ...metaPagina({
+      titulo: TITULO,
+      descricao: DESCRICAO,
+      caminho: "/entrando",
+    }),
   }),
   ssr: false,
   component: Entrando,

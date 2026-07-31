@@ -1,3 +1,4 @@
+import { metaPagina } from "@/lib/seo-head";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -13,14 +14,12 @@ const DESCRICAO = "Solicite um link seguro para redefinir a senha do seu acesso 
 
 export const Route = createFileRoute("/recuperar-senha")({
   head: () => ({
-    meta: [
-      { title: TITULO },
-      { name: "description", content: DESCRICAO },
-      { property: "og:title", content: TITULO },
-      { property: "og:description", content: DESCRICAO },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
+    ...metaPagina({
+      titulo: TITULO,
+      descricao: DESCRICAO,
+      caminho: "/recuperar-senha",
+      indexavel: true,
+    }),
   }),
   ssr: false,
   component: Pagina,
