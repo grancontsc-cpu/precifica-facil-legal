@@ -371,7 +371,7 @@ function ModoRapido() {
         ) : null}
       </div>
 
-      {passo < 4 ? (
+      {passo < 5 ? (
         <div className="flex items-center justify-between gap-3">
           <Button
             variant="ghost"
@@ -383,7 +383,7 @@ function ModoRapido() {
           </Button>
           <Button
             onClick={() => {
-              if (passo === 3) {
+              if (passo === 4) {
                 eventoSimular({
                   modo: "rapido",
                   regime,
@@ -404,11 +404,12 @@ function ModoRapido() {
             }}
             disabled={!podeAvancar}
           >
-            {passo === 3 ? "Ver preço sugerido" : "Continuar"}
+            {passo === 4 ? "Ver preço sugerido" : "Continuar"}
             <ArrowRight className="size-4" aria-hidden />
           </Button>
         </div>
       ) : null}
+
 
       <p className="text-center text-xs text-muted-foreground">
         Precisa de todos os tributos abertos?{" "}
