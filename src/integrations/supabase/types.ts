@@ -206,6 +206,48 @@ export type Database = {
           },
         ]
       }
+      licenses: {
+        Row: {
+          activated_at: string | null
+          created_at: string
+          expires_at: string | null
+          notes: string | null
+          plan: string
+          status: string
+          trial_ends_at: string
+          trial_started_at: string
+          updated_at: string
+          updated_by: string | null
+          user_id: string
+        }
+        Insert: {
+          activated_at?: string | null
+          created_at?: string
+          expires_at?: string | null
+          notes?: string | null
+          plan?: string
+          status?: string
+          trial_ends_at?: string
+          trial_started_at?: string
+          updated_at?: string
+          updated_by?: string | null
+          user_id: string
+        }
+        Update: {
+          activated_at?: string | null
+          created_at?: string
+          expires_at?: string | null
+          notes?: string | null
+          plan?: string
+          status?: string
+          trial_ends_at?: string
+          trial_started_at?: string
+          updated_at?: string
+          updated_by?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       organization_members: {
         Row: {
           approved_by: string | null
@@ -804,6 +846,7 @@ export type Database = {
       is_org_admin: { Args: { _org: string }; Returns: boolean }
       is_org_member: { Args: { _org: string }; Returns: boolean }
       is_super_admin: { Args: never; Returns: boolean }
+      licenca_valida: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       app_role: "grancont_admin"

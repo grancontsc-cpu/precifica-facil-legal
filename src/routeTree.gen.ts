@@ -14,6 +14,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as EsqueciMinhaSenhaRouteImport } from './routes/esqueci-minha-senha'
 import { Route as EntrandoRouteImport } from './routes/entrando'
 import { Route as ConfirmarEmailRouteImport } from './routes/confirmar-email'
+import { Route as CadastrarRouteImport } from './routes/cadastrar'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AguardandoAprovacaoRouteImport } from './routes/aguardando-aprovacao'
 import { Route as AcessoNegadoRouteImport } from './routes/acesso-negado'
@@ -36,6 +37,7 @@ import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminSolicitacoesRouteImport } from './routes/_authenticated/admin/solicitacoes'
 import { Route as AuthenticatedAdminSimulacoesRouteImport } from './routes/_authenticated/admin/simulacoes'
 import { Route as AuthenticatedAdminPerfisTributariosRouteImport } from './routes/_authenticated/admin/perfis-tributarios'
+import { Route as AuthenticatedAdminLicencasRouteImport } from './routes/_authenticated/admin/licencas'
 import { Route as AuthenticatedAdminEmpresasRouteImport } from './routes/_authenticated/admin/empresas'
 import { Route as AuthenticatedAdminConvitesRouteImport } from './routes/_authenticated/admin/convites'
 import { Route as AuthenticatedAdminAuditoriaRouteImport } from './routes/_authenticated/admin/auditoria'
@@ -63,6 +65,11 @@ const EntrandoRoute = EntrandoRouteImport.update({
 const ConfirmarEmailRoute = ConfirmarEmailRouteImport.update({
   id: '/confirmar-email',
   path: '/confirmar-email',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CadastrarRoute = CadastrarRouteImport.update({
+  id: '/cadastrar',
+  path: '/cadastrar',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -181,6 +188,12 @@ const AuthenticatedAdminPerfisTributariosRoute =
     path: '/admin/perfis-tributarios',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminLicencasRoute =
+  AuthenticatedAdminLicencasRouteImport.update({
+    id: '/admin/licencas',
+    path: '/admin/licencas',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminEmpresasRoute =
   AuthenticatedAdminEmpresasRouteImport.update({
     id: '/admin/empresas',
@@ -207,6 +220,7 @@ export interface FileRoutesByFullPath {
   '/acesso-negado': typeof AcessoNegadoRoute
   '/aguardando-aprovacao': typeof AguardandoAprovacaoRoute
   '/auth': typeof AuthRoute
+  '/cadastrar': typeof CadastrarRoute
   '/confirmar-email': typeof ConfirmarEmailRoute
   '/entrando': typeof EntrandoRoute
   '/esqueci-minha-senha': typeof EsqueciMinhaSenhaRoute
@@ -222,6 +236,7 @@ export interface FileRoutesByFullPath {
   '/admin/auditoria': typeof AuthenticatedAdminAuditoriaRoute
   '/admin/convites': typeof AuthenticatedAdminConvitesRoute
   '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
+  '/admin/licencas': typeof AuthenticatedAdminLicencasRoute
   '/admin/perfis-tributarios': typeof AuthenticatedAdminPerfisTributariosRoute
   '/admin/simulacoes': typeof AuthenticatedAdminSimulacoesRoute
   '/admin/solicitacoes': typeof AuthenticatedAdminSolicitacoesRoute
@@ -238,6 +253,7 @@ export interface FileRoutesByTo {
   '/acesso-negado': typeof AcessoNegadoRoute
   '/aguardando-aprovacao': typeof AguardandoAprovacaoRoute
   '/auth': typeof AuthRoute
+  '/cadastrar': typeof CadastrarRoute
   '/confirmar-email': typeof ConfirmarEmailRoute
   '/entrando': typeof EntrandoRoute
   '/esqueci-minha-senha': typeof EsqueciMinhaSenhaRoute
@@ -253,6 +269,7 @@ export interface FileRoutesByTo {
   '/admin/auditoria': typeof AuthenticatedAdminAuditoriaRoute
   '/admin/convites': typeof AuthenticatedAdminConvitesRoute
   '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
+  '/admin/licencas': typeof AuthenticatedAdminLicencasRoute
   '/admin/perfis-tributarios': typeof AuthenticatedAdminPerfisTributariosRoute
   '/admin/simulacoes': typeof AuthenticatedAdminSimulacoesRoute
   '/admin/solicitacoes': typeof AuthenticatedAdminSolicitacoesRoute
@@ -271,6 +288,7 @@ export interface FileRoutesById {
   '/acesso-negado': typeof AcessoNegadoRoute
   '/aguardando-aprovacao': typeof AguardandoAprovacaoRoute
   '/auth': typeof AuthRoute
+  '/cadastrar': typeof CadastrarRoute
   '/confirmar-email': typeof ConfirmarEmailRoute
   '/entrando': typeof EntrandoRoute
   '/esqueci-minha-senha': typeof EsqueciMinhaSenhaRoute
@@ -286,6 +304,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/auditoria': typeof AuthenticatedAdminAuditoriaRoute
   '/_authenticated/admin/convites': typeof AuthenticatedAdminConvitesRoute
   '/_authenticated/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
+  '/_authenticated/admin/licencas': typeof AuthenticatedAdminLicencasRoute
   '/_authenticated/admin/perfis-tributarios': typeof AuthenticatedAdminPerfisTributariosRoute
   '/_authenticated/admin/simulacoes': typeof AuthenticatedAdminSimulacoesRoute
   '/_authenticated/admin/solicitacoes': typeof AuthenticatedAdminSolicitacoesRoute
@@ -304,6 +323,7 @@ export interface FileRouteTypes {
     | '/acesso-negado'
     | '/aguardando-aprovacao'
     | '/auth'
+    | '/cadastrar'
     | '/confirmar-email'
     | '/entrando'
     | '/esqueci-minha-senha'
@@ -319,6 +339,7 @@ export interface FileRouteTypes {
     | '/admin/auditoria'
     | '/admin/convites'
     | '/admin/empresas'
+    | '/admin/licencas'
     | '/admin/perfis-tributarios'
     | '/admin/simulacoes'
     | '/admin/solicitacoes'
@@ -335,6 +356,7 @@ export interface FileRouteTypes {
     | '/acesso-negado'
     | '/aguardando-aprovacao'
     | '/auth'
+    | '/cadastrar'
     | '/confirmar-email'
     | '/entrando'
     | '/esqueci-minha-senha'
@@ -350,6 +372,7 @@ export interface FileRouteTypes {
     | '/admin/auditoria'
     | '/admin/convites'
     | '/admin/empresas'
+    | '/admin/licencas'
     | '/admin/perfis-tributarios'
     | '/admin/simulacoes'
     | '/admin/solicitacoes'
@@ -367,6 +390,7 @@ export interface FileRouteTypes {
     | '/acesso-negado'
     | '/aguardando-aprovacao'
     | '/auth'
+    | '/cadastrar'
     | '/confirmar-email'
     | '/entrando'
     | '/esqueci-minha-senha'
@@ -382,6 +406,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/auditoria'
     | '/_authenticated/admin/convites'
     | '/_authenticated/admin/empresas'
+    | '/_authenticated/admin/licencas'
     | '/_authenticated/admin/perfis-tributarios'
     | '/_authenticated/admin/simulacoes'
     | '/_authenticated/admin/solicitacoes'
@@ -400,6 +425,7 @@ export interface RootRouteChildren {
   AcessoNegadoRoute: typeof AcessoNegadoRoute
   AguardandoAprovacaoRoute: typeof AguardandoAprovacaoRoute
   AuthRoute: typeof AuthRoute
+  CadastrarRoute: typeof CadastrarRoute
   ConfirmarEmailRoute: typeof ConfirmarEmailRoute
   EntrandoRoute: typeof EntrandoRoute
   EsqueciMinhaSenhaRoute: typeof EsqueciMinhaSenhaRoute
@@ -442,6 +468,13 @@ declare module '@tanstack/react-router' {
       path: '/confirmar-email'
       fullPath: '/confirmar-email'
       preLoaderRoute: typeof ConfirmarEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cadastrar': {
+      id: '/cadastrar'
+      path: '/cadastrar'
+      fullPath: '/cadastrar'
+      preLoaderRoute: typeof CadastrarRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -598,6 +631,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminPerfisTributariosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/licencas': {
+      id: '/_authenticated/admin/licencas'
+      path: '/admin/licencas'
+      fullPath: '/admin/licencas'
+      preLoaderRoute: typeof AuthenticatedAdminLicencasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/empresas': {
       id: '/_authenticated/admin/empresas'
       path: '/admin/empresas'
@@ -633,6 +673,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminAuditoriaRoute: typeof AuthenticatedAdminAuditoriaRoute
   AuthenticatedAdminConvitesRoute: typeof AuthenticatedAdminConvitesRoute
   AuthenticatedAdminEmpresasRoute: typeof AuthenticatedAdminEmpresasRoute
+  AuthenticatedAdminLicencasRoute: typeof AuthenticatedAdminLicencasRoute
   AuthenticatedAdminPerfisTributariosRoute: typeof AuthenticatedAdminPerfisTributariosRoute
   AuthenticatedAdminSimulacoesRoute: typeof AuthenticatedAdminSimulacoesRoute
   AuthenticatedAdminSolicitacoesRoute: typeof AuthenticatedAdminSolicitacoesRoute
@@ -654,6 +695,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminAuditoriaRoute: AuthenticatedAdminAuditoriaRoute,
   AuthenticatedAdminConvitesRoute: AuthenticatedAdminConvitesRoute,
   AuthenticatedAdminEmpresasRoute: AuthenticatedAdminEmpresasRoute,
+  AuthenticatedAdminLicencasRoute: AuthenticatedAdminLicencasRoute,
   AuthenticatedAdminPerfisTributariosRoute:
     AuthenticatedAdminPerfisTributariosRoute,
   AuthenticatedAdminSimulacoesRoute: AuthenticatedAdminSimulacoesRoute,
@@ -676,6 +718,7 @@ const rootRouteChildren: RootRouteChildren = {
   AcessoNegadoRoute: AcessoNegadoRoute,
   AguardandoAprovacaoRoute: AguardandoAprovacaoRoute,
   AuthRoute: AuthRoute,
+  CadastrarRoute: CadastrarRoute,
   ConfirmarEmailRoute: ConfirmarEmailRoute,
   EntrandoRoute: EntrandoRoute,
   EsqueciMinhaSenhaRoute: EsqueciMinhaSenhaRoute,

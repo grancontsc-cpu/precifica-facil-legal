@@ -15,12 +15,15 @@ export function Carregando({ texto = "Carregando…" }: { texto?: string }) {
 
 /** Bloqueia a renderização até resolver sessão, situação da conta e papel. */
 export function GuardaStatus({ children }: { children: ReactNode }) {
-  const { loading, accountStatus } = useApp();
+  const { loading, accountStatus, situacaoLicenca, isSuperAdmin } = useApp();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (loading || !accountStatus) return;
-    if (accountStatus === "active") return;
+    if (accountStatus === "active") {
+      if (!isSuperAdmin && !situacaoLicenca.liberado) navigate({ to: "/acesso-bloqueado", replace: true });
+      return;
+    }
     const destino =
       accountStatus === "suspended"
         ? "/acesso-bloqueado"
@@ -30,9 +33,10 @@ export function GuardaStatus({ children }: { children: ReactNode }) {
             ? "/confirmar-email"
             : "/acesso-negado";
     navigate({ to: destino, replace: true });
-  }, [loading, accountStatus, navigate]);
+  }, [loading, accountStatus, navigate, isSuperAdmin, situacaoLicenca.liberado]);
 
   if (loading || !accountStatus || accountStatus !== "active") return <Carregando />;
+  if (!isSuperAdmin && !situacaoLicenca.liberado) return <Carregando texto="Verificando sua licença…" />;
   return <>{children}</>;
 }
 

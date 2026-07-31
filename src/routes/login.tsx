@@ -1,14 +1,16 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { CheckCircle2, Eye, EyeOff, Info, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { DialogoCadastrar } from "@/components/app/DialogoCadastrar";
 import { LogoGrancont } from "@/components/app/LogoGrancont";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { verificarEmailCadastrado } from "@/lib/conta.functions";
 
 const TITULO = "Entrar — Precifica Grancont";
 const DESCRICAO =
@@ -35,6 +37,8 @@ function LoginPage() {
   const [senha, setSenha] = useState("");
   const [mostrar, setMostrar] = useState(false);
   const [carregando, setCarregando] = useState(false);
+  const [situacaoEmail, setSituacaoEmail] = useState<"desconhecida" | "cadastrado" | "novo">("desconhecida");
+  const [dialogo, setDialogo] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -42,16 +46,45 @@ function LoginPage() {
     });
   }, [navigate]);
 
+  const conferirEmail = async (valor: string) => {
+    const limpo = valor.trim().toLowerCase();
+    if (!limpo || !limpo.includes("@")) {
+      setSituacaoEmail("desconhecida");
+      return null;
+    }
+    try {
+      const { cadastrado } = await verificarEmailCadastrado({ data: { email: limpo } });
+      setSituacaoEmail(cadastrado ? "cadastrado" : "novo");
+      return cadastrado;
+    } catch {
+      setSituacaoEmail("desconhecida");
+      return null;
+    }
+  };
+
   const entrar = async (e: React.FormEvent) => {
     e.preventDefault();
     setCarregando(true);
+    const emailLimpo = email.trim().toLowerCase();
+
+    const cadastrado = await conferirEmail(emailLimpo);
+    if (cadastrado === false) {
+      setCarregando(false);
+      setDialogo(true);
+      return;
+    }
+
     const { error } = await supabase.auth.signInWithPassword({
-      email: email.trim().toLowerCase(),
+      email: emailLimpo,
       password: senha,
     });
     setCarregando(false);
     if (error) {
-      toast.error("E-mail ou senha inválidos.");
+      toast.error(
+        error.message.toLowerCase().includes("not confirmed")
+          ? "Confirme seu e-mail antes de entrar. Verifique sua caixa de entrada."
+          : "Senha incorreta para este e-mail.",
+      );
       return;
     }
     navigate({ to: "/entrando", replace: true });
@@ -65,7 +98,7 @@ function LoginPage() {
         <h1 className="mt-5 text-xl font-semibold tracking-tight text-foreground">
           Precifica <span className="text-primary">Grancont</span>
         </h1>
-        <p className="mt-1 text-sm text-muted-foreground">Entre com o e-mail autorizado pela sua empresa.</p>
+        <p className="mt-1 text-sm text-muted-foreground">Entre com seu e-mail e senha.</p>
 
         <form className="mt-6 space-y-4" onSubmit={entrar}>
           <div className="space-y-1.5">
@@ -75,9 +108,23 @@ function LoginPage() {
               type="email"
               autoComplete="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setSituacaoEmail("desconhecida");
+              }}
+              onBlur={(e) => void conferirEmail(e.target.value)}
               required
             />
+            {situacaoEmail === "cadastrado" && (
+              <p className="flex items-center gap-1.5 text-xs text-primary">
+                <CheckCircle2 className="h-3.5 w-3.5" aria-hidden /> E-mail já cadastrado.
+              </p>
+            )}
+            {situacaoEmail === "novo" && (
+              <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <Info className="h-3.5 w-3.5" aria-hidden /> E-mail ainda não cadastrado.
+              </p>
+            )}
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="senha">Senha</Label>
@@ -106,18 +153,23 @@ function LoginPage() {
           </Button>
         </form>
 
-        <div className="mt-4 flex justify-between text-xs">
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-2 text-xs">
           <Link to="/esqueci-minha-senha" className="text-primary hover:underline">
             Esqueci minha senha
+          </Link>
+          <Link to="/cadastrar" className="text-primary hover:underline">
+            Criar conta — 30 dias grátis
           </Link>
         </div>
 
         <p className="mt-6 border-t border-border pt-4 text-xs text-muted-foreground">
-          O acesso é exclusivo para usuários autorizados e liberado por convite.
+          Novas contas passam por confirmação de e-mail e recebem 30 dias de teste gratuito.
           <br />
           Seu acesso é individual e não deve ser compartilhado.
         </p>
       </div>
+
+      <DialogoCadastrar aberto={dialogo} email={email.trim().toLowerCase()} onFechar={() => setDialogo(false)} />
     </main>
   );
 }
