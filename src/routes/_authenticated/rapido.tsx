@@ -1,9 +1,14 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight, Info, RotateCcw, Zap } from "lucide-react";
 
 import { metaPagina } from "@/lib/seo-head";
 import { Button } from "@/components/ui/button";
+import {
+  eventoParametroFiscal,
+  eventoSimulacaoIniciada,
+  eventoSimular,
+} from "@/lib/analytics-eventos";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
@@ -91,6 +96,11 @@ function ModoRapido() {
   const [ufDestino, setUfDestino] = useState(empresa?.uf ?? "");
   const regime = regimeDaEmpresa(empresa?.regime);
   const [ajustes, setAjustes] = useState<AjustesRapido>(ajustesVazios);
+
+  // Abertura do modo rápido.
+  useEffect(() => {
+    eventoSimulacaoIniciada({ modo: "rapido", origem: "nova" });
+  }, []);
 
   const estado = useMemo<SimulationState>(() => {
     const base = aplicarRegime(estadoInicial(), regime);
@@ -210,7 +220,10 @@ function ModoRapido() {
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <Label htmlFor="rapido-origem">Estado de origem</Label>
-                <Select value={ufOrigem || undefined} onValueChange={setUfOrigem}>
+                <Select value={ufOrigem || undefined} onValueChange={(v) => {
+                    eventoParametroFiscal({ modo: "rapido", campo: "ufOrigem", valor: v });
+                    setUfOrigem(v);
+                  }}>
                   <SelectTrigger id="rapido-origem">
                     <SelectValue placeholder="Selecione" />
                   </SelectTrigger>
@@ -225,7 +238,10 @@ function ModoRapido() {
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="rapido-destino">Estado de destino</Label>
-                <Select value={ufDestino || undefined} onValueChange={setUfDestino}>
+                <Select value={ufDestino || undefined} onValueChange={(v) => {
+                    eventoParametroFiscal({ modo: "rapido", campo: "ufDestino", valor: v });
+                    setUfDestino(v);
+                  }}>
                   <SelectTrigger id="rapido-destino">
                     <SelectValue placeholder="Selecione" />
                   </SelectTrigger>
@@ -290,7 +306,14 @@ function ModoRapido() {
               </Alert>
             )}
 
-            <SuposicoesFiscais state={estado} ajustes={ajustes} onChange={setAjustes} />
+            <SuposicoesFiscais
+              state={estado}
+              ajustes={ajustes}
+              onChange={(a) => {
+                eventoParametroFiscal({ modo: "rapido", campo: "suposicoes" });
+                setAjustes(a);
+              }}
+            />
 
             <PainelFronteira state={estado} resultado={resultado} compacto />
 
@@ -329,7 +352,21 @@ function ModoRapido() {
             <ArrowLeft className="size-4" aria-hidden />
             Voltar
           </Button>
-          <Button onClick={() => setPasso((p) => p + 1)} disabled={!podeAvancar}>
+          <Button
+            onClick={() => {
+              if (passo === 3) {
+                eventoSimular({
+                  modo: "rapido",
+                  regime,
+                  ufOrigem,
+                  ufDestino: ufDestino || ufOrigem,
+                  possuiResultado: !!recomendado,
+                });
+              }
+              setPasso((p) => p + 1);
+            }}
+            disabled={!podeAvancar}
+          >
             {passo === 3 ? "Ver preço sugerido" : "Continuar"}
             <ArrowRight className="size-4" aria-hidden />
           </Button>

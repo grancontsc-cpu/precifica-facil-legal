@@ -8,8 +8,7 @@ export const GA_MEASUREMENT_ID = "G-WGQH5BE9G1";
 type Gtag = (...args: unknown[]) => void;
 
 function gtag(): Gtag | null {
-  if (typeof window === "undefined") return null;
-  const fn = (window as unknown as { gtag?: Gtag }).gtag;
+  const fn = (globalThis as unknown as { gtag?: Gtag }).gtag;
   return typeof fn === "function" ? fn : null;
 }
 
