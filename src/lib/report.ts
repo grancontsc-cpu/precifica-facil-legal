@@ -7,6 +7,7 @@
  */
 import { formatBRL, formatData, formatNumero, formatPercent, formatQuantidade } from "@/lib/format";
 import { REGIMES } from "@/lib/comparison-defaults";
+import { apuraPeloSimples, calcularFronteira, creditaFronteiraPorRegime, nomeRegime } from "@/lib/pricing-engine";
 import type { SimulationResult, SimulationState } from "@/types/pricing";
 import type { SupplierComparison } from "@/types/comparison";
 
@@ -225,7 +226,28 @@ export function montarRelatorio(
     };
   }
 
+  const op = state.operacao;
   const premissas: string[] = [
+    ...(op
+      ? [
+          `Regime tributário: ${nomeRegime(op.regime)}.`,
+          `Trajeto da mercadoria: ${op.ufOrigem || "origem não informada"} → ${
+            op.ufDestino || "destino não informado"
+          }${op.importada ? " (mercadoria importada)" : ""}.`,
+          apuraPeloSimples(op.regime)
+            ? `Venda tributada pelo DAS à alíquota efetiva de ${formatPercent(op.aliquotaSimples)}.`
+            : `Alíquotas de ICMS usadas: interna do destino ${
+                op.aliquotaInternaDestino === null ? "não cadastrada" : formatPercent(op.aliquotaInternaDestino)
+              }, interestadual ${
+                op.aliquotaInterestadual === null ? "não aplicável" : formatPercent(op.aliquotaInterestadual)
+              }.`,
+          calcularFronteira(op).aplicavel
+            ? `ICMS de fronteira (diferencial de alíquotas) aplicado e ${
+                creditaFronteiraPorRegime(op.regime) ? "recuperável como crédito" : "tratado como custo puro"
+              }.`
+            : `Sem ICMS de fronteira nesta operação.`,
+        ]
+      : []),
     `Cenário tributário: ${CENARIO[state.cenario] ?? state.cenario}.`,
     `Perfil tributário aplicado: ${meta.perfilTributario}.`,
     `Base da margem: ${state.venda.baseMargem === "precoFinal" ? "preço final" : "preço base"}.`,
