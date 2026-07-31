@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { metaPagina } from "@/lib/seo-head";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -33,9 +33,11 @@ import {
 import { ContextoFiscal } from "@/components/pricing/ContextoFiscal";
 import {
   eventoParametroFiscal,
+  eventoRestaurarExemplo,
   eventoSimulacaoIniciada,
   eventoSimular,
   eventoSimulacaoConcluida,
+  type ContextoExemplo,
 } from "@/lib/analytics-eventos";
 import { useAliquotas } from "@/hooks/useAliquotas";
 import { sincronizarOperacao } from "@/lib/aliquotas";
@@ -453,13 +455,20 @@ function Simulador() {
     toast.success("Rascunho salvo neste navegador.");
   };
 
+  const ultimaAcao = useRef<{
+    tipo: Exclude<ContextoExemplo, "direto">;
+    em: number;
+  } | null>(null);
+
   const novaSimulacao = () => {
+    ultimaAcao.current = { tipo: "apos_nova_simulacao", em: Date.now() };
     eventoSimulacaoIniciada({ modo, origem: "nova" });
     setState(estadoInicial());
     toast.info("Nova simulação iniciada.");
   };
 
   const limpar = () => {
+    ultimaAcao.current = { tipo: "apos_limpar", em: Date.now() };
     localStorage.removeItem(STORAGE_KEY);
     setState(estadoInicial());
     setSalvoEm(null);
@@ -467,6 +476,15 @@ function Simulador() {
   };
 
   const carregarExemplo = () => {
+    const anterior = ultimaAcao.current;
+    eventoRestaurarExemplo({
+      modo,
+      contexto: anterior?.tipo ?? "direto",
+      segundosDesdeAcao: anterior
+        ? Math.round((Date.now() - anterior.em) / 1000)
+        : undefined,
+    });
+    ultimaAcao.current = null;
     eventoSimulacaoIniciada({ modo, origem: "exemplo" });
     setState(estadoExemplo());
     toast.info("Valores de exemplo restaurados.");
