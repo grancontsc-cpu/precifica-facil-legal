@@ -451,6 +451,26 @@ function ModoRapido() {
 
             <ComparativoModos state={estado} resultado={resultado} />
 
+            <div className="rounded-lg border border-dashed border-border p-3">
+              <p className="mb-2 text-xs font-medium text-muted-foreground">
+                Testar outro cenário sem recomeçar
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <Button size="sm" variant="outline" onClick={() => irPara(2)}>
+                  Valor e margem
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => irPara(3)}>
+                  Trajeto
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => irPara(4)}>
+                  Impostos
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => irPara(1)}>
+                  Produto e regime
+                </Button>
+              </div>
+            </div>
+
             <div className="flex flex-col gap-2 sm:flex-row">
               <Button className="flex-1" onClick={() => navigate({ to: "/simulador" })}>
                 Refinar no simulador completo
@@ -460,6 +480,7 @@ function ModoRapido() {
                 Nova estimativa
               </Button>
             </div>
+
           </div>
         ) : null}
       </div>
