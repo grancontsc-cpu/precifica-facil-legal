@@ -89,30 +89,17 @@ function Pagina() {
           </p>
         ) : (
           <form className="mt-6 space-y-4" onSubmit={salvar}>
-            <div className="space-y-1.5">
-              <Label htmlFor="s1">Nova senha</Label>
-              <Input
-                id="s1"
-                type="password"
-                minLength={8}
-                value={senha}
-                onChange={(e) => setSenha(e.target.value)}
-                aria-describedby="forca-senha-nova"
-                required
-              />
-              <ForcaSenha senha={senha} id="forca-senha-nova" className="pt-1" />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="s2">Confirmar nova senha</Label>
-              <Input
-                id="s2"
-                type="password"
-                minLength={8}
-                value={confirmacao}
-                onChange={(e) => setConfirmacao(e.target.value)}
-                required
-              />
-            </div>
+            <CamposSenha
+              senha={senha}
+              onSenhaChange={setSenha}
+              confirmacao={confirmacao}
+              onConfirmacaoChange={setConfirmacao}
+              rotulo="Nova senha"
+              rotuloConfirmacao="Confirmar nova senha"
+              idSenha="nova-senha"
+              disabled={carregando}
+            />
+
             <Button type="submit" className="w-full" disabled={carregando}>
               Salvar nova senha
             </Button>
