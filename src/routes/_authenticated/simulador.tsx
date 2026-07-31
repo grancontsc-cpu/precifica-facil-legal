@@ -33,9 +33,11 @@ import {
 import { ContextoFiscal } from "@/components/pricing/ContextoFiscal";
 import {
   eventoParametroFiscal,
+  eventoRestaurarExemplo,
   eventoSimulacaoIniciada,
   eventoSimular,
   eventoSimulacaoConcluida,
+  type ContextoExemplo,
 } from "@/lib/analytics-eventos";
 import { useAliquotas } from "@/hooks/useAliquotas";
 import { sincronizarOperacao } from "@/lib/aliquotas";
