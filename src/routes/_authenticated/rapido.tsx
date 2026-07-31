@@ -120,6 +120,7 @@ function ModoRapido() {
   const { tabela } = useAliquotas();
 
   const [passo, setPasso] = useState(1);
+  const [passoMaximo, setPassoMaximo] = useState(1);
   const [nome, setNome] = useState("");
   const [valorUnitario, setValorUnitario] = useState(0);
   const [quantidade, setQuantidade] = useState(1);
