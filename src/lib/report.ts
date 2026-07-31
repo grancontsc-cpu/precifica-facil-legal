@@ -7,7 +7,7 @@
  */
 import { formatBRL, formatData, formatNumero, formatPercent, formatQuantidade } from "@/lib/format";
 import { REGIMES } from "@/lib/comparison-defaults";
-import { apuraPeloSimples, calcularFronteira, creditaFronteiraPorRegime, nomeRegime } from "@/lib/pricing-engine";
+import { apuraPeloSimples, calcularFronteira, creditaFronteiraPorRegime, nomeRegime as nomeRegimeFiscal } from "@/lib/pricing-engine";
 import type { SimulationResult, SimulationState } from "@/types/pricing";
 import type { SupplierComparison } from "@/types/comparison";
 
@@ -230,7 +230,7 @@ export function montarRelatorio(
   const premissas: string[] = [
     ...(op
       ? [
-          `Regime tributário: ${nomeRegime(op.regime)}.`,
+          `Regime tributário: ${nomeRegimeFiscal(op.regime)}.`,
           `Trajeto da mercadoria: ${op.ufOrigem || "origem não informada"} → ${
             op.ufDestino || "destino não informado"
           }${op.importada ? " (mercadoria importada)" : ""}.`,
