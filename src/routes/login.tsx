@@ -153,18 +153,23 @@ function LoginPage() {
           </Button>
         </form>
 
-        <div className="mt-4 flex justify-between text-xs">
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-2 text-xs">
           <Link to="/esqueci-minha-senha" className="text-primary hover:underline">
             Esqueci minha senha
+          </Link>
+          <Link to="/cadastrar" className="text-primary hover:underline">
+            Criar conta — 30 dias grátis
           </Link>
         </div>
 
         <p className="mt-6 border-t border-border pt-4 text-xs text-muted-foreground">
-          O acesso é exclusivo para usuários autorizados e liberado por convite.
+          Novas contas passam por confirmação de e-mail e recebem 30 dias de teste gratuito.
           <br />
           Seu acesso é individual e não deve ser compartilhado.
         </p>
       </div>
+
+      <DialogoCadastrar aberto={dialogo} email={email.trim().toLowerCase()} onFechar={() => setDialogo(false)} />
     </main>
   );
 }
