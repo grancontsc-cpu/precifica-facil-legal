@@ -51,6 +51,27 @@ export function eventoSimulacaoIniciada(params: {
   );
 }
 
+/** Contexto imediatamente anterior ao clique em "Restaurar valores de exemplo". */
+export type ContextoExemplo = "apos_nova_simulacao" | "apos_limpar" | "direto";
+
+/** O usuário clicou em "Restaurar valores de exemplo". */
+export function eventoRestaurarExemplo(params: {
+  modo: ModoAnalytics;
+  contexto: ContextoExemplo;
+  /** Segundos desde a ação anterior (nova simulação/limpar), quando houver. */
+  segundosDesdeAcao?: number;
+}) {
+  enviar(
+    "restaurar_exemplo",
+    {
+      modo_simulador: params.modo,
+      contexto_exemplo: params.contexto,
+      segundos_desde_acao: params.segundosDesdeAcao,
+    },
+    params.modo,
+  );
+}
+
 /** O usuário alterou um parâmetro fiscal (regime, UF, alíquota, crédito...). */
 export function eventoParametroFiscal(params: {
   modo: ModoAnalytics;
