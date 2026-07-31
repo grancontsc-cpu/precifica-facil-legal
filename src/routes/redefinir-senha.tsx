@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { registrarEventoEmail } from "@/lib/email-eventos.functions";
 
 const TITULO = "Redefinir senha — Precifica Grancont";
 const DESCRICAO = "Crie uma nova senha para o seu acesso ao Precifica Grancont.";
@@ -51,10 +52,22 @@ function Pagina() {
       return;
     }
     setCarregando(true);
+    const { data: sessao } = await supabase.auth.getUser();
     const { error } = await supabase.auth.updateUser({ password: senha });
     setCarregando(false);
+
+    void registrarEventoEmail({
+      data: {
+        tipo: "senha_redefinida",
+        email: sessao.user?.email ?? undefined,
+        status: error ? "erro" : "ok",
+        codigoErro: error?.code ?? undefined,
+        mensagemErro: error?.message ?? undefined,
+      },
+    }).catch(() => {});
+
     if (error) {
-      toast.error(error.message);
+      toast.error("Não foi possível salvar a nova senha. Peça um novo link e tente novamente.");
       return;
     }
     toast.success("Senha atualizada.");

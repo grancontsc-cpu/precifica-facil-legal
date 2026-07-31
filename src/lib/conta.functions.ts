@@ -1,29 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
-import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-
-const emailSchema = z.object({
-  email: z.string().trim().toLowerCase().email("Informe um e-mail válido.").max(200),
-});
-
-/**
- * Informa se um e-mail já possui conta no sistema.
- * Usado apenas para orientar o usuário no login/recuperação de senha
- * (mensagem "e-mail não cadastrado" + convite para criar conta).
- * Não devolve nenhum dado pessoal além da existência da conta.
- */
-export const verificarEmailCadastrado = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) => emailSchema.parse(input))
-  .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: perfil } = await supabaseAdmin
-      .from("profiles")
-      .select("id")
-      .eq("email", data.email)
-      .maybeSingle();
-    return { cadastrado: !!perfil?.id };
-  });
 
 /**
  * Garante o provisionamento da conta após a confirmação do e-mail:
@@ -66,6 +43,14 @@ export const provisionarConta = createServerFn({ method: "POST" })
         .from("profiles")
         .update({ account_status: "active", email_verified_at: authUser.email_confirmed_at })
         .eq("id", userId);
+
+      await supabaseAdmin.from("email_events").insert({
+        event_type: "confirmacao_concluida",
+        normalized_email: authUser.email?.toLowerCase() ?? null,
+        user_id: userId,
+        provider: "supabase_auth",
+        request_status: "ok",
+      });
     }
 
     if (!emailConfirmado) return { emailConfirmado: false as const };

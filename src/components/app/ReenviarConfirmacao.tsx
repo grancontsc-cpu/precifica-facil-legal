@@ -4,6 +4,7 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { registrarEventoEmail } from "@/lib/email-eventos.functions";
 
 /**
  * Espera progressiva entre reenvios: 5s para o primeiro, 30s para o segundo,
@@ -54,6 +55,17 @@ export function ReenviarConfirmacao({ email, iniciarBloqueado = true, className 
     });
     setEnviando(false);
 
+    const alvo = email.trim().toLowerCase();
+    void registrarEventoEmail({
+      data: {
+        tipo: "confirmacao_reenviada",
+        email: alvo,
+        status: error ? "erro" : "ok",
+        codigoErro: error?.code ?? undefined,
+        mensagemErro: error?.message ?? undefined,
+      },
+    }).catch(() => {});
+
     if (error) {
       const msg = error.message.toLowerCase();
       if (msg.includes("rate") || msg.includes("security purposes")) {
@@ -61,18 +73,13 @@ export function ReenviarConfirmacao({ email, iniciarBloqueado = true, className 
         toast.error("Muitas tentativas seguidas. Aguarde um minuto antes de pedir um novo link.");
         return;
       }
-      if (msg.includes("already") || msg.includes("confirmed")) {
-        toast.success("Este e-mail já está confirmado. Faça login normalmente.");
-        return;
-      }
-      toast.error("Não foi possível reenviar agora. Tente novamente em instantes.");
-      return;
     }
 
+    // Mensagem genérica: não confirmamos se a conta existe ou já está confirmada.
     const feitos = reenvios + 1;
     setReenvios(feitos);
     setRestante(esperaReenvio(feitos));
-    toast.success(`Novo link enviado para ${email}. Confira também a caixa de spam.`);
+    toast.success(`Se houver uma conta pendente para ${alvo}, o novo link chegará em instantes.`);
   }, [restante, enviando, email, reenvios]);
 
   return (
