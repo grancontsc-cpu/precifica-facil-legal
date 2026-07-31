@@ -92,6 +92,29 @@ export function ExportarSimulacao({ state, resultado, meta, comparacao }: Props)
           />
         </div>
 
+        {comparacao ? (
+          <div className="rel-nao-imprimir flex items-center justify-between gap-3 rounded-lg border border-border p-3">
+            <Label htmlFor="rel-comparacao" className="text-sm font-medium">
+              Incluir comparação de fornecedores
+              <span className="block text-xs font-normal text-muted-foreground">
+                {comparacao.linhas.length} fornecedores comparados nesta simulação.
+              </span>
+            </Label>
+            <Switch
+              id="rel-comparacao"
+              checked={incluirComparacao}
+              onCheckedChange={(v) => {
+                setIncluirComparacao(v);
+                eventoComparacaoRelatorio({
+                  ativo: v,
+                  fornecedores: comparacao.linhas.length,
+                });
+              }}
+            />
+          </div>
+        ) : null}
+
+
         <div className="rel-nao-imprimir flex flex-wrap gap-2">
           <Button size="sm" onClick={() => imprimir("imprimir")}>
             <Printer className="h-4 w-4" aria-hidden />
