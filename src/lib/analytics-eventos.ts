@@ -75,6 +75,24 @@ export function eventoSimular(params: {
   });
 }
 
+/** Conversão: a simulação chegou a um preço recomendado válido. */
+export function eventoSimulacaoConcluida(params: {
+  modo: ModoAnalytics;
+  regime?: string;
+  ufOrigem?: string;
+  ufDestino?: string;
+  chave?: string;
+}) {
+  const chave = `concluida:${params.modo}:${params.chave ?? ""}`;
+  if (!permitido(chave, JANELA_PARAMETRO_MS)) return;
+  registrarEvento("simulacao_concluida", {
+    modo_simulador: params.modo,
+    regime: params.regime,
+    uf_origem: params.ufOrigem || undefined,
+    uf_destino: params.ufDestino || undefined,
+  });
+}
+
 export type FormatoExportacao = "imprimir" | "pdf" | "csv" | "whatsapp";
 
 /** O usuário exportou/baixou o relatório de precificação. */

@@ -35,6 +35,7 @@ import {
   eventoParametroFiscal,
   eventoSimulacaoIniciada,
   eventoSimular,
+  eventoSimulacaoConcluida,
 } from "@/lib/analytics-eventos";
 import { useAliquotas } from "@/hooks/useAliquotas";
 import { sincronizarOperacao } from "@/lib/aliquotas";
@@ -349,6 +350,14 @@ function Simulador() {
         ufDestino: operacao.ufDestino,
         possuiResultado: !!resultado.recomendado,
       });
+      if (resultado.recomendado) {
+        eventoSimulacaoConcluida({
+          modo,
+          regime: operacao.regime,
+          ufOrigem: operacao.ufOrigem,
+          ufDestino: operacao.ufDestino,
+        });
+      }
     }, 1500);
     return () => window.clearTimeout(id);
   }, [resultado, modo, operacao.regime, operacao.ufOrigem, operacao.ufDestino]);
