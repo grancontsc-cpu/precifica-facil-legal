@@ -903,9 +903,6 @@ function Simulador() {
         </main>
 
         <ResumoFlutuante resultado={resultado} />
-
-
-        {carregado ? <Toaster position="top-center" /> : null}
       </div>
     </TooltipProvider>
   );
