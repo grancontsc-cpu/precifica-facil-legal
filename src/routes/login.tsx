@@ -275,12 +275,14 @@ function LoginPage() {
           </p>
         </div>
       </div>
+      </main>
 
       <DialogoCadastrar
         aberto={dialogo}
         email={email.trim().toLowerCase()}
         onFechar={() => setDialogo(false)}
       />
-    </main>
+    </>
   );
+
 }
