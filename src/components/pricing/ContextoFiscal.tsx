@@ -99,7 +99,6 @@ export function ContextoFiscal({
 
       {simples ? (
         <CampoNumero
-          id="aliquota-simples"
           label="Alíquota efetiva do DAS (%)"
           value={operacao.aliquotaSimples}
           onChange={(v) => onChange({ aliquotaSimples: v })}
@@ -142,7 +141,6 @@ export function ContextoFiscal({
       {avancado && operacao.difalAtivo ? (
         <div className="grid gap-4 sm:grid-cols-3">
           <CampoNumero
-            id="aliq-interna"
             label="Alíquota interna do destino (%)"
             value={operacao.aliquotaInternaDestino ?? 0}
             onChange={(v) => onChange({ aliquotaInternaDestino: v })}
@@ -150,14 +148,12 @@ export function ContextoFiscal({
             ajuda="Vem da tabela vigente. Ajuste apenas se a operação tiver alíquota específica."
           />
           <CampoNumero
-            id="aliq-inter"
             label="Alíquota interestadual (%)"
             value={operacao.aliquotaInterestadual ?? 0}
             onChange={(v) => onChange({ aliquotaInterestadual: v })}
             sufixo="%"
           />
           <CampoNumero
-            id="difal-manual"
             label="Valor de fronteira manual (R$)"
             value={operacao.difalManual ?? 0}
             onChange={(v) => onChange({ difalManual: v > 0 ? v : null })}
