@@ -220,7 +220,10 @@ function ModoRapido() {
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <Label htmlFor="rapido-origem">Estado de origem</Label>
-                <Select value={ufOrigem || undefined} onValueChange={setUfOrigem}>
+                <Select value={ufOrigem || undefined} onValueChange={(v) => {
+                    eventoParametroFiscal({ modo: "rapido", campo: "ufOrigem", valor: v });
+                    setUfOrigem(v);
+                  }}>
                   <SelectTrigger id="rapido-origem">
                     <SelectValue placeholder="Selecione" />
                   </SelectTrigger>
@@ -235,7 +238,10 @@ function ModoRapido() {
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="rapido-destino">Estado de destino</Label>
-                <Select value={ufDestino || undefined} onValueChange={setUfDestino}>
+                <Select value={ufDestino || undefined} onValueChange={(v) => {
+                    eventoParametroFiscal({ modo: "rapido", campo: "ufDestino", valor: v });
+                    setUfDestino(v);
+                  }}>
                   <SelectTrigger id="rapido-destino">
                     <SelectValue placeholder="Selecione" />
                   </SelectTrigger>
@@ -300,7 +306,14 @@ function ModoRapido() {
               </Alert>
             )}
 
-            <SuposicoesFiscais state={estado} ajustes={ajustes} onChange={setAjustes} />
+            <SuposicoesFiscais
+              state={estado}
+              ajustes={ajustes}
+              onChange={(a) => {
+                eventoParametroFiscal({ modo: "rapido", campo: "suposicoes" });
+                setAjustes(a);
+              }}
+            />
 
             <PainelFronteira state={estado} resultado={resultado} compacto />
 
