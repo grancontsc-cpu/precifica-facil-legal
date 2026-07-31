@@ -8,7 +8,6 @@ import { LogoGrancont } from "@/components/app/LogoGrancont";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
 
 const TITULO = "Entrar — Precifica Grancont";
@@ -70,7 +69,6 @@ function LoginPage() {
 
   return (
     <>
-      <Toaster />
       <main className="grid min-h-screen lg:grid-cols-[1.05fr_1fr]">
 
 

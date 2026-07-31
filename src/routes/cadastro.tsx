@@ -9,7 +9,6 @@ import { LogoGrancont } from "@/components/app/LogoGrancont";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { registrarEventoEmail } from "@/lib/email-eventos.functions";
 
@@ -85,7 +84,6 @@ function CadastrarPage() {
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-background px-4 py-10">
-      <Toaster />
       <div className="w-full max-w-md rounded-xl border border-border bg-card p-6 shadow-[var(--shadow-card)] sm:p-8">
         <LogoGrancont className="h-9 w-auto" />
         {enviado ? (

@@ -9,7 +9,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -211,7 +210,6 @@ function PerfisPage() {
   return (
     <TooltipProvider delayDuration={150}>
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
-        <Toaster />
         <div className="flex flex-wrap items-center gap-3">
           <div className="min-w-0 flex-1">
             <h1 className="text-xl font-semibold tracking-tight text-foreground">Perfis tributários</h1>

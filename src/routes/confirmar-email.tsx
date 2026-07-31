@@ -3,7 +3,6 @@ import { MailCheck } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { registrarEventoEmail } from "@/lib/email-eventos.functions";
 
@@ -49,7 +48,6 @@ function Pagina() {
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-background px-4 py-10">
-      <Toaster />
       <div className="w-full max-w-md rounded-xl border border-border bg-card p-6 text-center shadow-[var(--shadow-card)]">
         <MailCheck className="mx-auto h-8 w-8 text-primary" aria-hidden />
         <h1 className="mt-3 text-lg font-semibold text-foreground">Confirme seu e-mail</h1>

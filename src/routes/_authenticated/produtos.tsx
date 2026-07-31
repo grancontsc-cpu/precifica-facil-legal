@@ -6,7 +6,6 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Toaster } from "@/components/ui/sonner";
 import { useApp } from "@/hooks/useApp";
 import { supabase } from "@/integrations/supabase/client";
 import { formatBRL } from "@/lib/format";
@@ -83,7 +82,6 @@ function ProdutosPage() {
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
-      <Toaster />
       <h1 className="text-xl font-semibold tracking-tight text-foreground">Produtos</h1>
       <p className="mt-1 text-sm text-muted-foreground">
         Produtos disponíveis para simulação na empresa selecionada.
