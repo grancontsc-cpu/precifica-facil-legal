@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { Carregando } from "@/components/app/GuardaAcesso";
 import { supabase } from "@/integrations/supabase/client";
 import { provisionarConta } from "@/lib/conta.functions";
+import { processarExpiracoes } from "@/lib/licencas.functions";
 import { avaliarLicenca, type Licenca } from "@/lib/licencas";
 
 export const Route = createFileRoute("/entrando")({
@@ -37,6 +38,8 @@ function Entrando() {
 
       try {
         await provisionarConta();
+        // Bloqueio automático: encerra testes e licenças vencidas antes de decidir o destino.
+        await processarExpiracoes();
       } catch {
         /* provisionamento tolerante a falha: o guarda de acesso decide o destino */
       }
