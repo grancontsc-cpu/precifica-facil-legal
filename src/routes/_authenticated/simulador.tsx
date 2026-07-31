@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Calculator, Info, RotateCcw, Save, Sparkles, Trash2 } from "lucide-react";
+import { Info, RotateCcw, Save, Sparkles, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
+
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -23,6 +23,8 @@ import { CardTributoCompra } from "@/components/pricing/CardTributoCompra";
 import { CardTributoVenda } from "@/components/pricing/CardTributoVenda";
 import { PainelResultados } from "@/components/pricing/PainelResultados";
 import { EntendaOCalculo } from "@/components/pricing/EntendaOCalculo";
+import { AlternadorModo } from "@/components/pricing/AlternadorModo";
+import { ResumoFlutuante } from "@/components/pricing/ResumoFlutuante";
 import { simular } from "@/lib/pricing-engine";
 import { CENARIOS, aplicarCenario, estadoExemplo, estadoInicial } from "@/lib/pricing-defaults";
 import { formatBRL, formatData } from "@/lib/format";
@@ -476,12 +478,12 @@ function Simulador() {
   return (
 
     <TooltipProvider delayDuration={150}>
-      <div className="min-h-screen bg-background pb-28 lg:pb-10">
-        <header className="sticky top-0 z-30 border-b border-border bg-card/95 backdrop-blur">
+      <div className="min-h-screen bg-background pb-32 lg:pb-10">
+        <header className="border-b border-border bg-card">
           <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 sm:px-6">
             <div className="min-w-0">
               <h1 className="truncate text-lg font-semibold tracking-tight text-foreground sm:text-xl">
-                Precifica Grancont
+                Simulador de preço
               </h1>
               <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                 <Badge variant="outline" className="border-primary/30 text-primary">
@@ -491,17 +493,18 @@ function Simulador() {
               </div>
             </div>
             <div className="flex shrink-0 items-center gap-2">
-              <Button variant="outline" size="sm" onClick={novaSimulacao}>
+              <Button variant="outline" size="sm" className="h-10" onClick={novaSimulacao}>
                 <RotateCcw className="h-4 w-4" aria-hidden />
                 <span className="hidden sm:inline">Nova simulação</span>
               </Button>
-              <Button size="sm" onClick={salvarRascunho}>
+              <Button size="sm" className="h-10" onClick={salvarRascunho}>
                 <Save className="h-4 w-4" aria-hidden />
                 <span className="hidden sm:inline">Salvar rascunho</span>
               </Button>
             </div>
           </div>
         </header>
+
 
         <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
           <div className="mb-6">
@@ -550,29 +553,33 @@ function Simulador() {
           </div>
           <div className="grid gap-6 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] lg:items-start">
             <div className="space-y-6">
-              <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-surface px-4 py-3">
-                <div className="flex items-center gap-2">
-                  <Switch
-                    id="modo-avancado"
-                    checked={state.modoAvancado}
-                    onCheckedChange={(v) => setState((s) => ({ ...s, modoAvancado: v }))}
-                  />
-                  <Label htmlFor="modo-avancado" className="text-sm">
-                    Modo avançado
-                  </Label>
-                  <Ajuda texto="No modo avançado você edita base de cálculo, redução de base, percentual de crédito, valores manuais e observações." />
+              <div className="space-y-3 rounded-xl border border-border bg-surface px-4 py-3">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <AlternadorModo
+                      avancado={state.modoAvancado}
+                      onChange={(v) => setState((s) => ({ ...s, modoAvancado: v }))}
+                    />
+                    <Ajuda texto="No modo completo você edita base de cálculo, redução de base, percentual de crédito, valores manuais e observações." />
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <Button variant="ghost" size="sm" className="h-10" onClick={carregarExemplo}>
+                      <Sparkles className="h-4 w-4" aria-hidden />
+                      Ver exemplo pronto
+                    </Button>
+                    <Button variant="ghost" size="sm" className="h-10" onClick={limpar}>
+                      <Trash2 className="h-4 w-4" aria-hidden />
+                      Limpar simulação
+                    </Button>
+                  </div>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  <Button variant="ghost" size="sm" onClick={carregarExemplo}>
-                    <Sparkles className="h-4 w-4" aria-hidden />
-                    Restaurar valores de exemplo
-                  </Button>
-                  <Button variant="ghost" size="sm" onClick={limpar}>
-                    <Trash2 className="h-4 w-4" aria-hidden />
-                    Limpar simulação
-                  </Button>
-                </div>
+                <p className="text-xs leading-relaxed text-muted-foreground">
+                  {state.modoAvancado
+                    ? "Modo completo: todos os detalhes de cada tributo ficam abertos para edição."
+                    : "Modo simples: preencha o que comprou, o quanto pagou e a margem desejada. O restante segue o perfil tributário da empresa."}
+                </p>
               </div>
+
 
               <Secao
                 numero="Seção 1"
@@ -896,17 +903,8 @@ function Simulador() {
           </div>
         </main>
 
-        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-card/95 p-3 backdrop-blur lg:hidden">
-          <Button
-            className="h-12 w-full text-base"
-            onClick={() => {
-              document.getElementById("resultados")?.scrollIntoView({ behavior: "smooth" });
-            }}
-          >
-            <Calculator className="h-5 w-5" aria-hidden />
-            Calcular preço
-          </Button>
-        </div>
+        <ResumoFlutuante resultado={resultado} />
+
 
         {carregado ? <Toaster position="top-center" /> : null}
       </div>

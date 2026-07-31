@@ -1,22 +1,26 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import {
-  Building2,
-  Calculator,
-  ClipboardList,
-  History,
-  LayoutDashboard,
-  LogOut,
-  MailPlus,
-  Package,
-  Percent,
-  Scale,
-  Users,
-  ShieldQuestion,
-  KeyRound,
-} from "lucide-react";
+import { ChevronDown, ShieldCheck } from "lucide-react";
 
+import { Glossario } from "@/components/app/Glossario";
+import { MenuConta } from "@/components/app/MenuConta";
+import { NavegacaoMobile } from "@/components/app/NavegacaoMobile";
+import {
+  NAV_ADMIN,
+  NAV_DIARIO,
+  NAV_GESTAO,
+  itemAtivo,
+  type ItemNav,
+} from "@/components/app/navegacao";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Select,
   SelectContent,
@@ -24,57 +28,122 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { NOME_PAPEL, useApp } from "@/hooks/useApp";
+import { useApp } from "@/hooks/useApp";
 import { cn } from "@/lib/utils";
 
-type Acesso = "todos" | "manager" | "super_admin";
+function LinkTopo({ item, ativo }: { item: ItemNav; ativo: boolean }) {
+  const Icon = item.icon;
+  return (
+    <Link
+      to={item.to}
+      title={item.descricao}
+      className={cn(
+        "inline-flex shrink-0 items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+        ativo
+          ? "bg-primary text-primary-foreground"
+          : "text-muted-foreground hover:bg-muted hover:text-foreground",
+      )}
+    >
+      <Icon className="h-4 w-4" aria-hidden />
+      {item.label}
+    </Link>
+  );
+}
 
-const LINKS: { to: string; label: string; icon: typeof Calculator; acesso: Acesso }[] = [
-  { to: "/admin", label: "Administração", icon: LayoutDashboard, acesso: "super_admin" },
-  { to: "/gestao", label: "Gestão", icon: LayoutDashboard, acesso: "manager" },
-  { to: "/simulador", label: "Simulador", icon: Calculator, acesso: "todos" },
-  { to: "/comparar", label: "Comparar fornecedores", icon: Scale, acesso: "todos" },
-  { to: "/simulacoes", label: "Simulações", icon: ClipboardList, acesso: "todos" },
-  { to: "/produtos", label: "Produtos", icon: Package, acesso: "todos" },
-  { to: "/perfis", label: "Perfis tributários", icon: Percent, acesso: "todos" },
-  { to: "/gestao/usuarios", label: "Usuários", icon: Users, acesso: "manager" },
-  { to: "/gestao/convites", label: "Convites", icon: MailPlus, acesso: "manager" },
-  { to: "/admin/usuarios", label: "Todos os usuários", icon: Users, acesso: "super_admin" },
-  { to: "/admin/convites", label: "Todos os convites", icon: MailPlus, acesso: "super_admin" },
-  { to: "/admin/solicitacoes", label: "Solicitações de acesso", icon: ShieldQuestion, acesso: "super_admin" },
-  { to: "/admin/licencas", label: "Licenças", icon: KeyRound, acesso: "super_admin" },
-  { to: "/empresas", label: "Empresas", icon: Building2, acesso: "super_admin" },
-  { to: "/auditoria", label: "Auditoria", icon: History, acesso: "super_admin" },
-];
+function MenuSuspenso({
+  rotulo,
+  itens,
+  pathname,
+}: {
+  rotulo: string;
+  itens: ItemNav[];
+  pathname: string;
+}) {
+  const algumAtivo = itens.some((i) => itemAtivo(pathname, i.to));
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          size="sm"
+          className={cn(
+            "h-9 gap-2 px-3 text-sm font-medium",
+            algumAtivo
+              ? "bg-primary text-primary-foreground hover:bg-primary/90"
+              : "text-muted-foreground",
+          )}
+        >
+          <ShieldCheck className="h-4 w-4" aria-hidden />
+          {rotulo}
+          <ChevronDown className="h-3.5 w-3.5" aria-hidden />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start" className="w-72">
+        <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
+          {rotulo}
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        {itens.map((item) => {
+          const Icon = item.icon;
+          return (
+            <DropdownMenuItem key={item.to} asChild>
+              <Link to={item.to} className="items-start gap-3">
+                <Icon className="mt-0.5 h-4 w-4 text-muted-foreground" aria-hidden />
+                <span className="min-w-0">
+                  <span className="block text-sm font-medium text-foreground">{item.label}</span>
+                  <span className="block text-xs leading-snug text-muted-foreground">
+                    {item.descricao}
+                  </span>
+                </span>
+              </Link>
+            </DropdownMenuItem>
+          );
+        })}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
 
 export function AppShell({ children }: { children: React.ReactNode }) {
-  const { organizations, orgId, setOrgId, isSuperAdmin, papel, email, signOut, memberships, situacaoLicenca } =
-    useApp();
+  const { organizations, orgId, setOrgId, isSuperAdmin, memberships, situacaoLicenca } = useApp();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const ehGestor = memberships.some((m) => m.role === "manager");
-
-  const visiveis = LINKS.filter((l) => {
-    if (l.acesso === "todos") return true;
-    if (l.acesso === "super_admin") return isSuperAdmin;
-    return ehGestor && !isSuperAdmin;
-  });
+  const empresaAtual = organizations.find((o) => o.id === orgId);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-16 lg:pb-0">
       <header className="sticky top-0 z-30 border-b border-border bg-card/95 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-3 px-4 py-3 sm:px-6">
-          <Link to="/simulador" className="text-base font-semibold tracking-tight text-foreground">
+        <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2.5 sm:px-6">
+          <Link
+            to="/simulador"
+            className="shrink-0 text-base font-semibold tracking-tight text-foreground"
+          >
             Precifica <span className="text-primary">Grancont</span>
           </Link>
-          <Badge variant="outline" className="border-primary/30 text-primary">
-            {NOME_PAPEL[papel]}
-          </Badge>
+
+          <nav aria-label="Navegação principal" className="ml-4 hidden items-center gap-1 lg:flex">
+            {NAV_DIARIO.map((item) => (
+              <LinkTopo key={item.to} item={item} ativo={itemAtivo(pathname, item.to)} />
+            ))}
+            {ehGestor && !isSuperAdmin ? (
+              <MenuSuspenso rotulo="Minha empresa" itens={NAV_GESTAO} pathname={pathname} />
+            ) : null}
+            {isSuperAdmin ? (
+              <MenuSuspenso rotulo="Administração" itens={NAV_ADMIN} pathname={pathname} />
+            ) : null}
+          </nav>
 
           <div className="ml-auto flex items-center gap-2">
+            <div className="hidden lg:block">
+              <Glossario />
+            </div>
             {organizations.length > 1 ? (
               <Select value={orgId ?? undefined} onValueChange={setOrgId}>
-                <SelectTrigger className="h-9 w-[190px] sm:w-[210px]">
-                  <SelectValue placeholder="Selecione a empresa" />
+                <SelectTrigger
+                  className="h-10 w-[150px] sm:w-[210px]"
+                  aria-label="Empresa selecionada"
+                >
+                  <SelectValue placeholder="Escolher empresa" />
                 </SelectTrigger>
                 <SelectContent>
                   {organizations.map((o) => (
@@ -84,45 +153,26 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   ))}
                 </SelectContent>
               </Select>
-            ) : organizations.length === 1 ? (
-              <span className="hidden text-xs text-muted-foreground sm:inline">{organizations[0].name}</span>
+            ) : empresaAtual ? (
+              <Badge variant="outline" className="hidden max-w-[220px] truncate sm:inline-flex">
+                {empresaAtual.name}
+              </Badge>
             ) : null}
-            <span className="hidden text-xs text-muted-foreground md:inline">{email}</span>
-            <Button variant="ghost" size="sm" onClick={() => void signOut()} aria-label="Sair">
-              <LogOut className="h-4 w-4" aria-hidden />
-            </Button>
+            <MenuConta />
           </div>
-
-          <nav className="order-last flex w-full gap-1 overflow-x-auto pb-1">
-            {visiveis.map((l) => {
-              const Icon = l.icon;
-              const ativo = pathname === l.to || pathname.startsWith(`${l.to}/`);
-              return (
-                <Link
-                  key={l.to}
-                  to={l.to}
-                  className={cn(
-                    "inline-flex shrink-0 items-center gap-2 rounded-md px-3 py-1.5 text-sm transition-colors",
-                    ativo
-                      ? "bg-primary text-primary-foreground"
-                      : "text-muted-foreground hover:bg-muted hover:text-foreground",
-                  )}
-                >
-                  <Icon className="h-4 w-4" aria-hidden />
-                  {l.label}
-                </Link>
-              );
-            })}
-          </nav>
         </div>
+
         {situacaoLicenca.emTeste && situacaoLicenca.liberado && (
           <div className="border-t border-border bg-primary/10 px-4 py-2 text-center text-xs text-foreground sm:px-6">
-            Teste gratuito: <strong>{situacaoLicenca.diasRestantes} dia(s)</strong> restantes. Depois desse prazo, o
-            acesso depende da liberação do Administrador Grancont.
+            Teste gratuito: <strong>{situacaoLicenca.diasRestantes} dia(s)</strong> restantes.
+            Depois desse prazo, o acesso depende da liberação do Administrador Grancont.
           </div>
         )}
       </header>
+
       {children}
+
+      <NavegacaoMobile ehGestor={ehGestor} isSuperAdmin={isSuperAdmin} />
     </div>
   );
 }
