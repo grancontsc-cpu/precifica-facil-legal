@@ -501,10 +501,9 @@ function ModoRapido() {
             <ArrowRight className="size-4" aria-hidden />
           </Button>
         ) : (
-          <Button variant="outline" onClick={() => irPara(5)} disabled>
-            Preço calculado
-          </Button>
+          <span />
         )}
+
       </div>
 
 
