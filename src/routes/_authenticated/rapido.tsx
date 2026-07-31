@@ -29,6 +29,12 @@ import { aplicarRegime, estadoInicial, operacaoPadrao } from "@/lib/pricing-defa
 import { SuposicoesFiscais } from "@/components/pricing/SuposicoesFiscais";
 import { ComparativoModos } from "@/components/pricing/ComparativoModos";
 import { ajustesVazios, aplicarAjustes, type AjustesRapido } from "@/lib/suposicoes-rapido";
+import { PerguntasImpostos } from "@/components/pricing/PerguntasImpostos";
+import {
+  aplicarRespostas,
+  respostasPadrao,
+  type RespostasImpostos,
+} from "@/lib/impostos-rapido";
 import { formatBRL } from "@/lib/format";
 import { useApp } from "@/hooks/useApp";
 import type { Regime, SimulationState } from "@/types/pricing";
