@@ -22,6 +22,7 @@ import {
   whatsappRelatorio,
   type RelatorioMeta,
 } from "@/lib/report";
+import { eventoCopiarResultado, eventoExportarRelatorio } from "@/lib/analytics-eventos";
 import type { SupplierComparison } from "@/types/comparison";
 import type { SimulationResult, SimulationState } from "@/types/pricing";
 
@@ -38,13 +39,22 @@ export function ExportarSimulacao({ state, resultado, meta, comparacao }: Props)
 
   const rel = montarRelatorio(state, resultado, { ...meta, observacoes }, comparacao ?? null);
 
+  const comComparacao = !!comparacao;
+
   const copiar = async (texto: string, mensagem: string) => {
     try {
       await navigator.clipboard.writeText(texto);
+      eventoCopiarResultado({ conteudo: "resumo_whatsapp", sucesso: true });
       toast.success(mensagem);
     } catch {
+      eventoCopiarResultado({ conteudo: "resumo_whatsapp", sucesso: false });
       toast.error("Não foi possível copiar. Selecione o texto manualmente.");
     }
+  };
+
+  const imprimir = (formato: "imprimir" | "pdf") => {
+    eventoExportarRelatorio({ formato, comComparacao });
+    window.print();
   };
 
   return (
@@ -76,11 +86,11 @@ export function ExportarSimulacao({ state, resultado, meta, comparacao }: Props)
         </div>
 
         <div className="rel-nao-imprimir flex flex-wrap gap-2">
-          <Button size="sm" onClick={() => window.print()}>
+          <Button size="sm" onClick={() => imprimir("imprimir")}>
             <Printer className="h-4 w-4" aria-hidden />
             Imprimir
           </Button>
-          <Button size="sm" variant="outline" onClick={() => window.print()}>
+          <Button size="sm" variant="outline" onClick={() => imprimir("pdf")}>
             <FileDown className="h-4 w-4" aria-hidden />
             Gerar PDF
           </Button>
@@ -88,6 +98,7 @@ export function ExportarSimulacao({ state, resultado, meta, comparacao }: Props)
             size="sm"
             variant="outline"
             onClick={() => {
+              eventoExportarRelatorio({ formato: "csv", comComparacao });
               baixarArquivo(csvRelatorio(rel), nomeArquivo(rel, "csv"), "text/csv;charset=utf-8");
               toast.success("CSV exportado.");
             }}
@@ -98,7 +109,10 @@ export function ExportarSimulacao({ state, resultado, meta, comparacao }: Props)
           <Button
             size="sm"
             variant="outline"
-            onClick={() => void copiar(whatsappRelatorio(rel), "Resumo copiado para o WhatsApp.")}
+            onClick={() => {
+              eventoExportarRelatorio({ formato: "whatsapp", comComparacao });
+              void copiar(whatsappRelatorio(rel), "Resumo copiado para o WhatsApp.");
+            }}
           >
             <Copy className="h-4 w-4" aria-hidden />
             Copiar resumo WhatsApp
