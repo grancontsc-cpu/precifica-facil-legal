@@ -552,29 +552,33 @@ function Simulador() {
           </div>
           <div className="grid gap-6 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] lg:items-start">
             <div className="space-y-6">
-              <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-surface px-4 py-3">
-                <div className="flex items-center gap-2">
-                  <Switch
-                    id="modo-avancado"
-                    checked={state.modoAvancado}
-                    onCheckedChange={(v) => setState((s) => ({ ...s, modoAvancado: v }))}
-                  />
-                  <Label htmlFor="modo-avancado" className="text-sm">
-                    Modo avançado
-                  </Label>
-                  <Ajuda texto="No modo avançado você edita base de cálculo, redução de base, percentual de crédito, valores manuais e observações." />
+              <div className="space-y-3 rounded-xl border border-border bg-surface px-4 py-3">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <AlternadorModo
+                      avancado={state.modoAvancado}
+                      onChange={(v) => setState((s) => ({ ...s, modoAvancado: v }))}
+                    />
+                    <Ajuda texto="No modo completo você edita base de cálculo, redução de base, percentual de crédito, valores manuais e observações." />
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <Button variant="ghost" size="sm" className="h-10" onClick={carregarExemplo}>
+                      <Sparkles className="h-4 w-4" aria-hidden />
+                      Ver exemplo pronto
+                    </Button>
+                    <Button variant="ghost" size="sm" className="h-10" onClick={limpar}>
+                      <Trash2 className="h-4 w-4" aria-hidden />
+                      Limpar simulação
+                    </Button>
+                  </div>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  <Button variant="ghost" size="sm" onClick={carregarExemplo}>
-                    <Sparkles className="h-4 w-4" aria-hidden />
-                    Restaurar valores de exemplo
-                  </Button>
-                  <Button variant="ghost" size="sm" onClick={limpar}>
-                    <Trash2 className="h-4 w-4" aria-hidden />
-                    Limpar simulação
-                  </Button>
-                </div>
+                <p className="text-xs leading-relaxed text-muted-foreground">
+                  {state.modoAvancado
+                    ? "Modo completo: todos os detalhes de cada tributo ficam abertos para edição."
+                    : "Modo simples: preencha o que comprou, o quanto pagou e a margem desejada. O restante segue o perfil tributário da empresa."}
+                </p>
               </div>
+
 
               <Secao
                 numero="Seção 1"
