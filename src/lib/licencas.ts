@@ -1,9 +1,12 @@
 /** Regras de licença (motor puro, sem acesso a banco ou interface). */
 
-export type StatusLicenca = "trial" | "active" | "suspended" | "expired";
+export type StatusLicenca = "trial" | "active" | "suspended" | "expired" | "canceled";
+
+/** Status como gravado no banco (inclui variantes que a UI normaliza). */
+export type StatusLicencaBanco = StatusLicenca | "courtesy" | "trial_expired";
 
 export interface Licenca {
-  status: StatusLicenca;
+  status: StatusLicencaBanco;
   plan: string;
   trial_started_at: string;
   trial_ends_at: string;
@@ -17,6 +20,7 @@ export const ROTULO_LICENCA: Record<StatusLicenca, string> = {
   active: "Licença ativa",
   suspended: "Suspensa",
   expired: "Expirada",
+  canceled: "Cancelada",
 };
 
 export interface SituacaoLicenca {
@@ -48,7 +52,17 @@ export function avaliarLicenca(licenca: Licenca | null, agora = new Date()): Sit
     };
   }
 
-  if (licenca.status === "active") {
+  if (licenca.status === "canceled") {
+    return {
+      liberado: false,
+      status: "canceled",
+      emTeste: false,
+      diasRestantes: null,
+      motivo: "A licença desta conta foi cancelada.",
+    };
+  }
+
+  if (licenca.status === "active" || licenca.status === "courtesy") {
     const fim = licenca.expires_at ? new Date(licenca.expires_at).getTime() : null;
     const vencida = fim !== null && fim <= agora.getTime();
     return {
@@ -76,7 +90,7 @@ export function avaliarLicenca(licenca: Licenca | null, agora = new Date()): Sit
 
   return {
     liberado: false,
-    status: licenca.status,
+    status: licenca.status === "suspended" ? "suspended" : "expired",
     emTeste: false,
     diasRestantes: null,
     motivo:

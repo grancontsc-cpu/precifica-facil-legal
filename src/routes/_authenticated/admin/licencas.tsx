@@ -9,7 +9,7 @@ import { Carregando, ExigePapel } from "@/components/app/GuardaAcesso";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { atualizarLicenca, listarLicencas } from "@/lib/licencas.functions";
+import { atualizarLicenca, listarLicencas, type AcaoLicenca } from "@/lib/licencas.functions";
 
 import { ROTULO_LICENCA, avaliarLicenca, type Licenca, type StatusLicenca } from "@/lib/licencas";
 
@@ -46,6 +46,7 @@ const CORES: Record<StatusLicenca, string> = {
   active: "border-emerald-500/40 text-emerald-600",
   suspended: "border-destructive/40 text-destructive",
   expired: "border-muted-foreground/40 text-muted-foreground",
+  canceled: "border-destructive/40 text-destructive",
 };
 
 function PainelLicencas() {
@@ -62,7 +63,7 @@ function PainelLicencas() {
   const acao = useMutation({
     mutationFn: async (v: {
       userId: string;
-      acao: "ativar" | "suspender" | "expirar" | "estender_teste" | "reiniciar_teste";
+      acao: AcaoLicenca;
       dias?: number;
       validade?: string | null;
       observacao?: string;
@@ -103,7 +104,7 @@ function PainelLicencas() {
       </header>
 
       <div className="flex flex-wrap gap-2">
-        {(["trial", "active", "suspended", "expired"] as StatusLicenca[]).map((s) => (
+        {(["trial", "active", "suspended", "expired", "canceled"] as StatusLicenca[]).map((s) => (
           <Badge key={s} variant="outline" className={CORES[s]}>
             {ROTULO_LICENCA[s]}: {resumo[s] ?? 0}
           </Badge>
@@ -173,9 +174,9 @@ function PainelLicencas() {
                     size="sm"
                     variant="outline"
                     disabled={acao.isPending}
-                    onClick={() => acao.mutate({ userId: l.user_id, acao: "estender_teste", dias: 30 })}
+                    onClick={() => acao.mutate({ userId: l.user_id, acao: "estender", dias: 30 })}
                   >
-                    +30 dias de teste
+                    +30 dias
                   </Button>
                   <Button
                     size="sm"
@@ -187,13 +188,22 @@ function PainelLicencas() {
                   </Button>
                   <Button
                     size="sm"
+                    variant="outline"
+                    disabled={acao.isPending}
+                    onClick={() => acao.mutate({ userId: l.user_id, acao: "reativar" })}
+                  >
+                    Reativar
+                  </Button>
+                  <Button
+                    size="sm"
                     variant="ghost"
                     disabled={acao.isPending}
-                    onClick={() => acao.mutate({ userId: l.user_id, acao: "expirar" })}
+                    onClick={() => acao.mutate({ userId: l.user_id, acao: "cancelar" })}
                   >
-                    Encerrar
+                    Cancelar
                   </Button>
                 </div>
+
               </li>
             );
           })}
