@@ -31,6 +31,11 @@ import {
   type ModoSimulador,
 } from "@/components/pricing/AlternadorModo";
 import { ContextoFiscal } from "@/components/pricing/ContextoFiscal";
+import {
+  eventoParametroFiscal,
+  eventoSimulacaoIniciada,
+  eventoSimular,
+} from "@/lib/analytics-eventos";
 import { useAliquotas } from "@/hooks/useAliquotas";
 import { sincronizarOperacao } from "@/lib/aliquotas";
 import { ResumoFlutuante } from "@/components/pricing/ResumoFlutuante";
@@ -333,13 +338,18 @@ function Simulador() {
 
   const operacao = state.operacao ?? operacaoPadrao();
 
-  const setOperacao = (patch: Partial<OperacaoFiscal>) =>
+  const setOperacao = (patch: Partial<OperacaoFiscal>) => {
+    for (const [campo, valor] of Object.entries(patch)) {
+      eventoParametroFiscal({ modo, campo, valor: valor as string | number | boolean });
+    }
     setState((s) => {
       const base = { ...operacaoPadrao(), ...(s.operacao ?? {}), ...patch };
       return { ...s, operacao: sincronizarOperacao(base, tabela) };
     });
+  };
 
-  const setRegime = (regime: Regime) =>
+  const setRegime = (regime: Regime) => {
+    eventoParametroFiscal({ modo, campo: "regime", valor: regime });
     setState((s) => {
       const comRegime = aplicarRegime(garantirOperacao(s), regime);
       return {
@@ -347,6 +357,7 @@ function Simulador() {
         operacao: sincronizarOperacao(comRegime.operacao ?? operacaoPadrao(), tabela),
       };
     });
+  };
 
   // Preenche o contexto fiscal com o cadastro da empresa e as alíquotas vigentes.
   useEffect(() => {
@@ -384,17 +395,21 @@ function Simulador() {
     setState((s) => ({ ...s, produto: { ...s.produto, ...patch } }));
   const setVenda = (patch: Partial<VendaConfig>) =>
     setState((s) => ({ ...s, venda: { ...s.venda, ...patch } }));
-  const setTributoCompra = (id: string, patch: Partial<PurchaseTax>) =>
+  const setTributoCompra = (id: string, patch: Partial<PurchaseTax>) => {
+    eventoParametroFiscal({ modo, campo: `compra.${id}` });
     setState((s) => ({
       ...s,
       cenario: "personalizado",
       tributosCompra: s.tributosCompra.map((t) => (t.id === id ? { ...t, ...patch } : t)),
     }));
-  const setTributoVenda = (id: string, patch: Partial<SaleTax>) =>
+  };
+  const setTributoVenda = (id: string, patch: Partial<SaleTax>) => {
+    eventoParametroFiscal({ modo, campo: `venda.${id}` });
     setState((s) => ({
       ...s,
       tributosVenda: s.tributosVenda.map((t) => (t.id === id ? { ...t, ...patch } : t)),
     }));
+  };
 
 
   const cenarioAtual = CENARIOS.find((c) => c.id === state.cenario);
@@ -407,6 +422,7 @@ function Simulador() {
   };
 
   const novaSimulacao = () => {
+    eventoSimulacaoIniciada({ modo, origem: "nova" });
     setState(estadoInicial());
     toast.info("Nova simulação iniciada.");
   };
@@ -419,6 +435,7 @@ function Simulador() {
   };
 
   const carregarExemplo = () => {
+    eventoSimulacaoIniciada({ modo, origem: "exemplo" });
     setState(estadoExemplo());
     toast.info("Valores de exemplo restaurados.");
   };
