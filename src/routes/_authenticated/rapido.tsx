@@ -495,6 +495,12 @@ function ModoRapido() {
           Voltar
         </Button>
         {passo < 5 ? (
+          <div className="flex items-center gap-2">
+            {maxPasso >= 5 ? (
+              <Button variant="secondary" onClick={() => irPara(5)}>
+                Voltar ao preço
+              </Button>
+            ) : null}
           <Button
             onClick={() => {
               if (passo === 4) {
