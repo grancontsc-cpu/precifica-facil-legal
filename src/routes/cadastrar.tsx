@@ -4,6 +4,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import { ReenviarConfirmacao } from "@/components/app/ReenviarConfirmacao";
 import { LogoGrancont } from "@/components/app/LogoGrancont";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -91,8 +92,9 @@ function CadastrarPage() {
               link para ativar a conta e iniciar seus 30 dias de teste gratuito.
             </p>
             <p className="mt-2 text-xs text-muted-foreground">
-              Não recebeu? Confira a caixa de spam ou aguarde alguns minutos antes de tentar novamente.
+              Não recebeu? Confira a caixa de spam e o lixo eletrônico, e confirme se o endereço está correto.
             </p>
+            <ReenviarConfirmacao email={email} className="mt-5 text-left" />
             <Link to="/login" className="mt-6 inline-block text-sm text-primary hover:underline">
               Voltar para o login
             </Link>

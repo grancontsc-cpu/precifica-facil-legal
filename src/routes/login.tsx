@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { DialogoCadastrar } from "@/components/app/DialogoCadastrar";
+import { ReenviarConfirmacao } from "@/components/app/ReenviarConfirmacao";
 import { LogoGrancont } from "@/components/app/LogoGrancont";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,6 +40,7 @@ function LoginPage() {
   const [carregando, setCarregando] = useState(false);
   const [situacaoEmail, setSituacaoEmail] = useState<"desconhecida" | "cadastrado" | "novo">("desconhecida");
   const [dialogo, setDialogo] = useState(false);
+  const [pendenteConfirmacao, setPendenteConfirmacao] = useState<string | null>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -80,13 +82,16 @@ function LoginPage() {
     });
     setCarregando(false);
     if (error) {
+      const naoConfirmado = error.message.toLowerCase().includes("not confirmed");
+      setPendenteConfirmacao(naoConfirmado ? emailLimpo : null);
       toast.error(
-        error.message.toLowerCase().includes("not confirmed")
+        naoConfirmado
           ? "Confirme seu e-mail antes de entrar. Verifique sua caixa de entrada."
           : "Senha incorreta para este e-mail.",
       );
       return;
     }
+    setPendenteConfirmacao(null);
     navigate({ to: "/entrando", replace: true });
   };
 
@@ -152,6 +157,18 @@ function LoginPage() {
             {carregando ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : "Entrar"}
           </Button>
         </form>
+
+        {pendenteConfirmacao && (
+          <div className="mt-4 rounded-lg border border-primary/30 bg-primary/5 p-3">
+            <p className="text-xs text-foreground">
+              Sua conta ainda não foi confirmada. Abra o link enviado para{" "}
+              <span className="font-medium">{pendenteConfirmacao}</span> ou peça um novo.
+            </p>
+            <ReenviarConfirmacao email={pendenteConfirmacao} iniciarBloqueado={false} className="mt-3" />
+          </div>
+        )}
+
+
 
         <div className="mt-4 flex flex-wrap items-center justify-between gap-2 text-xs">
           <Link to="/esqueci-minha-senha" className="text-primary hover:underline">
