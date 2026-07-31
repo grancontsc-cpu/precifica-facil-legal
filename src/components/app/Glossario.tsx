@@ -13,7 +13,8 @@ import {
 const TERMOS: { termo: string; texto: string }[] = [
   {
     termo: "Desembolso",
-    texto: "Todo o dinheiro que sai do seu caixa na compra: mercadoria, frete, seguro e tributos pagos por fora.",
+    texto:
+      "Todo o dinheiro que sai do seu caixa na compra: mercadoria, frete, seguro e tributos pagos por fora.",
   },
   {
     termo: "Crédito recuperável",
@@ -22,7 +23,8 @@ const TERMOS: { termo: string; texto: string }[] = [
   },
   {
     termo: "Custo líquido",
-    texto: "Desembolso menos os créditos recuperáveis. É o custo real do produto para a sua empresa.",
+    texto:
+      "Desembolso menos os créditos recuperáveis. É o custo real do produto para a sua empresa.",
   },
   {
     termo: "Tributo incluído (por dentro)",
@@ -46,7 +48,8 @@ const TERMOS: { termo: string; texto: string }[] = [
   },
   {
     termo: "Margem desejada",
-    texto: "Quanto você quer ganhar sobre a venda. O sistema calcula o preço que entrega essa margem.",
+    texto:
+      "Quanto você quer ganhar sobre a venda. O sistema calcula o preço que entrega essa margem.",
   },
   {
     termo: "Markup",
@@ -75,7 +78,9 @@ export function Glossario({ variant = "ghost" }: { variant?: "ghost" | "outline"
       <SheetContent side="right" className="w-full overflow-y-auto sm:max-w-md">
         <SheetHeader>
           <SheetTitle>Glossário em linguagem simples</SheetTitle>
-          <SheetDescription>O que cada termo do sistema quer dizer, sem juridiquês.</SheetDescription>
+          <SheetDescription>
+            O que cada termo do sistema quer dizer, sem juridiquês.
+          </SheetDescription>
         </SheetHeader>
         <dl className="space-y-4 px-4 pb-8">
           {TERMOS.map((t) => (

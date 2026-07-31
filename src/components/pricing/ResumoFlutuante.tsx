@@ -33,7 +33,9 @@ export function ResumoFlutuante({ resultado }: { resultado: SimulationResult }) 
       <Sheet>
         <SheetTrigger className="flex w-full items-center gap-3 px-4 py-2.5 text-left">
           <div className="min-w-0 flex-1">
-            <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Preço de venda sugerido</p>
+            <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
+              Preço de venda sugerido
+            </p>
             <p
               className={cn(
                 "truncate text-xl font-semibold tabular-nums transition-colors duration-300",
@@ -44,7 +46,9 @@ export function ResumoFlutuante({ resultado }: { resultado: SimulationResult }) 
             </p>
           </div>
           <div className="shrink-0 text-right">
-            <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Custo líquido</p>
+            <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
+              Custo líquido
+            </p>
             <p className="text-sm font-medium tabular-nums text-foreground">{formatBRL(custo)}</p>
           </div>
           <ChevronUp className="h-5 w-5 shrink-0 text-muted-foreground" aria-hidden />

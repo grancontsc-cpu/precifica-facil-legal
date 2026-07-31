@@ -3,7 +3,13 @@ import { Menu } from "lucide-react";
 import { useState } from "react";
 
 import { Glossario } from "@/components/app/Glossario";
-import { NAV_ADMIN, NAV_DIARIO, NAV_GESTAO, itemAtivo, type ItemNav } from "@/components/app/navegacao";
+import {
+  NAV_ADMIN,
+  NAV_DIARIO,
+  NAV_GESTAO,
+  itemAtivo,
+  type ItemNav,
+} from "@/components/app/navegacao";
 import {
   Sheet,
   SheetContent,
@@ -89,11 +95,16 @@ export function NavegacaoMobile({ ehGestor, isSuperAdmin }: Props) {
                             )}
                           >
                             <Icon
-                              className={cn("mt-0.5 h-5 w-5 shrink-0", ativo ? "text-primary" : "text-muted-foreground")}
+                              className={cn(
+                                "mt-0.5 h-5 w-5 shrink-0",
+                                ativo ? "text-primary" : "text-muted-foreground",
+                              )}
                               aria-hidden
                             />
                             <span className="min-w-0">
-                              <span className="block text-sm font-medium text-foreground">{item.label}</span>
+                              <span className="block text-sm font-medium text-foreground">
+                                {item.label}
+                              </span>
                               <span className="block text-xs leading-snug text-muted-foreground">
                                 {item.descricao}
                               </span>

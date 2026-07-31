@@ -39,12 +39,16 @@ export function MenuConta() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-64">
         <DropdownMenuLabel className="space-y-0.5">
-          <span className="block truncate text-sm font-semibold text-foreground">{nome ?? "Minha conta"}</span>
+          <span className="block truncate text-sm font-semibold text-foreground">
+            {nome ?? "Minha conta"}
+          </span>
           <span className="block truncate text-xs font-normal text-muted-foreground">{email}</span>
           <span className="block text-xs font-normal text-primary">{NOME_PAPEL[papel]}</span>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Aparência</DropdownMenuLabel>
+        <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
+          Aparência
+        </DropdownMenuLabel>
         <DropdownMenuRadioGroup value={tema} onValueChange={(v) => setTema(v as Tema)}>
           <DropdownMenuRadioItem value="claro">
             <Sun className="mr-2 h-4 w-4" aria-hidden />
