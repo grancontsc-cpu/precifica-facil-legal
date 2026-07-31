@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import {
+  eventoComparacaoRelatorio,
   eventoDetalhamentoResultado,
   eventoParametroFiscal,
   eventoSimulacaoIniciada,
@@ -109,5 +110,16 @@ describe("eventos de analytics do simulador", () => {
     const params = enviados[0]![2] as Record<string, unknown>;
     expect(params.com_comparacao).toBe(false);
     expect(params.detalhamento_aberto).toBe(false);
+  });
+
+  it("registra a ativação e a desativação da comparação no relatório", () => {
+    eventoComparacaoRelatorio({ ativo: true, fornecedores: 3 });
+    eventoComparacaoRelatorio({ ativo: false, fornecedores: 3 });
+    expect(enviados[0]).toEqual([
+      "event",
+      "comparacao_relatorio",
+      { comparacao_ativa: true, qtd_fornecedores: 3, modo_simulador: undefined },
+    ]);
+    expect((enviados[1]![2] as Record<string, unknown>).comparacao_ativa).toBe(false);
   });
 });
