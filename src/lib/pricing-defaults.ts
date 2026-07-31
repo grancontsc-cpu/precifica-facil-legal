@@ -1,11 +1,14 @@
 import type {
+  OperacaoFiscal,
   PurchaseTax,
   PurchaseTaxId,
+  Regime,
   SaleTax,
   SaleTaxId,
   ScenarioId,
   SimulationState,
 } from "@/types/pricing";
+
 
 const baseTax = (
   id: PurchaseTaxId,
