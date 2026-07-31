@@ -667,7 +667,7 @@ export function validar(state: SimulationState): ValidationIssue[] {
     }
   }
 
-  for (const t of state.tributosCompra) {
+  for (const t of tributosCompra) {
     if (!t.enabled) continue;
     if (!finito(t.rate) || t.rate < 0 || t.rate > 100) {
       issues.push({
@@ -718,7 +718,7 @@ export function validar(state: SimulationState): ValidationIssue[] {
 
   // Soma das alíquotas incluídas na compra: acima de 100% o valor informado
   // não comporta os tributos que supostamente estão dentro dele.
-  const somaCompraIncluida = state.tributosCompra
+  const somaCompraIncluida = tributosCompra
     .filter((t) => t.enabled && t.treatment === "incluido" && !t.useManualTax && finito(t.rate))
     .reduce((acc, t) => acc + t.rate, 0);
   if (somaCompraIncluida >= 100) {
@@ -730,7 +730,7 @@ export function validar(state: SimulationState): ValidationIssue[] {
     });
   }
 
-  for (const t of state.tributosVenda) {
+  for (const t of tributosVenda) {
     if (!t.enabled) continue;
     if (!finito(t.rate) || t.rate < 0 || t.rate > 100) {
       issues.push({
@@ -795,7 +795,7 @@ export function validar(state: SimulationState): ValidationIssue[] {
 
   // Aviso antecipado de percentuais próximos de 100%.
   const somaVenda =
-    state.tributosVenda
+    tributosVenda
       .filter((t) => t.enabled && t.treatment === "incluido" && finito(t.rate))
       .reduce((acc, t) => acc + t.rate, 0) +
     percentuais.filter(finito).reduce((acc, x) => acc + x, 0) +
