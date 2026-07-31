@@ -4,6 +4,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import { ForcaSenha } from "@/components/app/ForcaSenha";
 import { ReenviarConfirmacao } from "@/components/app/ReenviarConfirmacao";
 import { LogoGrancont } from "@/components/app/LogoGrancont";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { registrarEventoEmail } from "@/lib/email-eventos.functions";
+import { mensagemSenhaInvalida, traduzirErroSenha } from "@/lib/senha";
 
 const TITULO = "Criar conta — Precifica Grancont";
 const DESCRICAO =
@@ -45,8 +47,9 @@ function CadastrarPage() {
   const cadastrar = async (e: React.FormEvent) => {
     e.preventDefault();
     const emailLimpo = email.trim().toLowerCase();
-    if (senha.length < 8) {
-      toast.error("A senha deve ter ao menos 8 caracteres.");
+    const problema = mensagemSenhaInvalida(senha);
+    if (problema) {
+      toast.error(problema);
       return;
     }
     setCarregando(true);
@@ -70,6 +73,12 @@ function CadastrarPage() {
           mensagemErro: error?.message ?? undefined,
         },
       }).catch(() => {});
+
+      const traduzido = traduzirErroSenha(error?.message);
+      if (traduzido) {
+        toast.error(traduzido);
+        return;
+      }
 
       if (!error) {
         void registrarEventoEmail({ data: { tipo: "senha_criada", email: emailLimpo } }).catch(() => {});
@@ -146,7 +155,7 @@ function CadastrarPage() {
                   onChange={(e) => setSenha(e.target.value)}
                   required
                 />
-                <p className="text-xs text-muted-foreground">Mínimo de 8 caracteres.</p>
+                <ForcaSenha senha={senha} className="pt-1" />
               </div>
               <Button type="submit" className="w-full" disabled={carregando}>
                 {carregando ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : "Criar conta"}

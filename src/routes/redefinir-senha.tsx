@@ -6,7 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
+import { ForcaSenha } from "@/components/app/ForcaSenha";
 import { registrarEventoEmail } from "@/lib/email-eventos.functions";
+import { mensagemSenhaInvalida, traduzirErroSenha } from "@/lib/senha";
 
 const TITULO = "Redefinir senha — Precifica Grancont";
 const DESCRICAO = "Crie uma nova senha para o seu acesso ao Precifica Grancont.";
@@ -42,8 +44,9 @@ function Pagina() {
 
   const salvar = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (senha.length < 8) {
-      toast.error("A senha deve ter ao menos 8 caracteres.");
+    const problema = mensagemSenhaInvalida(senha);
+    if (problema) {
+      toast.error(problema);
       return;
     }
     if (senha !== confirmacao) {
@@ -66,6 +69,13 @@ function Pagina() {
     }).catch(() => {});
 
     if (error) {
+      toast.error(
+        traduzirErroSenha(error.message) ??
+          "Não conseguimos salvar a nova senha. Peça um novo link e tente novamente.",
+      );
+      return;
+    }
+    if (false) {
       toast.error("Não foi possível salvar a nova senha. Peça um novo link e tente novamente.");
       return;
     }
@@ -86,6 +96,7 @@ function Pagina() {
             <div className="space-y-1.5">
               <Label htmlFor="s1">Nova senha</Label>
               <Input id="s1" type="password" minLength={8} value={senha} onChange={(e) => setSenha(e.target.value)} required />
+              <ForcaSenha senha={senha} className="pt-1" />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="s2">Confirmar nova senha</Label>
