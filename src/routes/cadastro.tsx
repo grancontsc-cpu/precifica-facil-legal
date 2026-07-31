@@ -17,7 +17,7 @@ const TITULO = "Criar conta — Precifica Grancont";
 const DESCRICAO =
   "Crie sua conta no Precifica Grancont, confirme o e-mail e teste o simulador de precificação tributária por 30 dias sem limites.";
 
-export const Route = createFileRoute("/cadastrar")({
+export const Route = createFileRoute("/cadastro")({
   validateSearch: z.object({ email: z.string().optional() }),
   head: () => ({
     meta: [

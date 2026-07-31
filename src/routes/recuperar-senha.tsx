@@ -13,7 +13,7 @@ import { verificarEmailCadastrado } from "@/lib/conta.functions";
 const TITULO = "Recuperar senha — Precifica Grancont";
 const DESCRICAO = "Solicite um link seguro para redefinir a senha do seu acesso ao Precifica Grancont.";
 
-export const Route = createFileRoute("/esqueci-minha-senha")({
+export const Route = createFileRoute("/recuperar-senha")({
   head: () => ({
     meta: [
       { title: TITULO },

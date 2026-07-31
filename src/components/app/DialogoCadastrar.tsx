@@ -42,7 +42,7 @@ export function DialogoCadastrar({ aberto, email, onFechar }: Props) {
             className="w-full sm:w-auto"
             onClick={() => {
               onFechar();
-              navigate({ to: "/cadastrar", search: { email } });
+              navigate({ to: "/cadastro", search: { email } });
             }}
           >
             Cadastrar agora
