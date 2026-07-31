@@ -180,8 +180,16 @@ function ModoRapido() {
     (passo === 3 && !!ufOrigem && !!ufDestino) ||
     passo === 4;
 
+  // Maior etapa já alcançada — libera navegação livre para refazer testes.
+  const maxPasso = Math.max(passoMaximo, passo);
+  const irPara = (destino: number) => {
+    setPassoMaximo((m) => Math.max(m, passo));
+    setPasso(destino);
+  };
+
   const reiniciar = () => {
     setPasso(1);
+    setPassoMaximo(1);
     setNome("");
     setValorUnitario(0);
     setQuantidade(1);
@@ -192,6 +200,7 @@ function ModoRapido() {
     setRespostas(respostasPadrao());
     setAjustes(ajustesVazios());
   };
+
 
 
   return (
