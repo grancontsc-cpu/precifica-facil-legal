@@ -817,7 +817,7 @@ export function validar(state: SimulationState): ValidationIssue[] {
 
 export function simular(state: SimulationState): SimulationResult {
   const issues = validar(state);
-  const compra = calcularCompra(state.produto, state.tributosCompra);
+  const compra = calcularCompra(state.produto, tributosCompraEfetivos(state));
 
   if (compra.custoLiquidoTotal < 0) {
     issues.push({
@@ -832,7 +832,7 @@ export function simular(state: SimulationState): SimulationResult {
     // Precisão plena: a divisão total -> unitário não é arredondada aqui.
     custoLiquidoUnitario: compra.custoLiquidoUnitarioExato,
     venda: state.venda,
-    tributos: state.tributosVenda,
+    tributos: tributosVendaEfetivos(state),
   };
 
   const temErro = issues.some((i) => i.severidade === "erro");
