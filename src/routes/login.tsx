@@ -158,6 +158,18 @@ function LoginPage() {
           </Button>
         </form>
 
+        {pendenteConfirmacao && (
+          <div className="mt-4 rounded-lg border border-primary/30 bg-primary/5 p-3">
+            <p className="text-xs text-foreground">
+              Sua conta ainda não foi confirmada. Abra o link enviado para{" "}
+              <span className="font-medium">{pendenteConfirmacao}</span> ou peça um novo.
+            </p>
+            <ReenviarConfirmacao email={pendenteConfirmacao} iniciarBloqueado={false} className="mt-3" />
+          </div>
+        )}
+
+
+
         <div className="mt-4 flex flex-wrap items-center justify-between gap-2 text-xs">
           <Link to="/esqueci-minha-senha" className="text-primary hover:underline">
             Esqueci minha senha
