@@ -56,32 +56,53 @@ function regimeDaEmpresa(valor: string | null | undefined): Regime {
   return valor && REGIMES_VALIDOS.has(valor) ? (valor as Regime) : "real";
 }
 
-/** Trilha visual dos passos — reforça progresso e reduz abandono. */
-function Trilha({ passo }: { passo: number }) {
+/** Trilha visual dos passos — reforça progresso e permite voltar para ajustar. */
+function Trilha({
+  passo,
+  maxPasso,
+  onIr,
+}: {
+  passo: number;
+  maxPasso: number;
+  onIr: (destino: number) => void;
+}) {
   const passos = ["Produto", "Valor", "Trajeto", "Impostos", "Preço"];
   return (
     <ol className="flex items-center gap-2" aria-label="Progresso do modo rápido">
       {passos.map((rotulo, i) => {
-        const atual = i + 1 === passo;
-        const concluido = i + 1 < passo;
+        const numero = i + 1;
+        const atual = numero === passo;
+        const concluido = numero < passo;
+        const liberado = numero <= maxPasso;
         return (
           <li key={rotulo} className="flex flex-1 flex-col gap-1.5">
-            <span
-              aria-hidden
-              className={
-                "h-1.5 rounded-full transition-colors " +
-                (atual || concluido ? "bg-primary" : "bg-border")
-              }
-            />
-            <span
-              className={
-                "text-[11px] font-medium " +
-                (atual ? "text-foreground" : "text-muted-foreground")
-              }
+            <button
+              type="button"
+              onClick={() => liberado && onIr(numero)}
+              disabled={!liberado}
               aria-current={atual ? "step" : undefined}
+              aria-label={`Ir para a etapa ${rotulo}`}
+              className={
+                "flex flex-col gap-1.5 text-left " +
+                (liberado ? "cursor-pointer" : "cursor-default")
+              }
             >
-              {rotulo}
-            </span>
+              <span
+                aria-hidden
+                className={
+                  "h-1.5 rounded-full transition-colors " +
+                  (atual || concluido ? "bg-primary" : liberado ? "bg-primary/30" : "bg-border")
+                }
+              />
+              <span
+                className={
+                  "text-[11px] font-medium " +
+                  (atual ? "text-foreground" : "text-muted-foreground")
+                }
+              >
+                {rotulo}
+              </span>
+            </button>
           </li>
         );
       })}
@@ -92,12 +113,14 @@ function Trilha({ passo }: { passo: number }) {
 
 
 
+
 function ModoRapido() {
   const navigate = useNavigate();
   const { empresa } = useApp();
   const { tabela } = useAliquotas();
 
   const [passo, setPasso] = useState(1);
+  const [passoMaximo, setPassoMaximo] = useState(1);
   const [nome, setNome] = useState("");
   const [valorUnitario, setValorUnitario] = useState(0);
   const [quantidade, setQuantidade] = useState(1);
@@ -158,8 +181,16 @@ function ModoRapido() {
     (passo === 3 && !!ufOrigem && !!ufDestino) ||
     passo === 4;
 
+  // Maior etapa já alcançada — libera navegação livre para refazer testes.
+  const maxPasso = Math.max(passoMaximo, passo);
+  const irPara = (destino: number) => {
+    setPassoMaximo((m) => Math.max(m, passo));
+    setPasso(destino);
+  };
+
   const reiniciar = () => {
     setPasso(1);
+    setPassoMaximo(1);
     setNome("");
     setValorUnitario(0);
     setQuantidade(1);
@@ -170,6 +201,7 @@ function ModoRapido() {
     setRespostas(respostasPadrao());
     setAjustes(ajustesVazios());
   };
+
 
 
   return (
@@ -187,7 +219,13 @@ function ModoRapido() {
         </p>
       </header>
 
-      <Trilha passo={passo} />
+      <Trilha passo={passo} maxPasso={maxPasso} onIr={irPara} />
+      {maxPasso >= 5 ? (
+        <p className="-mt-3 text-center text-xs text-muted-foreground">
+          Toque em qualquer etapa acima para ajustar valores, margem ou tributos e ver o preço
+          recalculado.
+        </p>
+      ) : null}
 
       <div className="rounded-xl border border-border bg-surface p-5 sm:p-6">
         {passo === 1 ? (
@@ -413,6 +451,26 @@ function ModoRapido() {
 
             <ComparativoModos state={estado} resultado={resultado} />
 
+            <div className="rounded-lg border border-dashed border-border p-3">
+              <p className="mb-2 text-xs font-medium text-muted-foreground">
+                Testar outro cenário sem recomeçar
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <Button size="sm" variant="outline" onClick={() => irPara(2)}>
+                  Valor e margem
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => irPara(3)}>
+                  Trajeto
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => irPara(4)}>
+                  Impostos
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => irPara(1)}>
+                  Produto e regime
+                </Button>
+              </div>
+            </div>
+
             <div className="flex flex-col gap-2 sm:flex-row">
               <Button className="flex-1" onClick={() => navigate({ to: "/simulador" })}>
                 Refinar no simulador completo
@@ -422,20 +480,27 @@ function ModoRapido() {
                 Nova estimativa
               </Button>
             </div>
+
           </div>
         ) : null}
       </div>
 
-      {passo < 5 ? (
-        <div className="flex items-center justify-between gap-3">
-          <Button
-            variant="ghost"
-            onClick={() => setPasso((p) => Math.max(1, p - 1))}
-            disabled={passo === 1}
-          >
-            <ArrowLeft className="size-4" aria-hidden />
-            Voltar
-          </Button>
+      <div className="flex items-center justify-between gap-3">
+        <Button
+          variant="ghost"
+          onClick={() => irPara(Math.max(1, passo - 1))}
+          disabled={passo === 1}
+        >
+          <ArrowLeft className="size-4" aria-hidden />
+          Voltar
+        </Button>
+        {passo < 5 ? (
+          <div className="flex items-center gap-2">
+            {maxPasso >= 5 ? (
+              <Button variant="secondary" onClick={() => irPara(5)}>
+                Voltar ao preço
+              </Button>
+            ) : null}
           <Button
             onClick={() => {
               if (passo === 4) {
@@ -455,15 +520,20 @@ function ModoRapido() {
                   });
                 }
               }
-              setPasso((p) => p + 1);
+              irPara(passo + 1);
             }}
             disabled={!podeAvancar}
           >
             {passo === 4 ? "Ver preço sugerido" : "Continuar"}
             <ArrowRight className="size-4" aria-hidden />
           </Button>
-        </div>
-      ) : null}
+          </div>
+        ) : (
+          <span />
+        )}
+
+      </div>
+
 
 
       <p className="text-center text-xs text-muted-foreground">
