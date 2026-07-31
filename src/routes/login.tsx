@@ -98,7 +98,7 @@ function LoginPage() {
         <h1 className="mt-5 text-xl font-semibold tracking-tight text-foreground">
           Precifica <span className="text-primary">Grancont</span>
         </h1>
-        <p className="mt-1 text-sm text-muted-foreground">Entre com o e-mail autorizado pela sua empresa.</p>
+        <p className="mt-1 text-sm text-muted-foreground">Entre com seu e-mail e senha.</p>
 
         <form className="mt-6 space-y-4" onSubmit={entrar}>
           <div className="space-y-1.5">
@@ -108,9 +108,23 @@ function LoginPage() {
               type="email"
               autoComplete="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setSituacaoEmail("desconhecida");
+              }}
+              onBlur={(e) => void conferirEmail(e.target.value)}
               required
             />
+            {situacaoEmail === "cadastrado" && (
+              <p className="flex items-center gap-1.5 text-xs text-primary">
+                <CheckCircle2 className="h-3.5 w-3.5" aria-hidden /> E-mail já cadastrado.
+              </p>
+            )}
+            {situacaoEmail === "novo" && (
+              <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <Info className="h-3.5 w-3.5" aria-hidden /> E-mail ainda não cadastrado.
+              </p>
+            )}
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="senha">Senha</Label>
