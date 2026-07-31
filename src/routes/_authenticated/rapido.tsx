@@ -98,7 +98,8 @@ function ModoRapido() {
   const [margem, setMargem] = useState(30);
   const [ufOrigem, setUfOrigem] = useState("");
   const [ufDestino, setUfDestino] = useState(empresa?.uf ?? "");
-  const regime = regimeDaEmpresa(empresa?.regime);
+  const [regime, setRegime] = useState<Regime>(() => regimeDaEmpresa(empresa?.regime));
+  const [respostas, setRespostas] = useState<RespostasImpostos>(respostasPadrao);
   const [ajustes, setAjustes] = useState<AjustesRapido>(ajustesVazios);
 
   // Abertura do modo rápido.
@@ -113,20 +114,34 @@ function ModoRapido() {
       tabela,
     );
     return aplicarAjustes(
-      {
-        ...base,
-        produto: {
-          ...base.produto,
-          nome: nome.trim(),
-          quantidade: quantidade || 1,
-          valorUnitario,
+      aplicarRespostas(
+        {
+          ...base,
+          produto: {
+            ...base.produto,
+            nome: nome.trim(),
+            quantidade: quantidade || 1,
+            valorUnitario,
+          },
+          venda: { ...base.venda, margemDesejada: margem },
+          operacao,
         },
-        venda: { ...base.venda, margemDesejada: margem },
-        operacao,
-      },
+        respostas,
+      ),
       ajustes,
     );
-  }, [regime, ufOrigem, ufDestino, tabela, nome, quantidade, valorUnitario, margem, ajustes]);
+  }, [
+    regime,
+    ufOrigem,
+    ufDestino,
+    tabela,
+    nome,
+    quantidade,
+    valorUnitario,
+    margem,
+    respostas,
+    ajustes,
+  ]);
 
   const resultado = useMemo(() => simular(estado), [estado]);
   const recomendado = resultado.recomendado;
@@ -134,7 +149,8 @@ function ModoRapido() {
   const podeAvancar =
     (passo === 1 && nome.trim().length > 0) ||
     (passo === 2 && valorUnitario > 0 && quantidade > 0) ||
-    (passo === 3 && !!ufOrigem && !!ufDestino);
+    (passo === 3 && !!ufOrigem && !!ufDestino) ||
+    passo === 4;
 
   const reiniciar = () => {
     setPasso(1);
@@ -144,8 +160,11 @@ function ModoRapido() {
     setMargem(30);
     setUfOrigem("");
     setUfDestino(empresa?.uf ?? "");
+    setRegime(regimeDaEmpresa(empresa?.regime));
+    setRespostas(respostasPadrao());
     setAjustes(ajustesVazios());
   };
+
 
   return (
     <div className="mx-auto w-full max-w-xl space-y-6 px-4 py-8 sm:py-12">
