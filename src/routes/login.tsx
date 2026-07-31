@@ -3,7 +3,6 @@ import { CheckCircle2, Eye, EyeOff, Info, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-import { DialogoCadastrar } from "@/components/app/DialogoCadastrar";
 import { ReenviarConfirmacao } from "@/components/app/ReenviarConfirmacao";
 import { LogoGrancont } from "@/components/app/LogoGrancont";
 import { Button } from "@/components/ui/button";
@@ -37,10 +36,6 @@ function LoginPage() {
   const [senha, setSenha] = useState("");
   const [mostrar, setMostrar] = useState(false);
   const [carregando, setCarregando] = useState(false);
-  const [situacaoEmail, setSituacaoEmail] = useState<"desconhecida" | "cadastrado" | "novo">(
-    "desconhecida",
-  );
-  const [dialogo, setDialogo] = useState(false);
   const [pendenteConfirmacao, setPendenteConfirmacao] = useState<string | null>(null);
 
   useEffect(() => {
@@ -155,23 +150,9 @@ function LoginPage() {
                 autoComplete="email"
                 placeholder="voce@suaempresa.com.br"
                 value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  setSituacaoEmail("desconhecida");
-                }}
-                onBlur={(e) => void conferirEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value)}
                 required
               />
-              {situacaoEmail === "cadastrado" && (
-                <p className="flex items-center gap-1.5 text-xs text-success">
-                  <CheckCircle2 className="h-3.5 w-3.5" aria-hidden /> E-mail já cadastrado.
-                </p>
-              )}
-              {situacaoEmail === "novo" && (
-                <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <Info className="h-3.5 w-3.5" aria-hidden /> E-mail ainda não cadastrado.
-                </p>
-              )}
             </div>
 
             <div className="space-y-2">
@@ -252,12 +233,6 @@ function LoginPage() {
         </div>
       </div>
       </main>
-
-      <DialogoCadastrar
-        aberto={dialogo}
-        email={email.trim().toLowerCase()}
-        onFechar={() => setDialogo(false)}
-      />
     </>
   );
 
