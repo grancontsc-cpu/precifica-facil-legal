@@ -129,6 +129,7 @@ function ModoRapido() {
     setMargem(30);
     setUfOrigem("");
     setUfDestino(empresa?.uf ?? "");
+    setAjustes(ajustesVazios());
   };
 
   return (
