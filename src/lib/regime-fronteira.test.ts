@@ -136,7 +136,7 @@ describe("Simples Nacional e MEI na venda", () => {
   it("o DAS é incluído no preço e reduz a margem quando aumenta", () => {
     const a = simular(base("simples", { aliquotaSimples: 4 }));
     const b = simular(base("simples", { aliquotaSimples: 12 }));
-    expect(b.recomendado!.precoVenda).toBeGreaterThan(a.recomendado!.precoVenda);
+    expect(b.recomendado!.precoFinal).toBeGreaterThan(a.recomendado!.precoFinal);
   });
 
   it("aplicarRegime remove o crédito de ICMS, PIS e Cofins no Simples", () => {
