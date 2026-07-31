@@ -2,13 +2,12 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { DialogoCadastrar } from "@/components/app/DialogoCadastrar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { verificarEmailCadastrado } from "@/lib/conta.functions";
+import { registrarEventoEmail } from "@/lib/email-eventos.functions";
 
 const TITULO = "Recuperar senha — Precifica Grancont";
 const DESCRICAO = "Solicite um link seguro para redefinir a senha do seu acesso ao Precifica Grancont.";
@@ -32,29 +31,31 @@ function Pagina() {
   const [email, setEmail] = useState("");
   const [enviado, setEnviado] = useState(false);
   const [carregando, setCarregando] = useState(false);
-  const [dialogo, setDialogo] = useState(false);
 
   const enviar = async (e: React.FormEvent) => {
     e.preventDefault();
     const emailLimpo = email.trim().toLowerCase();
     setCarregando(true);
     try {
-      const { cadastrado } = await verificarEmailCadastrado({ data: { email: emailLimpo } });
-      if (!cadastrado) {
-        setDialogo(true);
-        return;
-      }
       const { error } = await supabase.auth.resetPasswordForEmail(emailLimpo, {
         redirectTo: `${window.location.origin}/redefinir-senha`,
       });
-      if (error) {
-        toast.error("Não foi possível enviar agora. Tente novamente em alguns minutos.");
-        return;
-      }
+
+      void registrarEventoEmail({
+        data: {
+          tipo: "recuperacao_solicitada",
+          email: emailLimpo,
+          status: error ? "erro" : "ok",
+          codigoErro: error?.code ?? undefined,
+          mensagemErro: error?.message ?? undefined,
+        },
+      }).catch(() => {});
+
+      // Resposta genérica: nunca revelamos se existe conta com este e-mail.
       setEnviado(true);
-      toast.success("Enviamos o link de nova senha para o seu e-mail.");
+      toast.success("Se houver uma conta com este e-mail, enviaremos o link de nova senha.");
     } catch {
-      toast.error("Não foi possível verificar o e-mail agora. Tente novamente.");
+      setEnviado(true);
     } finally {
       setCarregando(false);
     }
@@ -71,8 +72,8 @@ function Pagina() {
 
         {enviado ? (
           <p className="mt-6 rounded-md border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
-            Link enviado para <span className="font-medium text-foreground">{email}</span>. Verifique sua caixa de
-            entrada e também o spam. O link vale por tempo limitado.
+            Se houver uma conta associada a <span className="font-medium text-foreground">{email}</span>, o link de nova
+            senha chegará em instantes. Verifique a caixa de entrada e também o spam — o link vale por tempo limitado.
           </p>
         ) : (
           <form className="mt-6 space-y-4" onSubmit={enviar}>
@@ -81,7 +82,7 @@ function Pagina() {
               <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
             </div>
             <Button type="submit" className="w-full" disabled={carregando}>
-              {carregando ? "Verificando…" : "Enviar instruções"}
+              {carregando ? "Enviando…" : "Enviar instruções"}
             </Button>
           </form>
         )}
@@ -90,8 +91,6 @@ function Pagina() {
           Voltar para o login
         </Link>
       </div>
-
-      <DialogoCadastrar aberto={dialogo} email={email.trim().toLowerCase()} onFechar={() => setDialogo(false)} />
     </main>
   );
 }
