@@ -206,6 +206,33 @@ function ModoRapido() {
               onChange={setNome}
               placeholder="Ex.: Café torrado e moído 500g"
             />
+            <div className="space-y-1.5">
+              <Label htmlFor="rapido-regime">Regime tributário da sua empresa</Label>
+              <Select
+                value={regime}
+                onValueChange={(v) => {
+                  eventoParametroFiscal({ modo: "rapido", campo: "regime", valor: v });
+                  setRegime(v as Regime);
+                }}
+              >
+                <SelectTrigger id="rapido-regime">
+                  <SelectValue placeholder="Selecione" />
+                </SelectTrigger>
+                <SelectContent>
+                  {REGIMES.map((r) => (
+                    <SelectItem key={r.id} value={r.id}>
+                      {r.nome}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                {empresa?.regime
+                  ? "Preenchido pelo cadastro da empresa — você pode simular outro regime."
+                  : "Define como o ICMS de fronteira entra no custo."}
+              </p>
+            </div>
+
           </div>
         ) : null}
 
