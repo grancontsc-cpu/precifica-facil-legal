@@ -153,9 +153,10 @@ function CadastrarPage() {
                   minLength={8}
                   value={senha}
                   onChange={(e) => setSenha(e.target.value)}
+                  aria-describedby="forca-senha-cadastro"
                   required
                 />
-                <ForcaSenha senha={senha} className="pt-1" />
+                <ForcaSenha senha={senha} id="forca-senha-cadastro" className="pt-1" />
               </div>
               <Button type="submit" className="w-full" disabled={carregando}>
                 {carregando ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : "Criar conta"}
