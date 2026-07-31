@@ -10,6 +10,7 @@ import {
   Package,
   Percent,
   Scale,
+  Search,
   ShieldQuestion,
   UserPlus,
   Users,
@@ -140,6 +141,13 @@ export const NAV_ADMIN: ItemNav[] = [
     label: "Licenças",
     descricao: "Liberar, suspender ou estender assinaturas",
     icon: KeyRound,
+    acesso: "super_admin",
+  },
+  {
+    to: "/admin/seo",
+    label: "SEO e sitemap",
+    descricao: "Envio do sitemap ao Google e status da indexação",
+    icon: Search,
     acesso: "super_admin",
   },
   {

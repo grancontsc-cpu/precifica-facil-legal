@@ -39,6 +39,7 @@ import { Route as AuthenticatedCompararRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAuditoriaRouteImport } from './routes/_authenticated/auditoria'
 import { Route as AuthenticatedGestaoIndexRouteImport } from './routes/_authenticated/gestao/index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
+import { Route as ApiPublicSitemapPingRouteImport } from './routes/api/public/sitemap-ping'
 import { Route as AuthenticatedGestaoVinculosRouteImport } from './routes/_authenticated/gestao/vinculos'
 import { Route as AuthenticatedGestaoUsuariosRouteImport } from './routes/_authenticated/gestao/usuarios'
 import { Route as AuthenticatedGestaoConvitesRouteImport } from './routes/_authenticated/gestao/convites'
@@ -202,6 +203,11 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/admin/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicSitemapPingRoute = ApiPublicSitemapPingRouteImport.update({
+  id: '/api/public/sitemap-ping',
+  path: '/api/public/sitemap-ping',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedGestaoVinculosRoute =
   AuthenticatedGestaoVinculosRouteImport.update({
     id: '/gestao/vinculos',
@@ -315,6 +321,7 @@ export interface FileRoutesByFullPath {
   '/gestao/convites': typeof AuthenticatedGestaoConvitesRoute
   '/gestao/usuarios': typeof AuthenticatedGestaoUsuariosRoute
   '/gestao/vinculos': typeof AuthenticatedGestaoVinculosRoute
+  '/api/public/sitemap-ping': typeof ApiPublicSitemapPingRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/gestao/': typeof AuthenticatedGestaoIndexRoute
 }
@@ -358,6 +365,7 @@ export interface FileRoutesByTo {
   '/gestao/convites': typeof AuthenticatedGestaoConvitesRoute
   '/gestao/usuarios': typeof AuthenticatedGestaoUsuariosRoute
   '/gestao/vinculos': typeof AuthenticatedGestaoVinculosRoute
+  '/api/public/sitemap-ping': typeof ApiPublicSitemapPingRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/gestao': typeof AuthenticatedGestaoIndexRoute
 }
@@ -403,6 +411,7 @@ export interface FileRoutesById {
   '/_authenticated/gestao/convites': typeof AuthenticatedGestaoConvitesRoute
   '/_authenticated/gestao/usuarios': typeof AuthenticatedGestaoUsuariosRoute
   '/_authenticated/gestao/vinculos': typeof AuthenticatedGestaoVinculosRoute
+  '/api/public/sitemap-ping': typeof ApiPublicSitemapPingRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/gestao/': typeof AuthenticatedGestaoIndexRoute
 }
@@ -448,6 +457,7 @@ export interface FileRouteTypes {
     | '/gestao/convites'
     | '/gestao/usuarios'
     | '/gestao/vinculos'
+    | '/api/public/sitemap-ping'
     | '/admin/'
     | '/gestao/'
   fileRoutesByTo: FileRoutesByTo
@@ -491,6 +501,7 @@ export interface FileRouteTypes {
     | '/gestao/convites'
     | '/gestao/usuarios'
     | '/gestao/vinculos'
+    | '/api/public/sitemap-ping'
     | '/admin'
     | '/gestao'
   id:
@@ -535,6 +546,7 @@ export interface FileRouteTypes {
     | '/_authenticated/gestao/convites'
     | '/_authenticated/gestao/usuarios'
     | '/_authenticated/gestao/vinculos'
+    | '/api/public/sitemap-ping'
     | '/_authenticated/admin/'
     | '/_authenticated/gestao/'
   fileRoutesById: FileRoutesById
@@ -561,6 +573,7 @@ export interface RootRouteChildren {
   TesteExpiradoRoute: typeof TesteExpiradoRoute
   AppSplatRoute: typeof AppSplatRoute
   AppIndexRoute: typeof AppIndexRoute
+  ApiPublicSitemapPingRoute: typeof ApiPublicSitemapPingRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -775,6 +788,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/sitemap-ping': {
+      id: '/api/public/sitemap-ping'
+      path: '/api/public/sitemap-ping'
+      fullPath: '/api/public/sitemap-ping'
+      preLoaderRoute: typeof ApiPublicSitemapPingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/gestao/vinculos': {
       id: '/_authenticated/gestao/vinculos'
       path: '/gestao/vinculos'
@@ -936,6 +956,7 @@ const rootRouteChildren: RootRouteChildren = {
   TesteExpiradoRoute: TesteExpiradoRoute,
   AppSplatRoute: AppSplatRoute,
   AppIndexRoute: AppIndexRoute,
+  ApiPublicSitemapPingRoute: ApiPublicSitemapPingRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
