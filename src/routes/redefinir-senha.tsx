@@ -3,12 +3,11 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
-import { ForcaSenha } from "@/components/app/ForcaSenha";
+import { CamposSenha } from "@/components/app/CamposSenha";
 import { registrarEventoEmail } from "@/lib/email-eventos.functions";
-import { mensagemSenhaInvalida, traduzirErroSenha } from "@/lib/senha";
+import { traduzirErroSenha, validarParDeSenhas } from "@/lib/senha";
+
 
 const TITULO = "Redefinir senha — Precifica Grancont";
 const DESCRICAO = "Crie uma nova senha para o seu acesso ao Precifica Grancont.";
