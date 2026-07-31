@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TesteExpiradoRouteImport } from './routes/teste-expirado'
 import { Route as RedefinirSenhaRouteImport } from './routes/redefinir-senha'
 import { Route as RecuperarSenhaRouteImport } from './routes/recuperar-senha'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LicencaSuspensaRouteImport } from './routes/licenca-suspensa'
 import { Route as EsqueciMinhaSenhaRouteImport } from './routes/esqueci-minha-senha'
@@ -62,6 +63,11 @@ const RedefinirSenhaRoute = RedefinirSenhaRouteImport.update({
 const RecuperarSenhaRoute = RecuperarSenhaRouteImport.update({
   id: '/recuperar-senha',
   path: '/recuperar-senha',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -270,6 +276,7 @@ export interface FileRoutesByFullPath {
   '/esqueci-minha-senha': typeof EsqueciMinhaSenhaRoute
   '/licenca-suspensa': typeof LicencaSuspensaRoute
   '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
   '/teste-expirado': typeof TesteExpiradoRoute
@@ -310,6 +317,7 @@ export interface FileRoutesByTo {
   '/esqueci-minha-senha': typeof EsqueciMinhaSenhaRoute
   '/licenca-suspensa': typeof LicencaSuspensaRoute
   '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
   '/teste-expirado': typeof TesteExpiradoRoute
@@ -352,6 +360,7 @@ export interface FileRoutesById {
   '/esqueci-minha-senha': typeof EsqueciMinhaSenhaRoute
   '/licenca-suspensa': typeof LicencaSuspensaRoute
   '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
   '/teste-expirado': typeof TesteExpiradoRoute
@@ -394,6 +403,7 @@ export interface FileRouteTypes {
     | '/esqueci-minha-senha'
     | '/licenca-suspensa'
     | '/login'
+    | '/onboarding'
     | '/recuperar-senha'
     | '/redefinir-senha'
     | '/teste-expirado'
@@ -434,6 +444,7 @@ export interface FileRouteTypes {
     | '/esqueci-minha-senha'
     | '/licenca-suspensa'
     | '/login'
+    | '/onboarding'
     | '/recuperar-senha'
     | '/redefinir-senha'
     | '/teste-expirado'
@@ -475,6 +486,7 @@ export interface FileRouteTypes {
     | '/esqueci-minha-senha'
     | '/licenca-suspensa'
     | '/login'
+    | '/onboarding'
     | '/recuperar-senha'
     | '/redefinir-senha'
     | '/teste-expirado'
@@ -517,6 +529,7 @@ export interface RootRouteChildren {
   EsqueciMinhaSenhaRoute: typeof EsqueciMinhaSenhaRoute
   LicencaSuspensaRoute: typeof LicencaSuspensaRoute
   LoginRoute: typeof LoginRoute
+  OnboardingRoute: typeof OnboardingRoute
   RecuperarSenhaRoute: typeof RecuperarSenhaRoute
   RedefinirSenhaRoute: typeof RedefinirSenhaRoute
   TesteExpiradoRoute: typeof TesteExpiradoRoute
@@ -545,6 +558,13 @@ declare module '@tanstack/react-router' {
       path: '/recuperar-senha'
       fullPath: '/recuperar-senha'
       preLoaderRoute: typeof RecuperarSenhaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -867,6 +887,7 @@ const rootRouteChildren: RootRouteChildren = {
   EsqueciMinhaSenhaRoute: EsqueciMinhaSenhaRoute,
   LicencaSuspensaRoute: LicencaSuspensaRoute,
   LoginRoute: LoginRoute,
+  OnboardingRoute: OnboardingRoute,
   RecuperarSenhaRoute: RecuperarSenhaRoute,
   RedefinirSenhaRoute: RedefinirSenhaRoute,
   TesteExpiradoRoute: TesteExpiradoRoute,
