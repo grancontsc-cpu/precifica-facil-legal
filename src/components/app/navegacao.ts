@@ -152,6 +152,13 @@ export const NAV_ADMIN: ItemNav[] = [
     acesso: "super_admin",
   },
   {
+    to: "/admin/metricas",
+    label: "Métricas de uso",
+    descricao: "Sessões, usuários e eventos da precificação",
+    icon: BarChart3,
+    acesso: "super_admin",
+  },
+  {
     to: "/admin/seo",
     label: "SEO e sitemap",
     descricao: "Envio do sitemap ao Google e status da indexação",

@@ -49,6 +49,7 @@ import { Route as AuthenticatedAdminSolicitacoesRouteImport } from './routes/_au
 import { Route as AuthenticatedAdminSimulacoesRouteImport } from './routes/_authenticated/admin/simulacoes'
 import { Route as AuthenticatedAdminSeoRouteImport } from './routes/_authenticated/admin/seo'
 import { Route as AuthenticatedAdminPerfisTributariosRouteImport } from './routes/_authenticated/admin/perfis-tributarios'
+import { Route as AuthenticatedAdminMetricasRouteImport } from './routes/_authenticated/admin/metricas'
 import { Route as AuthenticatedAdminLicencasRouteImport } from './routes/_authenticated/admin/licencas'
 import { Route as AuthenticatedAdminEmpresasRouteImport } from './routes/_authenticated/admin/empresas'
 import { Route as AuthenticatedAdminEmailsRouteImport } from './routes/_authenticated/admin/emails'
@@ -262,6 +263,12 @@ const AuthenticatedAdminPerfisTributariosRoute =
     path: '/admin/perfis-tributarios',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminMetricasRoute =
+  AuthenticatedAdminMetricasRouteImport.update({
+    id: '/admin/metricas',
+    path: '/admin/metricas',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminLicencasRoute =
   AuthenticatedAdminLicencasRouteImport.update({
     id: '/admin/licencas',
@@ -327,6 +334,7 @@ export interface FileRoutesByFullPath {
   '/admin/emails': typeof AuthenticatedAdminEmailsRoute
   '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
   '/admin/licencas': typeof AuthenticatedAdminLicencasRoute
+  '/admin/metricas': typeof AuthenticatedAdminMetricasRoute
   '/admin/perfis-tributarios': typeof AuthenticatedAdminPerfisTributariosRoute
   '/admin/seo': typeof AuthenticatedAdminSeoRoute
   '/admin/simulacoes': typeof AuthenticatedAdminSimulacoesRoute
@@ -373,6 +381,7 @@ export interface FileRoutesByTo {
   '/admin/emails': typeof AuthenticatedAdminEmailsRoute
   '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
   '/admin/licencas': typeof AuthenticatedAdminLicencasRoute
+  '/admin/metricas': typeof AuthenticatedAdminMetricasRoute
   '/admin/perfis-tributarios': typeof AuthenticatedAdminPerfisTributariosRoute
   '/admin/seo': typeof AuthenticatedAdminSeoRoute
   '/admin/simulacoes': typeof AuthenticatedAdminSimulacoesRoute
@@ -421,6 +430,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/emails': typeof AuthenticatedAdminEmailsRoute
   '/_authenticated/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
   '/_authenticated/admin/licencas': typeof AuthenticatedAdminLicencasRoute
+  '/_authenticated/admin/metricas': typeof AuthenticatedAdminMetricasRoute
   '/_authenticated/admin/perfis-tributarios': typeof AuthenticatedAdminPerfisTributariosRoute
   '/_authenticated/admin/seo': typeof AuthenticatedAdminSeoRoute
   '/_authenticated/admin/simulacoes': typeof AuthenticatedAdminSimulacoesRoute
@@ -469,6 +479,7 @@ export interface FileRouteTypes {
     | '/admin/emails'
     | '/admin/empresas'
     | '/admin/licencas'
+    | '/admin/metricas'
     | '/admin/perfis-tributarios'
     | '/admin/seo'
     | '/admin/simulacoes'
@@ -515,6 +526,7 @@ export interface FileRouteTypes {
     | '/admin/emails'
     | '/admin/empresas'
     | '/admin/licencas'
+    | '/admin/metricas'
     | '/admin/perfis-tributarios'
     | '/admin/seo'
     | '/admin/simulacoes'
@@ -562,6 +574,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/emails'
     | '/_authenticated/admin/empresas'
     | '/_authenticated/admin/licencas'
+    | '/_authenticated/admin/metricas'
     | '/_authenticated/admin/perfis-tributarios'
     | '/_authenticated/admin/seo'
     | '/_authenticated/admin/simulacoes'
@@ -882,6 +895,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminPerfisTributariosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/metricas': {
+      id: '/_authenticated/admin/metricas'
+      path: '/admin/metricas'
+      fullPath: '/admin/metricas'
+      preLoaderRoute: typeof AuthenticatedAdminMetricasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/licencas': {
       id: '/_authenticated/admin/licencas'
       path: '/admin/licencas'
@@ -934,6 +954,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminEmailsRoute: typeof AuthenticatedAdminEmailsRoute
   AuthenticatedAdminEmpresasRoute: typeof AuthenticatedAdminEmpresasRoute
   AuthenticatedAdminLicencasRoute: typeof AuthenticatedAdminLicencasRoute
+  AuthenticatedAdminMetricasRoute: typeof AuthenticatedAdminMetricasRoute
   AuthenticatedAdminPerfisTributariosRoute: typeof AuthenticatedAdminPerfisTributariosRoute
   AuthenticatedAdminSeoRoute: typeof AuthenticatedAdminSeoRoute
   AuthenticatedAdminSimulacoesRoute: typeof AuthenticatedAdminSimulacoesRoute
@@ -960,6 +981,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminEmailsRoute: AuthenticatedAdminEmailsRoute,
   AuthenticatedAdminEmpresasRoute: AuthenticatedAdminEmpresasRoute,
   AuthenticatedAdminLicencasRoute: AuthenticatedAdminLicencasRoute,
+  AuthenticatedAdminMetricasRoute: AuthenticatedAdminMetricasRoute,
   AuthenticatedAdminPerfisTributariosRoute:
     AuthenticatedAdminPerfisTributariosRoute,
   AuthenticatedAdminSeoRoute: AuthenticatedAdminSeoRoute,
