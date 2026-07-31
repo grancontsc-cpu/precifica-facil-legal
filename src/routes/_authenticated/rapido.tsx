@@ -29,6 +29,12 @@ import { aplicarRegime, estadoInicial, operacaoPadrao } from "@/lib/pricing-defa
 import { SuposicoesFiscais } from "@/components/pricing/SuposicoesFiscais";
 import { ComparativoModos } from "@/components/pricing/ComparativoModos";
 import { ajustesVazios, aplicarAjustes, type AjustesRapido } from "@/lib/suposicoes-rapido";
+import { PerguntasImpostos } from "@/components/pricing/PerguntasImpostos";
+import {
+  aplicarRespostas,
+  respostasPadrao,
+  type RespostasImpostos,
+} from "@/lib/impostos-rapido";
 import { formatBRL } from "@/lib/format";
 import { useApp } from "@/hooks/useApp";
 import type { Regime, SimulationState } from "@/types/pricing";
@@ -52,7 +58,7 @@ function regimeDaEmpresa(valor: string | null | undefined): Regime {
 
 /** Trilha visual dos passos — reforça progresso e reduz abandono. */
 function Trilha({ passo }: { passo: number }) {
-  const passos = ["Produto", "Valor", "Trajeto", "Preço"];
+  const passos = ["Produto", "Valor", "Trajeto", "Impostos", "Preço"];
   return (
     <ol className="flex items-center gap-2" aria-label="Progresso do modo rápido">
       {passos.map((rotulo, i) => {
@@ -83,6 +89,9 @@ function Trilha({ passo }: { passo: number }) {
   );
 }
 
+
+
+
 function ModoRapido() {
   const navigate = useNavigate();
   const { empresa } = useApp();
@@ -95,7 +104,8 @@ function ModoRapido() {
   const [margem, setMargem] = useState(30);
   const [ufOrigem, setUfOrigem] = useState("");
   const [ufDestino, setUfDestino] = useState(empresa?.uf ?? "");
-  const regime = regimeDaEmpresa(empresa?.regime);
+  const [regime, setRegime] = useState<Regime>(() => regimeDaEmpresa(empresa?.regime));
+  const [respostas, setRespostas] = useState<RespostasImpostos>(respostasPadrao);
   const [ajustes, setAjustes] = useState<AjustesRapido>(ajustesVazios);
 
   // Abertura do modo rápido.
@@ -110,20 +120,34 @@ function ModoRapido() {
       tabela,
     );
     return aplicarAjustes(
-      {
-        ...base,
-        produto: {
-          ...base.produto,
-          nome: nome.trim(),
-          quantidade: quantidade || 1,
-          valorUnitario,
+      aplicarRespostas(
+        {
+          ...base,
+          produto: {
+            ...base.produto,
+            nome: nome.trim(),
+            quantidade: quantidade || 1,
+            valorUnitario,
+          },
+          venda: { ...base.venda, margemDesejada: margem },
+          operacao,
         },
-        venda: { ...base.venda, margemDesejada: margem },
-        operacao,
-      },
+        respostas,
+      ),
       ajustes,
     );
-  }, [regime, ufOrigem, ufDestino, tabela, nome, quantidade, valorUnitario, margem, ajustes]);
+  }, [
+    regime,
+    ufOrigem,
+    ufDestino,
+    tabela,
+    nome,
+    quantidade,
+    valorUnitario,
+    margem,
+    respostas,
+    ajustes,
+  ]);
 
   const resultado = useMemo(() => simular(estado), [estado]);
   const recomendado = resultado.recomendado;
@@ -131,7 +155,8 @@ function ModoRapido() {
   const podeAvancar =
     (passo === 1 && nome.trim().length > 0) ||
     (passo === 2 && valorUnitario > 0 && quantidade > 0) ||
-    (passo === 3 && !!ufOrigem && !!ufDestino);
+    (passo === 3 && !!ufOrigem && !!ufDestino) ||
+    passo === 4;
 
   const reiniciar = () => {
     setPasso(1);
@@ -141,8 +166,11 @@ function ModoRapido() {
     setMargem(30);
     setUfOrigem("");
     setUfDestino(empresa?.uf ?? "");
+    setRegime(regimeDaEmpresa(empresa?.regime));
+    setRespostas(respostasPadrao());
     setAjustes(ajustesVazios());
   };
+
 
   return (
     <div className="mx-auto w-full max-w-xl space-y-6 px-4 py-8 sm:py-12">
@@ -152,7 +180,7 @@ function ModoRapido() {
           Modo rápido
         </span>
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-          Preço de venda em três passos
+          Preço de venda em poucos passos
         </h1>
         <p className="text-sm text-muted-foreground">
           Uma estimativa imediata usando as alíquotas gerais do trajeto informado.
@@ -178,6 +206,33 @@ function ModoRapido() {
               onChange={setNome}
               placeholder="Ex.: Café torrado e moído 500g"
             />
+            <div className="space-y-1.5">
+              <Label htmlFor="rapido-regime">Regime tributário da sua empresa</Label>
+              <Select
+                value={regime}
+                onValueChange={(v) => {
+                  eventoParametroFiscal({ modo: "rapido", campo: "regime", valor: v });
+                  setRegime(v as Regime);
+                }}
+              >
+                <SelectTrigger id="rapido-regime">
+                  <SelectValue placeholder="Selecione" />
+                </SelectTrigger>
+                <SelectContent>
+                  {REGIMES.map((r) => (
+                    <SelectItem key={r.id} value={r.id}>
+                      {r.nome}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                {empresa?.regime
+                  ? "Preenchido pelo cadastro da empresa — você pode simular outro regime."
+                  : "Define como o ICMS de fronteira entra no custo."}
+              </p>
+            </div>
+
           </div>
         ) : null}
 
@@ -259,13 +314,41 @@ function ModoRapido() {
             <AliquotasTrajeto ufOrigem={ufOrigem} ufDestino={ufDestino} />
 
             <p className="text-xs text-muted-foreground">
-              Regime considerado: {REGIMES.find((r) => r.id === regime)?.nome ?? regime}
-              {empresa?.regime ? " (cadastro da empresa)" : " (padrão)"}.
+              Regime considerado: {REGIMES.find((r) => r.id === regime)?.nome ?? regime}.
             </p>
           </div>
         ) : null}
 
         {passo === 4 ? (
+          <div className="space-y-4">
+            <div>
+              <h2 className="text-base font-semibold text-foreground">
+                Como esse produto é tributado?
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Duas perguntas rápidas. Se não souber, marque “Não sei” — assumimos que é
+                tributado, o que é mais prudente para o seu preço.
+              </p>
+            </div>
+            <PerguntasImpostos
+              state={estado}
+              regime={regime}
+              respostas={respostas}
+              onChange={(r) => {
+                eventoParametroFiscal({ modo: "rapido", campo: "impostos" });
+                setRespostas(r);
+              }}
+              aliquotaSimples={ajustes.aliquotaSimples}
+              onAliquotaSimples={(v) => {
+                eventoParametroFiscal({ modo: "rapido", campo: "aliquotaSimples" });
+                setAjustes((a) => ({ ...a, aliquotaSimples: v }));
+              }}
+            />
+          </div>
+        ) : null}
+
+        {passo === 5 ? (
+
           <div className="space-y-5">
             <div className="text-center">
               <p className="text-sm text-muted-foreground">Preço de venda sugerido por unidade</p>
@@ -343,7 +426,7 @@ function ModoRapido() {
         ) : null}
       </div>
 
-      {passo < 4 ? (
+      {passo < 5 ? (
         <div className="flex items-center justify-between gap-3">
           <Button
             variant="ghost"
@@ -355,7 +438,7 @@ function ModoRapido() {
           </Button>
           <Button
             onClick={() => {
-              if (passo === 3) {
+              if (passo === 4) {
                 eventoSimular({
                   modo: "rapido",
                   regime,
@@ -376,11 +459,12 @@ function ModoRapido() {
             }}
             disabled={!podeAvancar}
           >
-            {passo === 3 ? "Ver preço sugerido" : "Continuar"}
+            {passo === 4 ? "Ver preço sugerido" : "Continuar"}
             <ArrowRight className="size-4" aria-hidden />
           </Button>
         </div>
       ) : null}
+
 
       <p className="text-center text-xs text-muted-foreground">
         Precisa de todos os tributos abertos?{" "}
