@@ -6,6 +6,13 @@
  * Nunca envie aqui dados que identifiquem a empresa ou o usuário.
  */
 import { registrarEvento } from "./analytics";
+import { registrarEventoInterno } from "./metricas-internas";
+
+/** Envia ao GA4 e grava o mesmo evento no painel interno de métricas. */
+function enviar(nome: string, parametros: Record<string, unknown>, modo?: string) {
+  registrarEvento(nome, parametros);
+  registrarEventoInterno(nome, { modo, parametros });
+}
 
 export type ModoAnalytics = "rapido" | "simples" | "completo";
 
@@ -37,10 +44,11 @@ export function eventoSimulacaoIniciada(params: {
   modo: ModoAnalytics;
   origem: "nova" | "carregada" | "exemplo" | "duplicada";
 }) {
-  registrarEvento("simulacao_iniciada", {
-    modo_simulador: params.modo,
-    origem_simulacao: params.origem,
-  });
+  enviar(
+    "simulacao_iniciada",
+    { modo_simulador: params.modo, origem_simulacao: params.origem },
+    params.modo,
+  );
 }
 
 /** O usuário alterou um parâmetro fiscal (regime, UF, alíquota, crédito...). */
@@ -51,11 +59,15 @@ export function eventoParametroFiscal(params: {
 }) {
   const chave = `${params.modo}:${params.campo}`;
   if (!permitido(chave, JANELA_PARAMETRO_MS)) return;
-  registrarEvento("parametro_fiscal_alterado", {
-    modo_simulador: params.modo,
-    campo_fiscal: params.campo,
-    valor_fiscal: params.valor === undefined ? undefined : String(params.valor),
-  });
+  enviar(
+    "parametro_fiscal_alterado",
+    {
+      modo_simulador: params.modo,
+      campo_fiscal: params.campo,
+      valor_fiscal: params.valor === undefined ? undefined : String(params.valor),
+    },
+    params.modo,
+  );
 }
 
 /** O usuário pediu o resultado ("Simular" / "Ver preço sugerido"). */
@@ -66,13 +78,17 @@ export function eventoSimular(params: {
   ufDestino?: string;
   possuiResultado: boolean;
 }) {
-  registrarEvento("simular", {
-    modo_simulador: params.modo,
-    regime: params.regime,
-    uf_origem: params.ufOrigem || undefined,
-    uf_destino: params.ufDestino || undefined,
-    resultado_valido: params.possuiResultado,
-  });
+  enviar(
+    "simular",
+    {
+      modo_simulador: params.modo,
+      regime: params.regime,
+      uf_origem: params.ufOrigem || undefined,
+      uf_destino: params.ufDestino || undefined,
+      resultado_valido: params.possuiResultado,
+    },
+    params.modo,
+  );
 }
 
 /** Conversão: a simulação chegou a um preço recomendado válido. */
@@ -85,12 +101,16 @@ export function eventoSimulacaoConcluida(params: {
 }) {
   const chave = `concluida:${params.modo}:${params.chave ?? ""}`;
   if (!permitido(chave, JANELA_PARAMETRO_MS)) return;
-  registrarEvento("simulacao_concluida", {
-    modo_simulador: params.modo,
-    regime: params.regime,
-    uf_origem: params.ufOrigem || undefined,
-    uf_destino: params.ufDestino || undefined,
-  });
+  enviar(
+    "simulacao_concluida",
+    {
+      modo_simulador: params.modo,
+      regime: params.regime,
+      uf_origem: params.ufOrigem || undefined,
+      uf_destino: params.ufDestino || undefined,
+    },
+    params.modo,
+  );
 }
 
 export type FormatoExportacao = "imprimir" | "pdf" | "csv" | "whatsapp";
@@ -101,11 +121,15 @@ export function eventoExportarRelatorio(params: {
   modo?: ModoAnalytics;
   comComparacao?: boolean;
 }) {
-  registrarEvento("exportar_relatorio", {
-    formato_exportacao: params.formato,
-    modo_simulador: params.modo,
-    com_comparacao: params.comComparacao,
-  });
+  enviar(
+    "exportar_relatorio",
+    {
+      formato_exportacao: params.formato,
+      modo_simulador: params.modo,
+      com_comparacao: params.comComparacao,
+    },
+    params.modo,
+  );
 }
 
 /** O usuário copiou o resultado para a área de transferência. */
@@ -114,9 +138,13 @@ export function eventoCopiarResultado(params: {
   sucesso: boolean;
   modo?: ModoAnalytics;
 }) {
-  registrarEvento("copiar_resultado", {
-    conteudo_copiado: params.conteudo,
-    copia_sucesso: params.sucesso,
-    modo_simulador: params.modo,
-  });
+  enviar(
+    "copiar_resultado",
+    {
+      conteudo_copiado: params.conteudo,
+      copia_sucesso: params.sucesso,
+      modo_simulador: params.modo,
+    },
+    params.modo,
+  );
 }

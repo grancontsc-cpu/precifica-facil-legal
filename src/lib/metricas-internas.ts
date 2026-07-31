@@ -6,8 +6,6 @@
  * que não depende de API externa. Falhas são silenciosas: métricas
  * nunca podem quebrar o fluxo do usuário.
  */
-import { supabase } from "@/integrations/supabase/client";
-
 const CHAVE_SESSAO = "pg:sessao-metricas";
 
 /** Identificador de sessão do navegador (por aba, sem dados pessoais). */
@@ -32,14 +30,20 @@ export function registrarEventoInterno(
   dados?: { modo?: string; parametros?: Record<string, unknown> },
 ) {
   if (typeof window === "undefined") return;
-  void supabase
-    .from("app_analytics_events")
-    .insert({
-      evento,
-      modo: dados?.modo ?? null,
-      sessao_id: idSessao(),
-      caminho: window.location.pathname,
-      parametros: (dados?.parametros ?? {}) as never,
-    })
-    .then(() => undefined, () => undefined);
+  const caminho = window.location.pathname;
+  const sessao = idSessao();
+  void import("@/integrations/supabase/client")
+    .then(({ supabase }) =>
+      supabase.from("app_analytics_events").insert({
+        evento,
+        modo: dados?.modo ?? null,
+        sessao_id: sessao,
+        caminho,
+        parametros: (dados?.parametros ?? {}) as never,
+      }),
+    )
+    .then(
+      () => undefined,
+      () => undefined,
+    );
 }
