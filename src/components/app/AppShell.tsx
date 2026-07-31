@@ -12,6 +12,7 @@ import {
   Scale,
   Users,
   ShieldQuestion,
+  KeyRound,
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -41,12 +42,14 @@ const LINKS: { to: string; label: string; icon: typeof Calculator; acesso: Acess
   { to: "/admin/usuarios", label: "Todos os usuários", icon: Users, acesso: "super_admin" },
   { to: "/admin/convites", label: "Todos os convites", icon: MailPlus, acesso: "super_admin" },
   { to: "/admin/solicitacoes", label: "Solicitações de acesso", icon: ShieldQuestion, acesso: "super_admin" },
+  { to: "/admin/licencas", label: "Licenças", icon: KeyRound, acesso: "super_admin" },
   { to: "/empresas", label: "Empresas", icon: Building2, acesso: "super_admin" },
   { to: "/auditoria", label: "Auditoria", icon: History, acesso: "super_admin" },
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
-  const { organizations, orgId, setOrgId, isSuperAdmin, papel, email, signOut, memberships } = useApp();
+  const { organizations, orgId, setOrgId, isSuperAdmin, papel, email, signOut, memberships, situacaoLicenca } =
+    useApp();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const ehGestor = memberships.some((m) => m.role === "manager");
 

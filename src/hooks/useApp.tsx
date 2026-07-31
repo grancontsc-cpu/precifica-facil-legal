@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useMemo, useState, type ReactNode
 import type { Session } from "@supabase/supabase-js";
 
 import { supabase } from "@/integrations/supabase/client";
+import { avaliarLicenca, type Licenca, type SituacaoLicenca } from "@/lib/licencas";
 
 export type OrgRole = "manager" | "user";
 export type PapelEfetivo = "super_admin" | "manager" | "user";
@@ -43,6 +44,8 @@ interface AppContextValue {
   setOrgId: (id: string) => void;
   /** Pode criar/editar dados da empresa selecionada (gestor ou administrador geral). */
   canEdit: boolean;
+  licenca: Licenca | null;
+  situacaoLicenca: SituacaoLicenca;
   loading: boolean;
   signOut: () => Promise<void>;
 }
@@ -82,6 +85,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const isSuperAdmin = perfilQuery.data?.isSuperAdmin ?? false;
   const accountStatus = (perfilQuery.data?.perfil?.account_status ?? null) as StatusConta | null;
+
+  const licencaQuery = useQuery({
+    queryKey: ["me", "licenca", userId],
+    enabled: !!userId,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("licenses")
+        .select("status, plan, trial_started_at, trial_ends_at, activated_at, expires_at, notes")
+        .eq("user_id", userId!)
+        .maybeSingle();
+      return (data as Licenca | null) ?? null;
+    },
+  });
 
   const membershipsQuery = useQuery({
     queryKey: ["me", "memberships", userId],
@@ -173,7 +189,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
     orgId,
     setOrgId,
     canEdit,
-    loading: perfilQuery.isLoading || membershipsQuery.isLoading,
+    licenca: licencaQuery.data ?? null,
+    situacaoLicenca: isSuperAdmin
+      ? { liberado: true, status: "active", emTeste: false, diasRestantes: null, motivo: "Licença interna." }
+      : avaliarLicenca(licencaQuery.data ?? null),
+    loading: perfilQuery.isLoading || membershipsQuery.isLoading || licencaQuery.isLoading,
     signOut,
   };
 
