@@ -17,18 +17,18 @@ describe("eventos de analytics do simulador", () => {
   beforeEach(() => {
     reiniciarControleEventos();
     enviados = [];
-    (window as unknown as { gtag?: unknown }).gtag = (...args: unknown[]) => {
+    (globalThis as unknown as { gtag?: unknown }).gtag = (...args: unknown[]) => {
       enviados.push(args);
     };
   });
 
   afterEach(() => {
-    delete (window as unknown as { gtag?: unknown }).gtag;
+    delete (globalThis as unknown as { gtag?: unknown }).gtag;
     vi.useRealTimers();
   });
 
   it("não envia nada quando o GA não foi carregado (sem consentimento)", () => {
-    delete (window as unknown as { gtag?: unknown }).gtag;
+    delete (globalThis as unknown as { gtag?: unknown }).gtag;
     expect(() => eventoSimulacaoIniciada({ modo: "rapido", origem: "nova" })).not.toThrow();
     expect(enviados).toHaveLength(0);
   });
