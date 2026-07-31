@@ -15,6 +15,12 @@ const TITULO = "Entrar — Precifica Grancont";
 const DESCRICAO =
   "Acesse o Precifica Grancont com o e-mail autorizado pela sua empresa para simular preços, consultar histórico e usar os perfis tributários liberados.";
 
+/** Só aceita caminho relativo de mesma origem como retorno pós-login. */
+function destinoSeguro(next: string | undefined): string | null {
+  if (!next || !next.startsWith("/") || next.startsWith("//")) return null;
+  return next;
+}
+
 export const Route = createFileRoute("/login")({
   head: () => ({
     ...metaPagina({
@@ -24,23 +30,34 @@ export const Route = createFileRoute("/login")({
       indexavel: true,
     }),
   }),
+  validateSearch: (s: Record<string, unknown>) => ({
+    next: typeof s.next === "string" ? s.next : undefined,
+  }),
   ssr: false,
   component: LoginPage,
 });
 
 function LoginPage() {
   const navigate = useNavigate();
+  const { next } = Route.useSearch();
+  const retorno = destinoSeguro(next);
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [mostrar, setMostrar] = useState(false);
   const [carregando, setCarregando] = useState(false);
   const [pendenteConfirmacao, setPendenteConfirmacao] = useState<string | null>(null);
 
+  const seguir = () => {
+    if (retorno) window.location.replace(retorno);
+    else navigate({ to: "/entrando", replace: true });
+  };
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/entrando", replace: true });
+      if (data.session) seguir();
     });
-  }, [navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const entrar = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,7 +80,7 @@ function LoginPage() {
       return;
     }
     setPendenteConfirmacao(null);
-    navigate({ to: "/entrando", replace: true });
+    seguir();
   };
 
   return (
