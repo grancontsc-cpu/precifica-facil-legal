@@ -173,9 +173,9 @@ function PainelLicencas() {
                     size="sm"
                     variant="outline"
                     disabled={acao.isPending}
-                    onClick={() => acao.mutate({ userId: l.user_id, acao: "estender_teste", dias: 30 })}
+                    onClick={() => acao.mutate({ userId: l.user_id, acao: "estender", dias: 30 })}
                   >
-                    +30 dias de teste
+                    +30 dias
                   </Button>
                   <Button
                     size="sm"
@@ -187,13 +187,22 @@ function PainelLicencas() {
                   </Button>
                   <Button
                     size="sm"
+                    variant="outline"
+                    disabled={acao.isPending}
+                    onClick={() => acao.mutate({ userId: l.user_id, acao: "reativar" })}
+                  >
+                    Reativar
+                  </Button>
+                  <Button
+                    size="sm"
                     variant="ghost"
                     disabled={acao.isPending}
-                    onClick={() => acao.mutate({ userId: l.user_id, acao: "expirar" })}
+                    onClick={() => acao.mutate({ userId: l.user_id, acao: "cancelar" })}
                   >
-                    Encerrar
+                    Cancelar
                   </Button>
                 </div>
+
               </li>
             );
           })}
