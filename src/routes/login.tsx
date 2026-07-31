@@ -35,6 +35,8 @@ function LoginPage() {
   const [senha, setSenha] = useState("");
   const [mostrar, setMostrar] = useState(false);
   const [carregando, setCarregando] = useState(false);
+  const [situacaoEmail, setSituacaoEmail] = useState<"desconhecida" | "cadastrado" | "novo">("desconhecida");
+  const [dialogo, setDialogo] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -42,16 +44,45 @@ function LoginPage() {
     });
   }, [navigate]);
 
+  const conferirEmail = async (valor: string) => {
+    const limpo = valor.trim().toLowerCase();
+    if (!limpo || !limpo.includes("@")) {
+      setSituacaoEmail("desconhecida");
+      return null;
+    }
+    try {
+      const { cadastrado } = await verificarEmailCadastrado({ data: { email: limpo } });
+      setSituacaoEmail(cadastrado ? "cadastrado" : "novo");
+      return cadastrado;
+    } catch {
+      setSituacaoEmail("desconhecida");
+      return null;
+    }
+  };
+
   const entrar = async (e: React.FormEvent) => {
     e.preventDefault();
     setCarregando(true);
+    const emailLimpo = email.trim().toLowerCase();
+
+    const cadastrado = await conferirEmail(emailLimpo);
+    if (cadastrado === false) {
+      setCarregando(false);
+      setDialogo(true);
+      return;
+    }
+
     const { error } = await supabase.auth.signInWithPassword({
-      email: email.trim().toLowerCase(),
+      email: emailLimpo,
       password: senha,
     });
     setCarregando(false);
     if (error) {
-      toast.error("E-mail ou senha inválidos.");
+      toast.error(
+        error.message.toLowerCase().includes("not confirmed")
+          ? "Confirme seu e-mail antes de entrar. Verifique sua caixa de entrada."
+          : "Senha incorreta para este e-mail.",
+      );
       return;
     }
     navigate({ to: "/entrando", replace: true });
