@@ -288,6 +288,8 @@ function ModoRapido() {
               </Alert>
             )}
 
+            <SuposicoesFiscais state={estado} ajustes={ajustes} onChange={setAjustes} />
+
             <PainelFronteira state={estado} resultado={resultado} compacto />
 
             <Alert>
