@@ -38,7 +38,9 @@ function LoginPage() {
   const [senha, setSenha] = useState("");
   const [mostrar, setMostrar] = useState(false);
   const [carregando, setCarregando] = useState(false);
-  const [situacaoEmail, setSituacaoEmail] = useState<"desconhecida" | "cadastrado" | "novo">("desconhecida");
+  const [situacaoEmail, setSituacaoEmail] = useState<"desconhecida" | "cadastrado" | "novo">(
+    "desconhecida",
+  );
   const [dialogo, setDialogo] = useState(false);
   const [pendenteConfirmacao, setPendenteConfirmacao] = useState<string | null>(null);
 
@@ -280,4 +282,3 @@ function LoginPage() {
     </main>
   );
 }
-
