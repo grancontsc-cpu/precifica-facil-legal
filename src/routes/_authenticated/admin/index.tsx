@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Building2, ClipboardList, MailPlus, Users } from "lucide-react";
+import { Building2, ClipboardList, MailPlus, ShieldQuestion, Users } from "lucide-react";
 
 import { ExigePapel } from "@/components/app/GuardaAcesso";
 import { supabase } from "@/integrations/supabase/client";
@@ -32,17 +32,23 @@ function PainelAdmin() {
   const resumo = useQuery({
     queryKey: ["admin", "resumo"],
     queryFn: async () => {
-      const [empresas, usuarios, convites, simulacoes] = await Promise.all([
+      const [empresas, usuarios, convites, simulacoes, solicitacoes] = await Promise.all([
         supabase.from("organizations").select("id", { count: "exact", head: true }).eq("active", true),
         supabase.from("profiles").select("id", { count: "exact", head: true }).eq("account_status", "active"),
         supabase.from("invitations").select("id", { count: "exact", head: true }).eq("invitation_status", "pending"),
         supabase.from("simulations").select("id", { count: "exact", head: true }),
+        supabase
+          .from("access_requests")
+          .select("id", { count: "exact", head: true })
+          .eq("status", "pending")
+          .is("simulation_id", null),
       ]);
       return {
         empresas: empresas.count ?? 0,
         usuarios: usuarios.count ?? 0,
         convites: convites.count ?? 0,
         simulacoes: simulacoes.count ?? 0,
+        solicitacoes: solicitacoes.count ?? 0,
       };
     },
   });
@@ -52,6 +58,12 @@ function PainelAdmin() {
     { rotulo: "Usuários ativos", valor: resumo.data?.usuarios, icone: Users, para: "/admin/usuarios" },
     { rotulo: "Convites pendentes", valor: resumo.data?.convites, icone: MailPlus, para: "/admin/convites" },
     { rotulo: "Simulações registradas", valor: resumo.data?.simulacoes, icone: ClipboardList, para: "/simulacoes" },
+    {
+      rotulo: "Solicitações de acesso",
+      valor: resumo.data?.solicitacoes,
+      icone: ShieldQuestion,
+      para: "/admin/solicitacoes",
+    },
   ] as const;
 
   return (
@@ -89,6 +101,7 @@ function PainelAdmin() {
           { to: "/admin/convites", t: "Convites", d: "Convidar, reenviar e cancelar." },
           { to: "/admin/perfis-tributarios", t: "Perfis tributários", d: "Versões e campos bloqueados." },
           { to: "/admin/simulacoes", t: "Simulações", d: "Histórico de todas as empresas." },
+          { to: "/admin/solicitacoes", t: "Solicitações de acesso", d: "Pedidos de acesso administrativo." },
           { to: "/admin/auditoria", t: "Auditoria", d: "Registro completo de ações." },
         ].map((i) => (
           <Link key={i.to} to={i.to} className="rounded-lg border border-border bg-card p-4 hover:border-primary/40">

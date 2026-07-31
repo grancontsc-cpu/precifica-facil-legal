@@ -24,6 +24,7 @@ export type Database = {
           message: string
           organization_id: string | null
           reason_code: string
+          requested_area: string | null
           requester_id: string
           simulation_id: string | null
           status: string
@@ -37,6 +38,7 @@ export type Database = {
           message?: string
           organization_id?: string | null
           reason_code?: string
+          requested_area?: string | null
           requester_id: string
           simulation_id?: string | null
           status?: string
@@ -50,6 +52,7 @@ export type Database = {
           message?: string
           organization_id?: string | null
           reason_code?: string
+          requested_area?: string | null
           requester_id?: string
           simulation_id?: string | null
           status?: string
