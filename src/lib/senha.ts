@@ -33,7 +33,7 @@ export function avaliarSenha(senha: string): {
   valida: boolean;
 } {
   const criterios: CriterioSenha[] = [
-    { id: "tamanho", rotulo: "Pelo menos 8 caracteres", ok: senha.length >= 8 },
+    { id: "tamanho", rotulo: `Pelo menos ${REGRA_SENHA_TAMANHO_MINIMO} caracteres`, ok: senha.length >= REGRA_SENHA_TAMANHO_MINIMO },
     { id: "maiuscula", rotulo: "Uma letra maiúscula (A-Z)", ok: /[A-ZÀ-Þ]/.test(senha) },
     { id: "minuscula", rotulo: "Uma letra minúscula (a-z)", ok: /[a-zà-þ]/.test(senha) },
     { id: "numero", rotulo: "Um número (0-9)", ok: /[0-9]/.test(senha) },
