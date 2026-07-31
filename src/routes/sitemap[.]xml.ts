@@ -1,43 +1,21 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 
+import { entradasDoSitemap, montarSitemapXml } from "@/lib/sitemap";
+
 const BASE_URL = "https://precifica-facil-legal.lovable.app";
 
-interface SitemapEntry {
-  path: string;
-  changefreq?: "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never";
-  priority?: string;
-}
+// Lista os arquivos de rota em tempo de build (sem importar os módulos),
+// para o sitemap acompanhar automaticamente as páginas públicas do app.
+const ARQUIVOS_DE_ROTA = Object.keys(
+  import.meta.glob("/src/routes/**/*.{ts,tsx}", { eager: false }),
+);
 
 export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
       GET: async () => {
-        const entries: SitemapEntry[] = [
-          { path: "/", changefreq: "weekly", priority: "1.0" },
-          { path: "/login", changefreq: "monthly", priority: "0.8" },
-          { path: "/cadastro", changefreq: "monthly", priority: "0.8" },
-          { path: "/recuperar-senha", changefreq: "yearly", priority: "0.3" },
-        ];
-
-        const urls = entries.map((e) =>
-          [
-            `  <url>`,
-            `    <loc>${BASE_URL}${e.path}</loc>`,
-            e.changefreq ? `    <changefreq>${e.changefreq}</changefreq>` : null,
-            e.priority ? `    <priority>${e.priority}</priority>` : null,
-            `  </url>`,
-          ]
-            .filter(Boolean)
-            .join("\n"),
-        );
-
-        const xml = [
-          `<?xml version="1.0" encoding="UTF-8"?>`,
-          `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`,
-          ...urls,
-          `</urlset>`,
-        ].join("\n");
+        const xml = montarSitemapXml(BASE_URL, entradasDoSitemap(ARQUIVOS_DE_ROTA));
 
         return new Response(xml, {
           headers: {
