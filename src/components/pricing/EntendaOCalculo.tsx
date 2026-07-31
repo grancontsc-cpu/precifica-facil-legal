@@ -32,16 +32,32 @@ function LinhaMemoria({
 export function EntendaOCalculo({
   state,
   resultado,
+  modo = "completo",
+  comComparacao = false,
 }: {
   state: SimulationState;
   resultado: SimulationResult;
+  modo?: ModoAnalytics;
+  comComparacao?: boolean;
 }) {
   const c = resultado.compra;
   const v = resultado.recomendado;
   const q = state.produto.quantidade;
 
   return (
-    <Accordion type="single" collapsible className="rounded-xl border border-border bg-card px-4">
+    <Accordion
+      type="single"
+      collapsible
+      className="rounded-xl border border-border bg-card px-4"
+      onValueChange={(valor) =>
+        eventoDetalhamentoResultado({
+          secao: "memoria_calculo",
+          aberto: valor === "memoria",
+          modo,
+          comComparacao,
+        })
+      }
+    >
       <AccordionItem value="memoria" className="border-0">
         <AccordionTrigger className="text-sm font-semibold">Entenda o cálculo</AccordionTrigger>
         <AccordionContent>
