@@ -48,20 +48,46 @@ export function ExportarSimulacao({ state, resultado, meta, comparacao }: Props)
 
   const comComparacao = !!comparacaoAtiva;
 
-  const copiar = async (texto: string, mensagem: string) => {
+  const motivo = (e: unknown) =>
+    e instanceof Error ? e.name || "erro" : typeof e === "string" ? e : "desconhecido";
+
+  const imprimir = (formato: "imprimir" | "pdf") => {
     try {
-      await navigator.clipboard.writeText(texto);
-      eventoCopiarResultado({ conteudo: "resumo_whatsapp", sucesso: true });
-      toast.success(mensagem);
-    } catch {
-      eventoCopiarResultado({ conteudo: "resumo_whatsapp", sucesso: false });
-      toast.error("Não foi possível copiar. Selecione o texto manualmente.");
+      window.print();
+      eventoExportarRelatorio({ formato, comComparacao, sucesso: true });
+    } catch (e) {
+      eventoExportarRelatorio({ formato, comComparacao, sucesso: false, erro: motivo(e) });
+      toast.error("Não foi possível abrir a janela de impressão.");
     }
   };
 
-  const imprimir = (formato: "imprimir" | "pdf") => {
-    eventoExportarRelatorio({ formato, comComparacao });
-    window.print();
+  const exportarCsv = () => {
+    try {
+      baixarArquivo(csvRelatorio(rel), nomeArquivo(rel, "csv"), "text/csv;charset=utf-8");
+      eventoExportarRelatorio({ formato: "csv", comComparacao, sucesso: true });
+      toast.success("CSV exportado.");
+    } catch (e) {
+      eventoExportarRelatorio({ formato: "csv", comComparacao, sucesso: false, erro: motivo(e) });
+      toast.error("Não foi possível gerar o CSV.");
+    }
+  };
+
+  const exportarWhatsapp = async () => {
+    try {
+      await navigator.clipboard.writeText(whatsappRelatorio(rel));
+      eventoCopiarResultado({ conteudo: "resumo_whatsapp", sucesso: true });
+      eventoExportarRelatorio({ formato: "whatsapp", comComparacao, sucesso: true });
+      toast.success("Resumo copiado para o WhatsApp.");
+    } catch (e) {
+      eventoCopiarResultado({ conteudo: "resumo_whatsapp", sucesso: false });
+      eventoExportarRelatorio({
+        formato: "whatsapp",
+        comComparacao,
+        sucesso: false,
+        erro: motivo(e),
+      });
+      toast.error("Não foi possível copiar. Selecione o texto manualmente.");
+    }
   };
 
   return (
@@ -124,26 +150,11 @@ export function ExportarSimulacao({ state, resultado, meta, comparacao }: Props)
             <FileDown className="h-4 w-4" aria-hidden />
             Gerar PDF
           </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => {
-              eventoExportarRelatorio({ formato: "csv", comComparacao });
-              baixarArquivo(csvRelatorio(rel), nomeArquivo(rel, "csv"), "text/csv;charset=utf-8");
-              toast.success("CSV exportado.");
-            }}
-          >
+          <Button size="sm" variant="outline" onClick={exportarCsv}>
             <FileSpreadsheet className="h-4 w-4" aria-hidden />
             Exportar CSV
           </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => {
-              eventoExportarRelatorio({ formato: "whatsapp", comComparacao });
-              void copiar(whatsappRelatorio(rel), "Resumo copiado para o WhatsApp.");
-            }}
-          >
+          <Button size="sm" variant="outline" onClick={() => void exportarWhatsapp()}>
             <Copy className="h-4 w-4" aria-hidden />
             Copiar resumo WhatsApp
           </Button>

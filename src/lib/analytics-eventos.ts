@@ -120,13 +120,20 @@ export function eventoExportarRelatorio(params: {
   formato: FormatoExportacao;
   modo?: ModoAnalytics;
   comComparacao?: boolean;
+  /** Resultado da exportação; quando omitido, considera-se sucesso. */
+  sucesso?: boolean;
+  /** Motivo curto da falha (nunca inclua dados do cliente ou do produto). */
+  erro?: string;
 }) {
+  const sucesso = params.sucesso !== false;
   enviar(
-    "exportar_relatorio",
+    sucesso ? "exportar_relatorio" : "exportar_relatorio_falha",
     {
       formato_exportacao: params.formato,
       modo_simulador: params.modo,
       com_comparacao: params.comComparacao,
+      exportacao_sucesso: sucesso,
+      erro_exportacao: sucesso ? undefined : (params.erro ?? "desconhecido"),
     },
     params.modo,
   );
