@@ -88,6 +88,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "Simulador de precificação: custo líquido de aquisição, créditos tributários e preço de venda recomendado.",
       },
       { name: "author", content: "Grancont" },
+      { name: "google-site-verification", content: "ubZZVcdFG3gdMEA9ccegfi4H9YGjYXxiy71bmcYPplI" },
+
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
