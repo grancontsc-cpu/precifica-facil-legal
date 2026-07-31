@@ -9,7 +9,7 @@ import { Carregando, ExigePapel } from "@/components/app/GuardaAcesso";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { atualizarLicenca, listarLicencas } from "@/lib/licencas.functions";
+import { atualizarLicenca, listarLicencas, type AcaoLicenca } from "@/lib/licencas.functions";
 
 import { ROTULO_LICENCA, avaliarLicenca, type Licenca, type StatusLicenca } from "@/lib/licencas";
 
