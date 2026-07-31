@@ -219,7 +219,13 @@ function ModoRapido() {
         </p>
       </header>
 
-      <Trilha passo={passo} />
+      <Trilha passo={passo} maxPasso={maxPasso} onIr={irPara} />
+      {maxPasso >= 5 ? (
+        <p className="-mt-3 text-center text-xs text-muted-foreground">
+          Toque em qualquer etapa acima para ajustar valores, margem ou tributos e ver o preço
+          recalculado.
+        </p>
+      ) : null}
 
       <div className="rounded-xl border border-border bg-surface p-5 sm:p-6">
         {passo === 1 ? (
