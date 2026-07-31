@@ -40,6 +40,7 @@ function LoginPage() {
   const [carregando, setCarregando] = useState(false);
   const [situacaoEmail, setSituacaoEmail] = useState<"desconhecida" | "cadastrado" | "novo">("desconhecida");
   const [dialogo, setDialogo] = useState(false);
+  const [pendenteConfirmacao, setPendenteConfirmacao] = useState<string | null>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
