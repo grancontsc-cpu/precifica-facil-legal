@@ -4,7 +4,9 @@
  * verifica os indicadores verde (atendido) / vermelho (pendente), a barra de
  * força e a validação de confirmação — os mesmos em todas as telas de senha.
  */
+import "@testing-library/jest-dom/vitest";
 import { describe, expect, it, afterEach } from "vitest";
+
 import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
