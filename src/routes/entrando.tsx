@@ -36,7 +36,7 @@ function Entrando() {
       }
 
       try {
-        await provisionarConta({ data: undefined });
+        await provisionarConta();
       } catch {
         /* provisionamento tolerante a falha: o guarda de acesso decide o destino */
       }
