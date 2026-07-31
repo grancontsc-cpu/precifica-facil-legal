@@ -115,6 +115,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             })}
           </nav>
         </div>
+        {situacaoLicenca.emTeste && situacaoLicenca.liberado && (
+          <div className="border-t border-border bg-primary/10 px-4 py-2 text-center text-xs text-foreground sm:px-6">
+            Teste gratuito: <strong>{situacaoLicenca.diasRestantes} dia(s)</strong> restantes. Depois desse prazo, o
+            acesso depende da liberação do Administrador Grancont.
+          </div>
+        )}
       </header>
       {children}
     </div>
