@@ -22,7 +22,12 @@ import {
   whatsappRelatorio,
   type RelatorioMeta,
 } from "@/lib/report";
-import { eventoCopiarResultado, eventoExportarRelatorio } from "@/lib/analytics-eventos";
+import {
+  eventoComparacaoRelatorio,
+  eventoCopiarResultado,
+  eventoExportarRelatorio,
+} from "@/lib/analytics-eventos";
+import { Switch } from "@/components/ui/switch";
 import type { SupplierComparison } from "@/types/comparison";
 import type { SimulationResult, SimulationState } from "@/types/pricing";
 
@@ -36,10 +41,12 @@ interface Props {
 export function ExportarSimulacao({ state, resultado, meta, comparacao }: Props) {
   const [aberto, setAberto] = useState(false);
   const [observacoes, setObservacoes] = useState("");
+  const [incluirComparacao, setIncluirComparacao] = useState(true);
 
-  const rel = montarRelatorio(state, resultado, { ...meta, observacoes }, comparacao ?? null);
+  const comparacaoAtiva = comparacao && incluirComparacao ? comparacao : null;
+  const rel = montarRelatorio(state, resultado, { ...meta, observacoes }, comparacaoAtiva);
 
-  const comComparacao = !!comparacao;
+  const comComparacao = !!comparacaoAtiva;
 
   const copiar = async (texto: string, mensagem: string) => {
     try {
