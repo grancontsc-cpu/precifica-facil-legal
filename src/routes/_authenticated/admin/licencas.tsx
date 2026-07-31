@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { atualizarLicenca, listarLicencas } from "@/lib/licencas.functions";
+
 import { ROTULO_LICENCA, avaliarLicenca, type Licenca, type StatusLicenca } from "@/lib/licencas";
 
 const TITULO = "Licenças — Administração Precifica Grancont";
@@ -59,7 +60,13 @@ function PainelLicencas() {
   });
 
   const acao = useMutation({
-    mutationFn: async (v: Parameters<typeof atualizarLicenca>[0]["data"]) => atualizar({ data: v }),
+    mutationFn: async (v: {
+      userId: string;
+      acao: "ativar" | "suspender" | "expirar" | "estender_teste" | "reiniciar_teste";
+      dias?: number;
+      validade?: string | null;
+      observacao?: string;
+    }) => atualizar({ data: v }),
     onSuccess: () => {
       toast.success("Licença atualizada.");
       queryClient.invalidateQueries({ queryKey: ["admin", "licencas"] });
