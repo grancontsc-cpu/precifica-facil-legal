@@ -210,8 +210,9 @@ export function aplicarRegime(state: SimulationState, regime: Regime): Simulatio
 
 export function estadoInicial(): SimulationState {
   return {
-
+    produto: {
       nome: "",
+
       sku: "",
       ncm: "",
       unidade: "unidade",
