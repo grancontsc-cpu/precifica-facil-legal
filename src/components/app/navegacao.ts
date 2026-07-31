@@ -1,4 +1,5 @@
 import {
+  BarChart3,
   Building2,
   Calculator,
   ClipboardList,
