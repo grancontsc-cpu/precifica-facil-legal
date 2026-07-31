@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import {
+  eventoDetalhamentoResultado,
   eventoParametroFiscal,
   eventoSimulacaoIniciada,
   eventoSimular,
@@ -82,5 +83,31 @@ describe("eventos de analytics do simulador", () => {
         resultado_valido: true,
       },
     ]);
+  });
+
+  it("registra a abertura do detalhamento com a seção e a comparação", () => {
+    eventoDetalhamentoResultado({
+      secao: "memoria_calculo",
+      aberto: true,
+      modo: "completo",
+      comComparacao: true,
+    });
+    expect(enviados[0]).toEqual([
+      "event",
+      "detalhamento_resultado",
+      {
+        secao_detalhamento: "memoria_calculo",
+        detalhamento_aberto: true,
+        modo_simulador: "completo",
+        com_comparacao: true,
+      },
+    ]);
+  });
+
+  it("marca com_comparacao como falso quando não há comparação de fornecedores", () => {
+    eventoDetalhamentoResultado({ secao: "memoria_calculo", aberto: false, modo: "simples" });
+    const params = enviados[0]![2] as Record<string, unknown>;
+    expect(params.com_comparacao).toBe(false);
+    expect(params.detalhamento_aberto).toBe(false);
   });
 });

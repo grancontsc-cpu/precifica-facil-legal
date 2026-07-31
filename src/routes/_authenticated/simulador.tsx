@@ -1060,7 +1060,12 @@ function Simulador() {
 
               <PainelFronteira state={state} resultado={resultado} />
 
-              <EntendaOCalculo state={state} resultado={resultado} />
+              <EntendaOCalculo
+                state={state}
+                resultado={resultado}
+                modo={state.modoAvancado ? "completo" : "simples"}
+                comComparacao={Boolean(comparacaoParaRelatorio)}
+              />
 
 
               <footer className="rounded-xl border border-border bg-surface p-4 text-xs leading-relaxed text-muted-foreground">
