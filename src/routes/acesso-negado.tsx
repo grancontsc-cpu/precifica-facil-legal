@@ -30,6 +30,7 @@ export const Route = createFileRoute("/acesso-negado")({
           ao administrador.
         </p>
         <div className="mt-6 grid gap-2">
+          <SolicitarAcessoAdmin className="w-full" />
           <Button variant="outline" onClick={() => window.history.back()}>
             Voltar
           </Button>
