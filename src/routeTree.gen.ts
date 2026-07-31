@@ -10,11 +10,11 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as RedefinirSenhaRouteImport } from './routes/redefinir-senha'
+import { Route as RecuperarSenhaRouteImport } from './routes/recuperar-senha'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as EsqueciMinhaSenhaRouteImport } from './routes/esqueci-minha-senha'
 import { Route as EntrandoRouteImport } from './routes/entrando'
 import { Route as ConfirmarEmailRouteImport } from './routes/confirmar-email'
-import { Route as CadastrarRouteImport } from './routes/cadastrar'
+import { Route as CadastroRouteImport } from './routes/cadastro'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AguardandoAprovacaoRouteImport } from './routes/aguardando-aprovacao'
 import { Route as AcessoNegadoRouteImport } from './routes/acesso-negado'
@@ -47,14 +47,14 @@ const RedefinirSenhaRoute = RedefinirSenhaRouteImport.update({
   path: '/redefinir-senha',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RecuperarSenhaRoute = RecuperarSenhaRouteImport.update({
+  id: '/recuperar-senha',
+  path: '/recuperar-senha',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EsqueciMinhaSenhaRoute = EsqueciMinhaSenhaRouteImport.update({
-  id: '/esqueci-minha-senha',
-  path: '/esqueci-minha-senha',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EntrandoRoute = EntrandoRouteImport.update({
@@ -67,9 +67,9 @@ const ConfirmarEmailRoute = ConfirmarEmailRouteImport.update({
   path: '/confirmar-email',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CadastrarRoute = CadastrarRouteImport.update({
-  id: '/cadastrar',
-  path: '/cadastrar',
+const CadastroRoute = CadastroRouteImport.update({
+  id: '/cadastro',
+  path: '/cadastro',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -220,11 +220,11 @@ export interface FileRoutesByFullPath {
   '/acesso-negado': typeof AcessoNegadoRoute
   '/aguardando-aprovacao': typeof AguardandoAprovacaoRoute
   '/auth': typeof AuthRoute
-  '/cadastrar': typeof CadastrarRoute
+  '/cadastro': typeof CadastroRoute
   '/confirmar-email': typeof ConfirmarEmailRoute
   '/entrando': typeof EntrandoRoute
-  '/esqueci-minha-senha': typeof EsqueciMinhaSenhaRoute
   '/login': typeof LoginRoute
+  '/recuperar-senha': typeof RecuperarSenhaRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
   '/auditoria': typeof AuthenticatedAuditoriaRoute
   '/comparar': typeof AuthenticatedCompararRoute
@@ -253,11 +253,11 @@ export interface FileRoutesByTo {
   '/acesso-negado': typeof AcessoNegadoRoute
   '/aguardando-aprovacao': typeof AguardandoAprovacaoRoute
   '/auth': typeof AuthRoute
-  '/cadastrar': typeof CadastrarRoute
+  '/cadastro': typeof CadastroRoute
   '/confirmar-email': typeof ConfirmarEmailRoute
   '/entrando': typeof EntrandoRoute
-  '/esqueci-minha-senha': typeof EsqueciMinhaSenhaRoute
   '/login': typeof LoginRoute
+  '/recuperar-senha': typeof RecuperarSenhaRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
   '/auditoria': typeof AuthenticatedAuditoriaRoute
   '/comparar': typeof AuthenticatedCompararRoute
@@ -288,11 +288,11 @@ export interface FileRoutesById {
   '/acesso-negado': typeof AcessoNegadoRoute
   '/aguardando-aprovacao': typeof AguardandoAprovacaoRoute
   '/auth': typeof AuthRoute
-  '/cadastrar': typeof CadastrarRoute
+  '/cadastro': typeof CadastroRoute
   '/confirmar-email': typeof ConfirmarEmailRoute
   '/entrando': typeof EntrandoRoute
-  '/esqueci-minha-senha': typeof EsqueciMinhaSenhaRoute
   '/login': typeof LoginRoute
+  '/recuperar-senha': typeof RecuperarSenhaRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
   '/_authenticated/auditoria': typeof AuthenticatedAuditoriaRoute
   '/_authenticated/comparar': typeof AuthenticatedCompararRoute
@@ -323,11 +323,11 @@ export interface FileRouteTypes {
     | '/acesso-negado'
     | '/aguardando-aprovacao'
     | '/auth'
-    | '/cadastrar'
+    | '/cadastro'
     | '/confirmar-email'
     | '/entrando'
-    | '/esqueci-minha-senha'
     | '/login'
+    | '/recuperar-senha'
     | '/redefinir-senha'
     | '/auditoria'
     | '/comparar'
@@ -356,11 +356,11 @@ export interface FileRouteTypes {
     | '/acesso-negado'
     | '/aguardando-aprovacao'
     | '/auth'
-    | '/cadastrar'
+    | '/cadastro'
     | '/confirmar-email'
     | '/entrando'
-    | '/esqueci-minha-senha'
     | '/login'
+    | '/recuperar-senha'
     | '/redefinir-senha'
     | '/auditoria'
     | '/comparar'
@@ -390,11 +390,11 @@ export interface FileRouteTypes {
     | '/acesso-negado'
     | '/aguardando-aprovacao'
     | '/auth'
-    | '/cadastrar'
+    | '/cadastro'
     | '/confirmar-email'
     | '/entrando'
-    | '/esqueci-minha-senha'
     | '/login'
+    | '/recuperar-senha'
     | '/redefinir-senha'
     | '/_authenticated/auditoria'
     | '/_authenticated/comparar'
@@ -425,11 +425,11 @@ export interface RootRouteChildren {
   AcessoNegadoRoute: typeof AcessoNegadoRoute
   AguardandoAprovacaoRoute: typeof AguardandoAprovacaoRoute
   AuthRoute: typeof AuthRoute
-  CadastrarRoute: typeof CadastrarRoute
+  CadastroRoute: typeof CadastroRoute
   ConfirmarEmailRoute: typeof ConfirmarEmailRoute
   EntrandoRoute: typeof EntrandoRoute
-  EsqueciMinhaSenhaRoute: typeof EsqueciMinhaSenhaRoute
   LoginRoute: typeof LoginRoute
+  RecuperarSenhaRoute: typeof RecuperarSenhaRoute
   RedefinirSenhaRoute: typeof RedefinirSenhaRoute
 }
 
@@ -442,18 +442,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RedefinirSenhaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/recuperar-senha': {
+      id: '/recuperar-senha'
+      path: '/recuperar-senha'
+      fullPath: '/recuperar-senha'
+      preLoaderRoute: typeof RecuperarSenhaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/esqueci-minha-senha': {
-      id: '/esqueci-minha-senha'
-      path: '/esqueci-minha-senha'
-      fullPath: '/esqueci-minha-senha'
-      preLoaderRoute: typeof EsqueciMinhaSenhaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/entrando': {
@@ -470,11 +470,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConfirmarEmailRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/cadastrar': {
-      id: '/cadastrar'
-      path: '/cadastrar'
-      fullPath: '/cadastrar'
-      preLoaderRoute: typeof CadastrarRouteImport
+    '/cadastro': {
+      id: '/cadastro'
+      path: '/cadastro'
+      fullPath: '/cadastro'
+      preLoaderRoute: typeof CadastroRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -718,13 +718,23 @@ const rootRouteChildren: RootRouteChildren = {
   AcessoNegadoRoute: AcessoNegadoRoute,
   AguardandoAprovacaoRoute: AguardandoAprovacaoRoute,
   AuthRoute: AuthRoute,
-  CadastrarRoute: CadastrarRoute,
+  CadastroRoute: CadastroRoute,
   ConfirmarEmailRoute: ConfirmarEmailRoute,
   EntrandoRoute: EntrandoRoute,
-  EsqueciMinhaSenhaRoute: EsqueciMinhaSenhaRoute,
   LoginRoute: LoginRoute,
+  RecuperarSenhaRoute: RecuperarSenhaRoute,
   RedefinirSenhaRoute: RedefinirSenhaRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
