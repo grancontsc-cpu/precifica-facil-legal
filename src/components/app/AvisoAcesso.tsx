@@ -1,19 +1,23 @@
 import { ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { SolicitarAcesso } from "@/components/app/SolicitarAcesso";
 import { MENSAGENS_ACESSO, type CodigoAcesso } from "@/lib/acesso-simulacao";
 
 interface AvisoAcessoProps {
   codigo: CodigoAcesso;
   /** Ações opcionais exibidas abaixo da mensagem. */
   acoes?: { rotulo: string; onClick: () => void; variante?: "default" | "outline" }[];
+  /** Exibe o botão "Solicitar acesso" com o id da simulação da URL. */
+  solicitacao?: { simulacaoId?: string | null };
 }
 
 /**
  * Aviso padrão de acesso negado. Mostra apenas mensagens genéricas do catálogo
  * (src/lib/acesso-simulacao.ts) — nunca dados do registro solicitado.
  */
-export function AvisoAcesso({ codigo, acoes = [] }: AvisoAcessoProps) {
+export function AvisoAcesso({ codigo, acoes = [], solicitacao }: AvisoAcessoProps) {
   const msg = MENSAGENS_ACESSO[codigo];
+
   return (
     <main className="mx-auto w-full max-w-2xl px-4 py-10 sm:py-16">
       <div
