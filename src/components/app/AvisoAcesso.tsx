@@ -42,7 +42,11 @@ export function AvisoAcesso({ codigo, acoes = [], solicitacao }: AvisoAcessoProp
                 {a.rotulo}
               </Button>
             ))}
+            {solicitacao && (
+              <SolicitarAcesso simulacaoId={solicitacao.simulacaoId} motivoCodigo={codigo} />
+            )}
           </div>
+
         )}
       </div>
     </main>
