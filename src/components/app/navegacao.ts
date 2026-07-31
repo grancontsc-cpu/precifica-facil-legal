@@ -5,6 +5,7 @@ import {
   History,
   KeyRound,
   LayoutDashboard,
+  Mail,
   MailPlus,
   Package,
   Percent,
@@ -117,6 +118,13 @@ export const NAV_ADMIN: ItemNav[] = [
     label: "Solicitações de acesso",
     descricao: "Pedidos aguardando sua resposta",
     icon: ShieldQuestion,
+    acesso: "super_admin",
+  },
+  {
+    to: "/admin/emails",
+    label: "E-mails",
+    descricao: "Teste e histórico dos e-mails do sistema",
+    icon: Mail,
     acesso: "super_admin",
   },
   {
