@@ -457,6 +457,8 @@ function Simulador() {
     return (
       <AvisoAcesso
         codigo={acessoSimulacao.codigo ?? "sem_permissao_leitura"}
+        solicitacao={{ simulacaoId }}
+
         acoes={[
           {
             rotulo: "Nova simulação",
