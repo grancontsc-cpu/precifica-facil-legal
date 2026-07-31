@@ -30,7 +30,7 @@ export function AvisoAcesso({ codigo, acoes = [], solicitacao }: AvisoAcessoProp
         <h1 className="mt-4 text-lg font-semibold text-foreground">{msg.titulo}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{msg.descricao}</p>
         <p className="mt-1 text-sm text-muted-foreground">{msg.orientacao}</p>
-        {acoes.length > 0 && (
+        {(acoes.length > 0 || solicitacao) && (
           <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-center">
             {acoes.map((a) => (
               <Button
