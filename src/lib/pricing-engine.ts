@@ -1,10 +1,12 @@
 import Decimal from "decimal.js";
 import type {
   MarginBase,
+  OperacaoFiscal,
   ProdutoCompra,
   PurchaseResult,
   PurchaseTax,
   PurchaseTaxResult,
+  Regime,
   SaleEvaluation,
   SaleTax,
   SaleTaxResult,
@@ -13,6 +15,7 @@ import type {
   ValidationIssue,
   VendaConfig,
 } from "@/types/pricing";
+
 
 /**
  * Motor de precificação — funções puras, sem dependência de interface.
