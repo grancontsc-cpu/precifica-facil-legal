@@ -338,6 +338,29 @@ function Simulador() {
 
   const operacao = state.operacao ?? operacaoPadrao();
 
+  // O simulador completo recalcula em tempo real: registramos "simular" quando
+  // o usuário para de editar e o resultado se estabiliza.
+  useEffect(() => {
+    const id = window.setTimeout(() => {
+      eventoSimular({
+        modo,
+        regime: operacao.regime,
+        ufOrigem: operacao.ufOrigem,
+        ufDestino: operacao.ufDestino,
+        possuiResultado: !!resultado.recomendado,
+      });
+    }, 1500);
+    return () => window.clearTimeout(id);
+  }, [resultado, modo, operacao.regime, operacao.ufOrigem, operacao.ufDestino]);
+
+  // Abertura da tela: nova simulação ou simulação carregada do histórico.
+  useEffect(() => {
+    eventoSimulacaoIniciada({ modo: "simples", origem: simulacaoId ? "carregada" : "nova" });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [simulacaoId]);
+
+
+
   const setOperacao = (patch: Partial<OperacaoFiscal>) => {
     for (const [campo, valor] of Object.entries(patch)) {
       eventoParametroFiscal({ modo, campo, valor: valor as string | number | boolean });
