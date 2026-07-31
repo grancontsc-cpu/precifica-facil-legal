@@ -46,6 +46,7 @@ import { Route as AuthenticatedGestaoConvitesRouteImport } from './routes/_authe
 import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authenticated/admin/usuarios'
 import { Route as AuthenticatedAdminSolicitacoesRouteImport } from './routes/_authenticated/admin/solicitacoes'
 import { Route as AuthenticatedAdminSimulacoesRouteImport } from './routes/_authenticated/admin/simulacoes'
+import { Route as AuthenticatedAdminSeoRouteImport } from './routes/_authenticated/admin/seo'
 import { Route as AuthenticatedAdminPerfisTributariosRouteImport } from './routes/_authenticated/admin/perfis-tributarios'
 import { Route as AuthenticatedAdminLicencasRouteImport } from './routes/_authenticated/admin/licencas'
 import { Route as AuthenticatedAdminEmpresasRouteImport } from './routes/_authenticated/admin/empresas'
@@ -244,6 +245,11 @@ const AuthenticatedAdminSimulacoesRoute =
     path: '/admin/simulacoes',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminSeoRoute = AuthenticatedAdminSeoRouteImport.update({
+  id: '/admin/seo',
+  path: '/admin/seo',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAdminPerfisTributariosRoute =
   AuthenticatedAdminPerfisTributariosRouteImport.update({
     id: '/admin/perfis-tributarios',
@@ -315,6 +321,7 @@ export interface FileRoutesByFullPath {
   '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
   '/admin/licencas': typeof AuthenticatedAdminLicencasRoute
   '/admin/perfis-tributarios': typeof AuthenticatedAdminPerfisTributariosRoute
+  '/admin/seo': typeof AuthenticatedAdminSeoRoute
   '/admin/simulacoes': typeof AuthenticatedAdminSimulacoesRoute
   '/admin/solicitacoes': typeof AuthenticatedAdminSolicitacoesRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
@@ -359,6 +366,7 @@ export interface FileRoutesByTo {
   '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
   '/admin/licencas': typeof AuthenticatedAdminLicencasRoute
   '/admin/perfis-tributarios': typeof AuthenticatedAdminPerfisTributariosRoute
+  '/admin/seo': typeof AuthenticatedAdminSeoRoute
   '/admin/simulacoes': typeof AuthenticatedAdminSimulacoesRoute
   '/admin/solicitacoes': typeof AuthenticatedAdminSolicitacoesRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
@@ -405,6 +413,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
   '/_authenticated/admin/licencas': typeof AuthenticatedAdminLicencasRoute
   '/_authenticated/admin/perfis-tributarios': typeof AuthenticatedAdminPerfisTributariosRoute
+  '/_authenticated/admin/seo': typeof AuthenticatedAdminSeoRoute
   '/_authenticated/admin/simulacoes': typeof AuthenticatedAdminSimulacoesRoute
   '/_authenticated/admin/solicitacoes': typeof AuthenticatedAdminSolicitacoesRoute
   '/_authenticated/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
@@ -451,6 +460,7 @@ export interface FileRouteTypes {
     | '/admin/empresas'
     | '/admin/licencas'
     | '/admin/perfis-tributarios'
+    | '/admin/seo'
     | '/admin/simulacoes'
     | '/admin/solicitacoes'
     | '/admin/usuarios'
@@ -495,6 +505,7 @@ export interface FileRouteTypes {
     | '/admin/empresas'
     | '/admin/licencas'
     | '/admin/perfis-tributarios'
+    | '/admin/seo'
     | '/admin/simulacoes'
     | '/admin/solicitacoes'
     | '/admin/usuarios'
@@ -540,6 +551,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/empresas'
     | '/_authenticated/admin/licencas'
     | '/_authenticated/admin/perfis-tributarios'
+    | '/_authenticated/admin/seo'
     | '/_authenticated/admin/simulacoes'
     | '/_authenticated/admin/solicitacoes'
     | '/_authenticated/admin/usuarios'
@@ -837,6 +849,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminSimulacoesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/seo': {
+      id: '/_authenticated/admin/seo'
+      path: '/admin/seo'
+      fullPath: '/admin/seo'
+      preLoaderRoute: typeof AuthenticatedAdminSeoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/perfis-tributarios': {
       id: '/_authenticated/admin/perfis-tributarios'
       path: '/admin/perfis-tributarios'
@@ -896,6 +915,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminEmpresasRoute: typeof AuthenticatedAdminEmpresasRoute
   AuthenticatedAdminLicencasRoute: typeof AuthenticatedAdminLicencasRoute
   AuthenticatedAdminPerfisTributariosRoute: typeof AuthenticatedAdminPerfisTributariosRoute
+  AuthenticatedAdminSeoRoute: typeof AuthenticatedAdminSeoRoute
   AuthenticatedAdminSimulacoesRoute: typeof AuthenticatedAdminSimulacoesRoute
   AuthenticatedAdminSolicitacoesRoute: typeof AuthenticatedAdminSolicitacoesRoute
   AuthenticatedAdminUsuariosRoute: typeof AuthenticatedAdminUsuariosRoute
@@ -921,6 +941,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminLicencasRoute: AuthenticatedAdminLicencasRoute,
   AuthenticatedAdminPerfisTributariosRoute:
     AuthenticatedAdminPerfisTributariosRoute,
+  AuthenticatedAdminSeoRoute: AuthenticatedAdminSeoRoute,
   AuthenticatedAdminSimulacoesRoute: AuthenticatedAdminSimulacoesRoute,
   AuthenticatedAdminSolicitacoesRoute: AuthenticatedAdminSolicitacoesRoute,
   AuthenticatedAdminUsuariosRoute: AuthenticatedAdminUsuariosRoute,
