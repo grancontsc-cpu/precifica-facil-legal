@@ -43,7 +43,7 @@ export function ForcaSenha({
 
   // Anúncio com atraso: evita ler cada tecla digitada.
   const [anuncio, setAnuncio] = useState("");
-  const timer = useRef<ReturnType<typeof setTimeout>>();
+  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   useEffect(() => {
     clearTimeout(timer.current);
     timer.current = setTimeout(() => setAnuncio(resumo), 700);
