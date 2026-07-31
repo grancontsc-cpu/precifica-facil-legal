@@ -146,6 +146,8 @@ function Simulador() {
     userId,
     email,
     organizations,
+    empresa,
+
     memberships,
     isSuperAdmin,
     accountStatus,
