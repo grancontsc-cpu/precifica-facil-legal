@@ -98,8 +98,10 @@ function LoginPage() {
   };
 
   return (
-    <main className="grid min-h-screen lg:grid-cols-[1.05fr_1fr]">
+    <>
       <Toaster />
+      <main className="grid min-h-screen lg:grid-cols-[1.05fr_1fr]">
+
 
       {/* Painel de contexto: prova, autoridade e resultado esperado antes do formulário. */}
       <aside className="relative hidden overflow-hidden bg-graphite px-12 py-14 lg:flex lg:flex-col lg:justify-between">
