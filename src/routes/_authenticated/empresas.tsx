@@ -14,6 +14,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { UFS, ufValida } from "@/lib/aliquotas";
+import { REGIMES, nomeRegime } from "@/lib/pricing-engine";
+import type { Regime } from "@/types/pricing";
 import { useApp } from "@/hooks/useApp";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -39,6 +42,8 @@ function EmpresasPage() {
   const qc = useQueryClient();
   const [nome, setNome] = useState("");
   const [cnpj, setCnpj] = useState("");
+  const [uf, setUf] = useState("");
+  const [regime, setRegime] = useState<Regime>("real");
   const [selecionada, setSelecionada] = useState<string | null>(null);
 
   const orgs = useQuery({
@@ -46,7 +51,7 @@ function EmpresasPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("organizations")
-        .select("id, name, cnpj, active, default_tax_profile_id, created_at")
+        .select("id, name, cnpj, uf, regime, active, default_tax_profile_id, created_at")
         .order("name");
       if (error) throw error;
       return data;
@@ -91,9 +96,13 @@ function EmpresasPage() {
   const criar = useMutation({
     mutationFn: async () => {
       if (!nome.trim()) throw new Error("Informe o nome da empresa.");
+      if (!cnpj.trim()) throw new Error("Informe o CNPJ da empresa.");
+      if (!ufValida(uf)) throw new Error("Informe o estado (UF) da empresa.");
       const { error } = await supabase.from("organizations").insert({
         name: nome.trim(),
-        cnpj: cnpj.trim() || null,
+        cnpj: cnpj.trim(),
+        uf,
+        regime,
         created_by: userId,
       });
       if (error) throw error;
@@ -101,6 +110,8 @@ function EmpresasPage() {
     onSuccess: () => {
       setNome("");
       setCnpj("");
+      setUf("");
+      setRegime("real");
       toast.success("Empresa cadastrada.");
       qc.invalidateQueries({ queryKey: ["organizations"] });
     },
@@ -167,7 +178,11 @@ function EmpresasPage() {
 
       <section className="mt-6 rounded-xl border border-border bg-card p-5">
         <h2 className="text-sm font-semibold text-foreground">Nova empresa</h2>
-        <div className="mt-3 grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
+        <p className="mt-1 text-xs text-muted-foreground">
+          O CNPJ, o estado e o regime são obrigatórios: é com eles que o simulador calcula o ICMS de
+          fronteira e o tratamento dos créditos.
+        </p>
+        <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_1fr_auto]">
           <div className="space-y-1.5">
             <Label htmlFor="org-nome">Nome</Label>
             <Input id="org-nome" value={nome} onChange={(e) => setNome(e.target.value)} maxLength={120} />
@@ -175,6 +190,36 @@ function EmpresasPage() {
           <div className="space-y-1.5">
             <Label htmlFor="org-cnpj">CNPJ</Label>
             <Input id="org-cnpj" value={cnpj} onChange={(e) => setCnpj(e.target.value)} maxLength={20} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="org-uf">Estado (UF)</Label>
+            <Select value={uf || undefined} onValueChange={setUf}>
+              <SelectTrigger id="org-uf">
+                <SelectValue placeholder="Selecione" />
+              </SelectTrigger>
+              <SelectContent>
+                {UFS.map((u) => (
+                  <SelectItem key={u.sigla} value={u.sigla}>
+                    {u.sigla} — {u.nome}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="org-regime">Regime tributário</Label>
+            <Select value={regime} onValueChange={(v) => setRegime(v as Regime)}>
+              <SelectTrigger id="org-regime">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {REGIMES.map((r) => (
+                  <SelectItem key={r.id} value={r.id}>
+                    {r.nome}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="flex items-end">
             <Button onClick={() => criar.mutate()} disabled={criar.isPending}>
@@ -190,7 +235,9 @@ function EmpresasPage() {
             <div className="flex flex-wrap items-center gap-3">
               <div className="min-w-0 flex-1">
                 <p className="font-medium text-foreground">{o.name}</p>
-                <p className="text-xs text-muted-foreground">{o.cnpj ?? "sem CNPJ"}</p>
+                  <p className="text-xs text-muted-foreground">
+                  {(o.cnpj ?? "sem CNPJ") + " · " + (o.uf ?? "UF não informada") + " · " + nomeRegime(o.regime as Regime)}
+                </p>
               </div>
               <Badge variant={o.active ? "secondary" : "outline"}>{o.active ? "Ativa" : "Inativa"}</Badge>
               <Select
