@@ -111,8 +111,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         children: `window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', '${GA_MEASUREMENT_ID}');`,
       },
-
+      {
         type: "application/ld+json",
+
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "SoftwareApplication",
