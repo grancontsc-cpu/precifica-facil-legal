@@ -144,7 +144,7 @@ function Simulador() {
 
   const [state, setState] = useState<SimulationState>(() => estadoInicial());
   const [salvoEm, setSalvoEm] = useState<Date | null>(null);
-  const [carregado, setCarregado] = useState(false);
+  const [, setCarregado] = useState(false);
   const [titulo, setTitulo] = useState("Nova simulação");
   const [perfilId, setPerfilId] = useState<string | null>(null);
   const [produtoId, setProdutoId] = useState<string | null>(produtoQuery ?? null);
