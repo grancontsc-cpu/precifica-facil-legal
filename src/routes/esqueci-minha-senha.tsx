@@ -2,11 +2,13 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { DialogoCadastrar } from "@/components/app/DialogoCadastrar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { verificarEmailCadastrado } from "@/lib/conta.functions";
 
 const TITULO = "Recuperar senha — Precifica Grancont";
 const DESCRICAO = "Solicite um link seguro para redefinir a senha do seu acesso ao Precifica Grancont.";
