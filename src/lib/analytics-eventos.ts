@@ -148,3 +148,28 @@ export function eventoCopiarResultado(params: {
     params.modo,
   );
 }
+
+/** Seções de detalhamento das parcelas do resultado. */
+export type SecaoDetalhamento = "memoria_calculo" | "fronteira" | "suposicoes_fiscais";
+
+/**
+ * O usuário expandiu (ou recolheu) o detalhamento das parcelas do resultado:
+ * custos de compra, tributos e margem.
+ */
+export function eventoDetalhamentoResultado(params: {
+  secao: SecaoDetalhamento;
+  aberto: boolean;
+  modo?: ModoAnalytics;
+  comComparacao?: boolean;
+}) {
+  enviar(
+    "detalhamento_resultado",
+    {
+      secao_detalhamento: params.secao,
+      detalhamento_aberto: params.aberto,
+      modo_simulador: params.modo,
+      com_comparacao: Boolean(params.comComparacao),
+    },
+    params.modo,
+  );
+}
