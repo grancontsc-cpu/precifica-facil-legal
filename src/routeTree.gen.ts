@@ -45,6 +45,7 @@ import { Route as AuthenticatedAdminSimulacoesRouteImport } from './routes/_auth
 import { Route as AuthenticatedAdminPerfisTributariosRouteImport } from './routes/_authenticated/admin/perfis-tributarios'
 import { Route as AuthenticatedAdminLicencasRouteImport } from './routes/_authenticated/admin/licencas'
 import { Route as AuthenticatedAdminEmpresasRouteImport } from './routes/_authenticated/admin/empresas'
+import { Route as AuthenticatedAdminEmailsRouteImport } from './routes/_authenticated/admin/emails'
 import { Route as AuthenticatedAdminConvitesRouteImport } from './routes/_authenticated/admin/convites'
 import { Route as AuthenticatedAdminAuditoriaRouteImport } from './routes/_authenticated/admin/auditoria'
 
@@ -236,6 +237,12 @@ const AuthenticatedAdminEmpresasRoute =
     path: '/admin/empresas',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminEmailsRoute =
+  AuthenticatedAdminEmailsRouteImport.update({
+    id: '/admin/emails',
+    path: '/admin/emails',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminConvitesRoute =
   AuthenticatedAdminConvitesRouteImport.update({
     id: '/admin/convites',
@@ -277,6 +284,7 @@ export interface FileRoutesByFullPath {
   '/app/': typeof AppIndexRoute
   '/admin/auditoria': typeof AuthenticatedAdminAuditoriaRoute
   '/admin/convites': typeof AuthenticatedAdminConvitesRoute
+  '/admin/emails': typeof AuthenticatedAdminEmailsRoute
   '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
   '/admin/licencas': typeof AuthenticatedAdminLicencasRoute
   '/admin/perfis-tributarios': typeof AuthenticatedAdminPerfisTributariosRoute
@@ -316,6 +324,7 @@ export interface FileRoutesByTo {
   '/app': typeof AppIndexRoute
   '/admin/auditoria': typeof AuthenticatedAdminAuditoriaRoute
   '/admin/convites': typeof AuthenticatedAdminConvitesRoute
+  '/admin/emails': typeof AuthenticatedAdminEmailsRoute
   '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
   '/admin/licencas': typeof AuthenticatedAdminLicencasRoute
   '/admin/perfis-tributarios': typeof AuthenticatedAdminPerfisTributariosRoute
@@ -357,6 +366,7 @@ export interface FileRoutesById {
   '/app/': typeof AppIndexRoute
   '/_authenticated/admin/auditoria': typeof AuthenticatedAdminAuditoriaRoute
   '/_authenticated/admin/convites': typeof AuthenticatedAdminConvitesRoute
+  '/_authenticated/admin/emails': typeof AuthenticatedAdminEmailsRoute
   '/_authenticated/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
   '/_authenticated/admin/licencas': typeof AuthenticatedAdminLicencasRoute
   '/_authenticated/admin/perfis-tributarios': typeof AuthenticatedAdminPerfisTributariosRoute
@@ -398,6 +408,7 @@ export interface FileRouteTypes {
     | '/app/'
     | '/admin/auditoria'
     | '/admin/convites'
+    | '/admin/emails'
     | '/admin/empresas'
     | '/admin/licencas'
     | '/admin/perfis-tributarios'
@@ -437,6 +448,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/admin/auditoria'
     | '/admin/convites'
+    | '/admin/emails'
     | '/admin/empresas'
     | '/admin/licencas'
     | '/admin/perfis-tributarios'
@@ -477,6 +489,7 @@ export interface FileRouteTypes {
     | '/app/'
     | '/_authenticated/admin/auditoria'
     | '/_authenticated/admin/convites'
+    | '/_authenticated/admin/emails'
     | '/_authenticated/admin/empresas'
     | '/_authenticated/admin/licencas'
     | '/_authenticated/admin/perfis-tributarios'
@@ -765,6 +778,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminEmpresasRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/emails': {
+      id: '/_authenticated/admin/emails'
+      path: '/admin/emails'
+      fullPath: '/admin/emails'
+      preLoaderRoute: typeof AuthenticatedAdminEmailsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/convites': {
       id: '/_authenticated/admin/convites'
       path: '/admin/convites'
@@ -792,6 +812,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSimuladorRoute: typeof AuthenticatedSimuladorRoute
   AuthenticatedAdminAuditoriaRoute: typeof AuthenticatedAdminAuditoriaRoute
   AuthenticatedAdminConvitesRoute: typeof AuthenticatedAdminConvitesRoute
+  AuthenticatedAdminEmailsRoute: typeof AuthenticatedAdminEmailsRoute
   AuthenticatedAdminEmpresasRoute: typeof AuthenticatedAdminEmpresasRoute
   AuthenticatedAdminLicencasRoute: typeof AuthenticatedAdminLicencasRoute
   AuthenticatedAdminPerfisTributariosRoute: typeof AuthenticatedAdminPerfisTributariosRoute
@@ -814,6 +835,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSimuladorRoute: AuthenticatedSimuladorRoute,
   AuthenticatedAdminAuditoriaRoute: AuthenticatedAdminAuditoriaRoute,
   AuthenticatedAdminConvitesRoute: AuthenticatedAdminConvitesRoute,
+  AuthenticatedAdminEmailsRoute: AuthenticatedAdminEmailsRoute,
   AuthenticatedAdminEmpresasRoute: AuthenticatedAdminEmpresasRoute,
   AuthenticatedAdminLicencasRoute: AuthenticatedAdminLicencasRoute,
   AuthenticatedAdminPerfisTributariosRoute:
