@@ -74,3 +74,31 @@ export function eventoSimular(params: {
     resultado_valido: params.possuiResultado,
   });
 }
+
+export type FormatoExportacao = "imprimir" | "pdf" | "csv" | "whatsapp";
+
+/** O usuário exportou/baixou o relatório de precificação. */
+export function eventoExportarRelatorio(params: {
+  formato: FormatoExportacao;
+  modo?: ModoAnalytics;
+  comComparacao?: boolean;
+}) {
+  registrarEvento("exportar_relatorio", {
+    formato_exportacao: params.formato,
+    modo_simulador: params.modo,
+    com_comparacao: params.comComparacao,
+  });
+}
+
+/** O usuário copiou o resultado para a área de transferência. */
+export function eventoCopiarResultado(params: {
+  conteudo: "resumo_whatsapp" | string;
+  sucesso: boolean;
+  modo?: ModoAnalytics;
+}) {
+  registrarEvento("copiar_resultado", {
+    conteudo_copiado: params.conteudo,
+    copia_sucesso: params.sucesso,
+    modo_simulador: params.modo,
+  });
+}
