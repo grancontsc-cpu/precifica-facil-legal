@@ -897,17 +897,8 @@ function Simulador() {
           </div>
         </main>
 
-        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-card/95 p-3 backdrop-blur lg:hidden">
-          <Button
-            className="h-12 w-full text-base"
-            onClick={() => {
-              document.getElementById("resultados")?.scrollIntoView({ behavior: "smooth" });
-            }}
-          >
-            <Calculator className="h-5 w-5" aria-hidden />
-            Calcular preço
-          </Button>
-        </div>
+        <ResumoFlutuante resultado={resultado} />
+
 
         {carregado ? <Toaster position="top-center" /> : null}
       </div>
