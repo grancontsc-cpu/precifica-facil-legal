@@ -21,6 +21,7 @@ import { PainelFronteira } from "@/components/pricing/PainelFronteira";
 import { AliquotasTrajeto } from "@/components/pricing/AliquotasTrajeto";
 import { aplicarRegime, estadoInicial, operacaoPadrao } from "@/lib/pricing-defaults";
 import { SuposicoesFiscais } from "@/components/pricing/SuposicoesFiscais";
+import { ComparativoModos } from "@/components/pricing/ComparativoModos";
 import { ajustesVazios, aplicarAjustes, type AjustesRapido } from "@/lib/suposicoes-rapido";
 import { formatBRL } from "@/lib/format";
 import { useApp } from "@/hooks/useApp";
