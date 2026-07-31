@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { DialogoCadastrar } from "@/components/app/DialogoCadastrar";
+import { ReenviarConfirmacao } from "@/components/app/ReenviarConfirmacao";
 import { LogoGrancont } from "@/components/app/LogoGrancont";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -80,13 +81,16 @@ function LoginPage() {
     });
     setCarregando(false);
     if (error) {
+      const naoConfirmado = error.message.toLowerCase().includes("not confirmed");
+      setPendenteConfirmacao(naoConfirmado ? emailLimpo : null);
       toast.error(
-        error.message.toLowerCase().includes("not confirmed")
+        naoConfirmado
           ? "Confirme seu e-mail antes de entrar. Verifique sua caixa de entrada."
           : "Senha incorreta para este e-mail.",
       );
       return;
     }
+    setPendenteConfirmacao(null);
     navigate({ to: "/entrando", replace: true });
   };
 
