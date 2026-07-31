@@ -192,12 +192,57 @@
 @layer base {
   html {
     font-family: var(--font-sans);
+    -webkit-tap-highlight-color: transparent;
   }
 
   body {
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "cv11", "ss01";
+  }
+
+  /* Hierarquia tipográfica: títulos mais firmes, texto de apoio mais leve. */
+  h1,
+  h2,
+  h3 {
+    letter-spacing: -0.02em;
+    font-weight: 650;
+  }
+
+  ::selection {
+    background-color: color-mix(in oklab, var(--brand) 22%, transparent);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  /* Números fiscais nunca "dançam" ao atualizar o cálculo. */
+  input[inputmode="decimal"],
+  input[type="number"],
+  th,
+  td,
+  .num {
+    font-variant-numeric: tabular-nums;
   }
 }
+
+@utility num-destaque {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 
 /* ---------------------------------------------------------------- */
 /* Impressão do relatório (Imprimir / Gerar PDF)                     */
