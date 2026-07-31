@@ -133,8 +133,9 @@ function LoginPage() {
           </div>
 
           <h1 className="mt-6 text-2xl font-bold tracking-tight text-foreground lg:mt-0">
-            Precifica <span className="text-primary">Grancont</span>
+            Precifica <span className="text-primary">Grancont</span> — Simulador de Precificação Fiscal
           </h1>
+
           <p className="mt-1.5 text-sm text-muted-foreground">
             Entre para retomar suas simulações de onde parou.
           </p>

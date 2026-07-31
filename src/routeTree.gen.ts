@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TesteExpiradoRouteImport } from './routes/teste-expirado'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as RedefinirSenhaRouteImport } from './routes/redefinir-senha'
 import { Route as RecuperarSenhaRouteImport } from './routes/recuperar-senha'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
@@ -54,6 +55,11 @@ import { Route as AuthenticatedAdminAuditoriaRouteImport } from './routes/_authe
 const TesteExpiradoRoute = TesteExpiradoRouteImport.update({
   id: '/teste-expirado',
   path: '/teste-expirado',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RedefinirSenhaRoute = RedefinirSenhaRouteImport.update({
@@ -286,6 +292,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof OnboardingRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/teste-expirado': typeof TesteExpiradoRoute
   '/auditoria': typeof AuthenticatedAuditoriaRoute
   '/comparar': typeof AuthenticatedCompararRoute
@@ -328,6 +335,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof OnboardingRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/teste-expirado': typeof TesteExpiradoRoute
   '/auditoria': typeof AuthenticatedAuditoriaRoute
   '/comparar': typeof AuthenticatedCompararRoute
@@ -372,6 +380,7 @@ export interface FileRoutesById {
   '/onboarding': typeof OnboardingRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/teste-expirado': typeof TesteExpiradoRoute
   '/_authenticated/auditoria': typeof AuthenticatedAuditoriaRoute
   '/_authenticated/comparar': typeof AuthenticatedCompararRoute
@@ -416,6 +425,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/recuperar-senha'
     | '/redefinir-senha'
+    | '/sitemap.xml'
     | '/teste-expirado'
     | '/auditoria'
     | '/comparar'
@@ -458,6 +468,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/recuperar-senha'
     | '/redefinir-senha'
+    | '/sitemap.xml'
     | '/teste-expirado'
     | '/auditoria'
     | '/comparar'
@@ -501,6 +512,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/recuperar-senha'
     | '/redefinir-senha'
+    | '/sitemap.xml'
     | '/teste-expirado'
     | '/_authenticated/auditoria'
     | '/_authenticated/comparar'
@@ -545,6 +557,7 @@ export interface RootRouteChildren {
   OnboardingRoute: typeof OnboardingRoute
   RecuperarSenhaRoute: typeof RecuperarSenhaRoute
   RedefinirSenhaRoute: typeof RedefinirSenhaRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TesteExpiradoRoute: typeof TesteExpiradoRoute
   AppSplatRoute: typeof AppSplatRoute
   AppIndexRoute: typeof AppIndexRoute
@@ -557,6 +570,13 @@ declare module '@tanstack/react-router' {
       path: '/teste-expirado'
       fullPath: '/teste-expirado'
       preLoaderRoute: typeof TesteExpiradoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/redefinir-senha': {
@@ -912,6 +932,7 @@ const rootRouteChildren: RootRouteChildren = {
   OnboardingRoute: OnboardingRoute,
   RecuperarSenhaRoute: RecuperarSenhaRoute,
   RedefinirSenhaRoute: RedefinirSenhaRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   TesteExpiradoRoute: TesteExpiradoRoute,
   AppSplatRoute: AppSplatRoute,
   AppIndexRoute: AppIndexRoute,
