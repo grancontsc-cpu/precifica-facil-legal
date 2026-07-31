@@ -173,3 +173,20 @@ export function eventoDetalhamentoResultado(params: {
     params.modo,
   );
 }
+
+/** O usuário ativou ou desativou a comparação de fornecedores no relatório. */
+export function eventoComparacaoRelatorio(params: {
+  ativo: boolean;
+  fornecedores?: number;
+  modo?: ModoAnalytics;
+}) {
+  enviar(
+    "comparacao_relatorio",
+    {
+      comparacao_ativa: params.ativo,
+      qtd_fornecedores: params.fornecedores,
+      modo_simulador: params.modo,
+    },
+    params.modo,
+  );
+}
