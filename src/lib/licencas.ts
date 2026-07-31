@@ -99,3 +99,9 @@ export function avaliarLicenca(licenca: Licenca | null, agora = new Date()): Sit
         : "Sua licença está expirada.",
   };
 }
+
+/** Rota pública de aviso correspondente ao motivo do bloqueio. */
+export function rotaBloqueio(situacao: SituacaoLicenca): "/teste-expirado" | "/licenca-suspensa" {
+  if (situacao.emTeste && situacao.status === "expired") return "/teste-expirado";
+  return "/licenca-suspensa";
+}
