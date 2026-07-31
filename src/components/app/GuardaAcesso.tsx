@@ -3,6 +3,7 @@ import { Loader2 } from "lucide-react";
 import { useEffect, type ReactNode } from "react";
 
 import { useApp } from "@/hooks/useApp";
+import { rotaBloqueio } from "@/lib/licencas";
 
 export function Carregando({ texto = "Carregando…" }: { texto?: string }) {
   return (
@@ -21,19 +22,20 @@ export function GuardaStatus({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (loading || !accountStatus) return;
     if (accountStatus === "active") {
-      if (!isSuperAdmin && !situacaoLicenca.liberado) navigate({ to: "/acesso-bloqueado", replace: true });
+      if (!isSuperAdmin && !situacaoLicenca.liberado)
+        navigate({ to: rotaBloqueio(situacaoLicenca), replace: true });
       return;
     }
     const destino =
       accountStatus === "suspended"
-        ? "/acesso-bloqueado"
+        ? "/licenca-suspensa"
         : accountStatus === "pending_approval"
           ? "/aguardando-aprovacao"
           : accountStatus === "pending_email_verification" || accountStatus === "invited"
             ? "/confirmar-email"
             : "/acesso-negado";
     navigate({ to: destino, replace: true });
-  }, [loading, accountStatus, navigate, isSuperAdmin, situacaoLicenca.liberado]);
+  }, [loading, accountStatus, navigate, isSuperAdmin, situacaoLicenca]);
 
   if (loading || !accountStatus || accountStatus !== "active") return <Carregando />;
   if (!isSuperAdmin && !situacaoLicenca.liberado) return <Carregando texto="Verificando sua licença…" />;

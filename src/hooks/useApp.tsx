@@ -208,7 +208,7 @@ export function useApp() {
 
 /** Destino inicial conforme papel e situação da conta. */
 export function destinoInicial(papel: PapelEfetivo, status: StatusConta | null, temVinculo: boolean) {
-  if (status === "suspended") return "/acesso-bloqueado";
+  if (status === "suspended") return "/licenca-suspensa";
   if (status === "pending_approval") return "/aguardando-aprovacao";
   if (status === "pending_email_verification" || status === "invited") return "/confirmar-email";
   if (status === "rejected" || status === "archived") return "/acesso-negado";
