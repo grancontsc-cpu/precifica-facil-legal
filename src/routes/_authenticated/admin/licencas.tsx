@@ -62,7 +62,7 @@ function PainelLicencas() {
   const acao = useMutation({
     mutationFn: async (v: {
       userId: string;
-      acao: "ativar" | "suspender" | "expirar" | "estender_teste" | "reiniciar_teste";
+      acao: AcaoLicenca;
       dias?: number;
       validade?: string | null;
       observacao?: string;
