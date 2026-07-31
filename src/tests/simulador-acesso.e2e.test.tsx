@@ -168,7 +168,11 @@ describe("URL com simulação de outra empresa", () => {
     await abrirSimulador("sim-1");
     await screen.findByText("Simulação indisponível");
 
-    expect(escritas.filter((e) => e.operacao !== "select")).toHaveLength(0);
+    expect(
+      escritas.filter(
+        (e) => e.operacao !== "select" && e.tabela !== "app_analytics_events",
+      ),
+    ).toHaveLength(0);
   });
 
   it("registra a tentativa negada de carregamento", async () => {
@@ -213,7 +217,11 @@ describe("URL com simulação de outro usuário na mesma empresa", () => {
     await abrirSimulador("sim-1");
 
     await screen.findByText("Simulação indisponível");
-    expect(escritas.filter((e) => e.operacao !== "select")).toHaveLength(0);
+    expect(
+      escritas.filter(
+        (e) => e.operacao !== "select" && e.tabela !== "app_analytics_events",
+      ),
+    ).toHaveLength(0);
     appState.canEdit = true;
   });
 
@@ -233,7 +241,11 @@ describe("conta suspensa e sessão ausente", () => {
     await abrirSimulador("sim-1");
 
     await screen.findByText("Conta sem acesso");
-    expect(escritas.filter((e) => e.operacao !== "select")).toHaveLength(0);
+    expect(
+      escritas.filter(
+        (e) => e.operacao !== "select" && e.tabela !== "app_analytics_events",
+      ),
+    ).toHaveLength(0);
   });
 });
 

@@ -1,4 +1,5 @@
 import {
+  BarChart3,
   Building2,
   Calculator,
   ClipboardList,
@@ -149,6 +150,13 @@ export const NAV_ADMIN: ItemNav[] = [
     label: "Licenças",
     descricao: "Liberar, suspender ou estender assinaturas",
     icon: KeyRound,
+    acesso: "super_admin",
+  },
+  {
+    to: "/admin/metricas",
+    label: "Métricas de uso",
+    descricao: "Sessões, usuários e eventos da precificação",
+    icon: BarChart3,
     acesso: "super_admin",
   },
   {
