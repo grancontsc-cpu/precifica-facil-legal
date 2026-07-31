@@ -1,3 +1,4 @@
+import { metaPagina } from "@/lib/seo-head";
 import { createFileRoute } from "@tanstack/react-router";
 
 import { PainelUsuarios } from "@/components/admin/PainelUsuarios";
@@ -8,15 +9,11 @@ const DESCRICAO = "Gerencie usuários de todas as empresas: papéis, situação 
 
 export const Route = createFileRoute("/_authenticated/admin/usuarios")({
   head: () => ({
-    meta: [
-      { title: TITULO },
-      { name: "description", content: DESCRICAO },
-      { property: "og:title", content: TITULO },
-      { property: "og:description", content: DESCRICAO },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "robots", content: "noindex" },
-    ],
+    ...metaPagina({
+      titulo: TITULO,
+      descricao: DESCRICAO,
+      caminho: "/admin/usuarios",
+    }),
   }),
   component: () => (
     <ExigePapel papel="super_admin">

@@ -1,3 +1,4 @@
+import { metaPagina } from "@/lib/seo-head";
 import { createFileRoute } from "@tanstack/react-router";
 
 import { PainelUsuarios } from "@/components/admin/PainelUsuarios";
@@ -9,15 +10,11 @@ const DESCRICAO = "Gestor: acompanhe a equipe da empresa, suspenda acessos e red
 
 export const Route = createFileRoute("/_authenticated/gestao/usuarios")({
   head: () => ({
-    meta: [
-      { title: TITULO },
-      { name: "description", content: DESCRICAO },
-      { property: "og:title", content: TITULO },
-      { property: "og:description", content: DESCRICAO },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "robots", content: "noindex" },
-    ],
+    ...metaPagina({
+      titulo: TITULO,
+      descricao: DESCRICAO,
+      caminho: "/gestao/usuarios",
+    }),
   }),
   component: Pagina,
 });

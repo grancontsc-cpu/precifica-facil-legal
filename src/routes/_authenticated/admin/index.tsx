@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { metaPagina } from "@/lib/seo-head";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Building2, ClipboardList, MailPlus, ShieldQuestion, Users } from "lucide-react";
 
@@ -11,15 +12,11 @@ const DESCRICAO =
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   head: () => ({
-    meta: [
-      { title: TITULO },
-      { name: "description", content: DESCRICAO },
-      { property: "og:title", content: TITULO },
-      { property: "og:description", content: DESCRICAO },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "robots", content: "noindex" },
-    ],
+    ...metaPagina({
+      titulo: TITULO,
+      descricao: DESCRICAO,
+      caminho: "/admin",
+    }),
   }),
   component: () => (
     <ExigePapel papel="super_admin">

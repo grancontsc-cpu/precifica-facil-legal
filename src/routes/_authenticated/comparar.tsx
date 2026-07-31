@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { metaPagina } from "@/lib/seo-head";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Plus, RotateCcw, Sparkles } from "lucide-react";
@@ -31,14 +32,11 @@ const DESCRICAO =
 
 export const Route = createFileRoute("/_authenticated/comparar")({
   head: () => ({
-    meta: [
-      { title: TITULO },
-      { name: "description", content: DESCRICAO },
-      { property: "og:title", content: TITULO },
-      { property: "og:description", content: DESCRICAO },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
+    ...metaPagina({
+      titulo: TITULO,
+      descricao: DESCRICAO,
+      caminho: "/comparar",
+    }),
   }),
   component: CompararPage,
 });
