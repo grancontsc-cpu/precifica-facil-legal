@@ -1,10 +1,12 @@
 import Decimal from "decimal.js";
 import type {
   MarginBase,
+  OperacaoFiscal,
   ProdutoCompra,
   PurchaseResult,
   PurchaseTax,
   PurchaseTaxResult,
+  Regime,
   SaleEvaluation,
   SaleTax,
   SaleTaxResult,
@@ -13,6 +15,7 @@ import type {
   ValidationIssue,
   VendaConfig,
 } from "@/types/pricing";
+
 
 /**
  * Motor de precificação — funções puras, sem dependência de interface.
@@ -174,6 +177,180 @@ export function calcularCompra(produto: ProdutoCompra, tributos: PurchaseTax[]):
 function formatoFormula(base: Decimal) {
   return `base ${base.toDecimalPlaces(2).toString()}`;
 }
+
+/* ------------------------------------------------------------------ */
+/* Regime tributário e ICMS de fronteira (DIFAL / antecipação)         */
+/* ------------------------------------------------------------------ */
+
+export const REGIMES: Array<{ id: Regime; nome: string; descricao: string }> = [
+  {
+    id: "simples",
+    nome: "Simples Nacional",
+    descricao: "Recolhe tudo no DAS. Não credita ICMS, PIS e Cofins da compra.",
+  },
+  {
+    id: "presumido",
+    nome: "Lucro Presumido",
+    descricao: "Credita ICMS. PIS e Cofins são cumulativos (sem crédito).",
+  },
+  {
+    id: "real",
+    nome: "Lucro Real",
+    descricao: "Credita ICMS, PIS e Cofins da compra.",
+  },
+  {
+    id: "mei",
+    nome: "MEI",
+    descricao: "Recolhe valor fixo mensal. Nenhum tributo da compra gera crédito.",
+  },
+];
+
+export function nomeRegime(regime: Regime | undefined | null): string {
+  return REGIMES.find((r) => r.id === regime)?.nome ?? "Não informado";
+}
+
+/** Empresas do Simples e o MEI não se creditam do ICMS de fronteira: é custo puro. */
+export function creditaFronteiraPorRegime(regime: Regime): boolean {
+  return regime === "real" || regime === "presumido";
+}
+
+/** O regime apura a venda pelo DAS (tributo único incluído no preço)? */
+export function apuraPeloSimples(regime: Regime): boolean {
+  return regime === "simples" || regime === "mei";
+}
+
+export interface ResultadoFronteira {
+  /** Alíquota resultante em % (interna do destino − interestadual). */
+  rate: number;
+  aliquotaInterna: number | null;
+  aliquotaInterestadual: number | null;
+  /** Existe diferencial a recolher? */
+  aplicavel: boolean;
+  /** Faltou alíquota cadastrada para o par informado. */
+  faltaAliquota: boolean;
+  creditavel: boolean;
+  explicacao: string;
+}
+
+/**
+ * ICMS de fronteira na entrada:
+ *
+ *   difal = max(0; alíquota interna do destino − alíquota interestadual) × base
+ *
+ * Operação dentro do mesmo estado não tem fronteira. Lucro Real e Presumido
+ * creditam o valor recolhido; Simples e MEI o carregam como custo.
+ */
+export function calcularFronteira(op: OperacaoFiscal | undefined): ResultadoFronteira {
+  const vazio: ResultadoFronteira = {
+    rate: 0,
+    aliquotaInterna: null,
+    aliquotaInterestadual: null,
+    aplicavel: false,
+    faltaAliquota: false,
+    creditavel: false,
+    explicacao: "ICMS de fronteira não aplicável.",
+  };
+  if (!op || !op.difalAtivo) return vazio;
+
+  const origem = (op.ufOrigem ?? "").toUpperCase();
+  const destino = (op.ufDestino ?? "").toUpperCase();
+  const creditavel = op.creditarDifal ?? creditaFronteiraPorRegime(op.regime);
+
+  if (!origem || !destino) {
+    return { ...vazio, explicacao: "Informe os estados de origem e destino." };
+  }
+  if (origem === destino) {
+    return {
+      ...vazio,
+      explicacao: "Compra dentro do próprio estado: não há ICMS de fronteira.",
+    };
+  }
+
+  const interna = op.aliquotaInternaDestino;
+  const inter = op.aliquotaInterestadual;
+  if (typeof interna !== "number" || typeof inter !== "number") {
+    return {
+      ...vazio,
+      faltaAliquota: true,
+      creditavel,
+      explicacao: `Não há alíquota cadastrada para ${origem} → ${destino}.`,
+    };
+  }
+
+  const diferenca = Decimal.max(0, D(interna).minus(D(inter)));
+  return {
+    rate: r4(diferenca),
+    aliquotaInterna: interna,
+    aliquotaInterestadual: inter,
+    aplicavel: diferenca.gt(0),
+    faltaAliquota: false,
+    creditavel,
+    explicacao: diferenca.gt(0)
+      ? `${origem} → ${destino}: interna ${interna}% − interestadual ${inter}% = ${r4(diferenca)}%` +
+        (creditavel
+          ? ". Recuperável: entra como crédito."
+          : ". Não recuperável neste regime: vira custo do produto.")
+      : `Alíquota interna do destino (${interna}%) não é maior que a interestadual (${inter}%): nada a recolher.`,
+  };
+}
+
+/** Tributo de compra derivado do contexto fiscal (ICMS de fronteira). */
+export function tributoFronteira(op: OperacaoFiscal | undefined): PurchaseTax | null {
+  if (!op || !op.difalAtivo) return null;
+  const f = calcularFronteira(op);
+  const manual = typeof op.difalManual === "number" && op.difalManual > 0;
+  if (!manual && !f.aplicavel) return null;
+
+  const creditavel = op.creditarDifal ?? creditaFronteiraPorRegime(op.regime);
+
+  return {
+    id: "icmsFronteira",
+    label: "ICMS fronteira (DIFAL/antecipação)",
+    descricao: f.explicacao,
+    enabled: true,
+    rate: f.rate,
+    baseMode: "padrao",
+    baseManual: 0,
+    baseReduction: 0,
+    useManualTax: manual,
+    manualTaxValue: manual ? (op.difalManual as number) : 0,
+    treatment: "porFora",
+    creditMode: creditavel ? "integral" : "nao",
+    creditPercent: 0,
+    creditManual: 0,
+    note: f.explicacao,
+  };
+}
+
+/**
+ * Tributos de compra efetivamente usados no cálculo: os informados pelo
+ * usuário mais o ICMS de fronteira derivado do regime e das UFs.
+ */
+export function tributosCompraEfetivos(state: SimulationState): PurchaseTax[] {
+  const informados = (state.tributosCompra ?? []).filter((t) => t.id !== "icmsFronteira");
+  const fronteira = tributoFronteira(state.operacao);
+  return fronteira ? [...informados, fronteira] : informados;
+}
+
+/**
+ * Tributos de venda efetivos. No Simples/MEI a venda é tributada por um único
+ * tributo (DAS) com a alíquota efetiva informada; os demais ficam desligados.
+ */
+export function tributosVendaEfetivos(state: SimulationState): SaleTax[] {
+  const op = state.operacao;
+  const lista = state.tributosVenda ?? [];
+  if (!op) return lista.filter((t) => t.id !== "dasVenda" || t.enabled);
+
+  if (apuraPeloSimples(op.regime)) {
+    return lista.map((t) =>
+      t.id === "dasVenda"
+        ? { ...t, enabled: true, rate: D(op.aliquotaSimples).toNumber(), treatment: "incluido" as const, baseMode: "padrao" as const }
+        : { ...t, enabled: t.treatment === "informativo" ? t.enabled : false },
+    );
+  }
+  return lista.map((t) => (t.id === "dasVenda" ? { ...t, enabled: false } : t));
+}
+
 
 /* ------------------------------------------------------------------ */
 /* Venda — núcleo único                                                */
@@ -383,6 +560,67 @@ export const MENSAGEM_IMPOSSIVEL =
 export function validar(state: SimulationState): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
   const p = state.produto;
+  const tributosCompra = tributosCompraEfetivos(state);
+  const tributosVenda = tributosVendaEfetivos(state);
+  const op = state.operacao;
+
+  if (op) {
+    // Sem nenhuma UF informada a simulação segue: apenas não há fronteira a
+    // calcular. Com apenas uma delas o trajeto fica indefinido — isso é erro.
+    if (!op.ufOrigem && !op.ufDestino) {
+      if (op.difalAtivo) {
+        issues.push({
+          campo: "ufOrigem",
+          mensagem:
+            "Informe os estados de origem e destino para considerar o ICMS de fronteira na compra.",
+          severidade: "aviso",
+        });
+      }
+    } else if (!op.ufOrigem) {
+      issues.push({
+        campo: "ufOrigem",
+        mensagem: "Informe o estado de origem da mercadoria.",
+        severidade: "erro",
+      });
+    } else if (!op.ufDestino) {
+      issues.push({
+        campo: "ufDestino",
+        mensagem: "Informe o estado de destino (o estado da sua empresa).",
+        severidade: "erro",
+      });
+    }
+    const fronteira = calcularFronteira(op);
+    if (fronteira.faltaAliquota) {
+      issues.push({
+        campo: "aliquotasIcms",
+        mensagem: `${fronteira.explicacao} Cadastre a alíquota vigente ou informe o valor de fronteira manualmente.`,
+        severidade: "erro",
+      });
+    }
+    if (apuraPeloSimples(op.regime)) {
+      if (!finito(op.aliquotaSimples) || op.aliquotaSimples < 0) {
+        issues.push({
+          campo: "aliquotaSimples",
+          mensagem: "Informe a alíquota efetiva do DAS (a que aparece na sua apuração).",
+          severidade: "erro",
+        });
+      } else if (op.aliquotaSimples === 0) {
+        issues.push({
+          campo: "aliquotaSimples",
+          mensagem:
+            "A alíquota efetiva do DAS está zerada: o preço não considerará o imposto do Simples.",
+          severidade: "aviso",
+        });
+      } else if (op.aliquotaSimples > 33) {
+        issues.push({
+          campo: "aliquotaSimples",
+          mensagem: "A alíquota efetiva do DAS acima de 33% é incomum. Confira a apuração.",
+          severidade: "aviso",
+        });
+      }
+    }
+  }
+
 
   if (!p.nome.trim()) {
     issues.push({ campo: "nome", mensagem: "Informe o nome do produto.", severidade: "erro" });
@@ -439,7 +677,7 @@ export function validar(state: SimulationState): ValidationIssue[] {
     }
   }
 
-  for (const t of state.tributosCompra) {
+  for (const t of tributosCompra) {
     if (!t.enabled) continue;
     if (!finito(t.rate) || t.rate < 0 || t.rate > 100) {
       issues.push({
@@ -490,7 +728,7 @@ export function validar(state: SimulationState): ValidationIssue[] {
 
   // Soma das alíquotas incluídas na compra: acima de 100% o valor informado
   // não comporta os tributos que supostamente estão dentro dele.
-  const somaCompraIncluida = state.tributosCompra
+  const somaCompraIncluida = tributosCompra
     .filter((t) => t.enabled && t.treatment === "incluido" && !t.useManualTax && finito(t.rate))
     .reduce((acc, t) => acc + t.rate, 0);
   if (somaCompraIncluida >= 100) {
@@ -502,7 +740,7 @@ export function validar(state: SimulationState): ValidationIssue[] {
     });
   }
 
-  for (const t of state.tributosVenda) {
+  for (const t of tributosVenda) {
     if (!t.enabled) continue;
     if (!finito(t.rate) || t.rate < 0 || t.rate > 100) {
       issues.push({
@@ -567,7 +805,7 @@ export function validar(state: SimulationState): ValidationIssue[] {
 
   // Aviso antecipado de percentuais próximos de 100%.
   const somaVenda =
-    state.tributosVenda
+    tributosVenda
       .filter((t) => t.enabled && t.treatment === "incluido" && finito(t.rate))
       .reduce((acc, t) => acc + t.rate, 0) +
     percentuais.filter(finito).reduce((acc, x) => acc + x, 0) +
@@ -589,7 +827,7 @@ export function validar(state: SimulationState): ValidationIssue[] {
 
 export function simular(state: SimulationState): SimulationResult {
   const issues = validar(state);
-  const compra = calcularCompra(state.produto, state.tributosCompra);
+  const compra = calcularCompra(state.produto, tributosCompraEfetivos(state));
 
   if (compra.custoLiquidoTotal < 0) {
     issues.push({
@@ -604,7 +842,7 @@ export function simular(state: SimulationState): SimulationResult {
     // Precisão plena: a divisão total -> unitário não é arredondada aqui.
     custoLiquidoUnitario: compra.custoLiquidoUnitarioExato,
     venda: state.venda,
-    tributos: state.tributosVenda,
+    tributos: tributosVendaEfetivos(state),
   };
 
   const temErro = issues.some((i) => i.severidade === "erro");

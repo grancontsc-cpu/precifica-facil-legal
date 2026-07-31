@@ -22,10 +22,26 @@ import { CardTributoCompra } from "@/components/pricing/CardTributoCompra";
 import { CardTributoVenda } from "@/components/pricing/CardTributoVenda";
 import { PainelResultados } from "@/components/pricing/PainelResultados";
 import { EntendaOCalculo } from "@/components/pricing/EntendaOCalculo";
-import { AlternadorModo } from "@/components/pricing/AlternadorModo";
+import {
+  AlternadorModo,
+  DESCRICAO_MODO,
+  modoValido,
+  type ModoSimulador,
+} from "@/components/pricing/AlternadorModo";
+import { ContextoFiscal } from "@/components/pricing/ContextoFiscal";
+import { useAliquotas } from "@/hooks/useAliquotas";
+import { sincronizarOperacao } from "@/lib/aliquotas";
 import { ResumoFlutuante } from "@/components/pricing/ResumoFlutuante";
 import { simular } from "@/lib/pricing-engine";
-import { CENARIOS, aplicarCenario, estadoExemplo, estadoInicial } from "@/lib/pricing-defaults";
+import {
+  CENARIOS,
+  aplicarCenario,
+  aplicarRegime,
+  estadoExemplo,
+  estadoInicial,
+  garantirOperacao,
+  operacaoPadrao,
+} from "@/lib/pricing-defaults";
 import { formatBRL, formatData } from "@/lib/format";
 import { BarraSimulacao } from "@/components/app/BarraSimulacao";
 import { ExportarSimulacao } from "@/components/report/ExportarSimulacao";
@@ -48,7 +64,9 @@ import {
   type TaxProfileRow,
 } from "@/lib/tax-profiles";
 import type {
+  OperacaoFiscal,
   ProdutoCompra,
+  Regime,
   PurchaseTax,
   SaleTax,
   ScenarioId,
@@ -128,6 +146,8 @@ function Simulador() {
     userId,
     email,
     organizations,
+    empresa,
+
     memberships,
     isSuperAdmin,
     accountStatus,
@@ -143,6 +163,7 @@ function Simulador() {
   );
 
   const [state, setState] = useState<SimulationState>(() => estadoInicial());
+  const [modo, setModo] = useState<ModoSimulador>("simples");
   const [salvoEm, setSalvoEm] = useState<Date | null>(null);
   const [, setCarregado] = useState(false);
   const [titulo, setTitulo] = useState("Nova simulação");
@@ -308,7 +329,49 @@ function Simulador() {
     setCarregado(true);
   }, [simulacaoId]);
 
+  const { tabela } = useAliquotas();
   const resultado = useMemo(() => simular(state), [state]);
+
+  const operacao = state.operacao ?? operacaoPadrao();
+
+  const setOperacao = (patch: Partial<OperacaoFiscal>) =>
+    setState((s) => {
+      const base = { ...operacaoPadrao(), ...(s.operacao ?? {}), ...patch };
+      return { ...s, operacao: sincronizarOperacao(base, tabela) };
+    });
+
+  const setRegime = (regime: Regime) =>
+    setState((s) => {
+      const comRegime = aplicarRegime(garantirOperacao(s), regime);
+      return {
+        ...comRegime,
+        operacao: sincronizarOperacao(comRegime.operacao ?? operacaoPadrao(), tabela),
+      };
+    });
+
+  // Preenche o contexto fiscal com o cadastro da empresa e as alíquotas vigentes.
+  useEffect(() => {
+    setState((s) => {
+      const atual = { ...operacaoPadrao(), ...(s.operacao ?? {}) };
+      const proposta = {
+        ...atual,
+        ufDestino: atual.ufDestino || (empresa?.uf ?? ""),
+        regime: (atual.regime ?? "real") as Regime,
+      };
+      const sincronizada = sincronizarOperacao(proposta, tabela);
+      const igual = JSON.stringify(sincronizada) === JSON.stringify(s.operacao);
+      return igual ? s : { ...s, operacao: sincronizada };
+    });
+  }, [empresa?.uf, tabela]);
+
+  // O regime cadastrado da empresa vale como padrão da primeira simulação.
+  useEffect(() => {
+    const regimeEmpresa = empresa?.regime as Regime | undefined;
+    if (!regimeEmpresa || simulacaoId) return;
+    setState((s) =>
+      s.operacao?.regime && s.operacao.regime !== "real" ? s : aplicarRegime(garantirOperacao(s), regimeEmpresa),
+    );
+  }, [empresa?.regime, simulacaoId]);
 
   const nomeEmpresa =
     organizations?.find((o) => o.id === orgId)?.name ?? "Empresa não selecionada";
@@ -333,6 +396,7 @@ function Simulador() {
       ...s,
       tributosVenda: s.tributosVenda.map((t) => (t.id === id ? { ...t, ...patch } : t)),
     }));
+
 
   const cenarioAtual = CENARIOS.find((c) => c.id === state.cenario);
 
@@ -556,8 +620,11 @@ function Simulador() {
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="flex items-center gap-2">
                     <AlternadorModo
-                      avancado={state.modoAvancado}
-                      onChange={(v) => setState((s) => ({ ...s, modoAvancado: v }))}
+                      modo={modo}
+                      onChange={(v) => {
+                        setModo(v);
+                        setState((s) => ({ ...s, modoAvancado: v === "completo" }));
+                      }}
                     />
                     <Ajuda texto="No modo completo você edita base de cálculo, redução de base, percentual de crédito, valores manuais e observações." />
                   </div>
@@ -573,14 +640,72 @@ function Simulador() {
                   </div>
                 </div>
                 <p className="text-xs leading-relaxed text-muted-foreground">
-                  {state.modoAvancado
-                    ? "Modo completo: todos os detalhes de cada tributo ficam abertos para edição."
-                    : "Modo simples: preencha o que comprou, o quanto pagou e a margem desejada. O restante segue o perfil tributário da empresa."}
+                  {DESCRICAO_MODO[modo]}
                 </p>
               </div>
 
-
               <Secao
+                numero="Contexto fiscal"
+                titulo="Regime e trajeto da mercadoria"
+                descricao="O regime da empresa e os estados de origem e destino definem o ICMS de fronteira e se ele vira crédito ou custo."
+              >
+                <ContextoFiscal
+                  operacao={operacao}
+                  onChange={setOperacao}
+                  onRegime={setRegime}
+                  avancado={modo === "completo"}
+                  compacto={modo === "rapido"}
+                />
+              </Secao>
+
+              {modo === "rapido" ? (
+                <>
+                  <Secao
+                    numero="Seção 1"
+                    titulo="Produto e preço"
+                    descricao="O essencial para uma estimativa rápida do preço de venda."
+                  >
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <CampoTexto
+                        label="Nome do produto"
+                        value={state.produto.nome}
+                        onChange={(v) => setProduto({ nome: v })}
+                        placeholder="Ex.: Café torrado e moído 500g"
+                        className="sm:col-span-2"
+                      />
+                      <CampoNumero
+                        label="Valor unitário de compra"
+                        value={state.produto.valorUnitario}
+                        onChange={(v) => setProduto({ valorUnitario: v })}
+                        prefixo="R$"
+                      />
+                      <CampoNumero
+                        label="Quantidade"
+                        value={state.produto.quantidade}
+                        onChange={(v) => setProduto({ quantidade: v })}
+                      />
+                      <CampoNumero
+                        label="Margem desejada"
+                        value={state.venda.margemDesejada}
+                        onChange={(v) => setVenda({ margemDesejada: v })}
+                        sufixo="%"
+                        className="sm:col-span-2"
+                      />
+                    </div>
+                  </Secao>
+                  <Alert>
+                    <Info className="size-4" />
+                    <AlertDescription>
+                      Este é um valor aproximado: o modo rápido usa apenas as alíquotas gerais do
+                      trajeto informado. Para precificar com precisão — com créditos, despesas de
+                      venda, frete e benefícios fiscais — use o modo Simples ou o modo Completo.
+                    </AlertDescription>
+                  </Alert>
+                </>
+              ) : (
+                <>
+              <Secao
+
                 numero="Seção 1"
                 titulo="Produto e compra"
                 descricao="Informe o que foi comprado e quanto foi pago ao fornecedor."
@@ -882,8 +1007,11 @@ function Simulador() {
                   ))}
                 </div>
               </Secao>
+                </>
+              )}
 
               <EntendaOCalculo state={state} resultado={resultado} />
+
 
               <footer className="rounded-xl border border-border bg-surface p-4 text-xs leading-relaxed text-muted-foreground">
                 {AVISO_RODAPE}

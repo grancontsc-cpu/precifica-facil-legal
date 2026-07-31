@@ -219,6 +219,93 @@ export type Database = {
         }
         Relationships: []
       }
+      icms_aliquotas_interestaduais: {
+        Row: {
+          aliquota: number
+          aliquota_importado: number
+          created_at: string
+          created_by: string | null
+          fonte: string | null
+          id: string
+          observacao: string | null
+          uf_destino: string
+          uf_origem: string
+          updated_at: string
+          vigencia_fim: string | null
+          vigencia_inicio: string
+        }
+        Insert: {
+          aliquota: number
+          aliquota_importado?: number
+          created_at?: string
+          created_by?: string | null
+          fonte?: string | null
+          id?: string
+          observacao?: string | null
+          uf_destino: string
+          uf_origem: string
+          updated_at?: string
+          vigencia_fim?: string | null
+          vigencia_inicio?: string
+        }
+        Update: {
+          aliquota?: number
+          aliquota_importado?: number
+          created_at?: string
+          created_by?: string | null
+          fonte?: string | null
+          id?: string
+          observacao?: string | null
+          uf_destino?: string
+          uf_origem?: string
+          updated_at?: string
+          vigencia_fim?: string | null
+          vigencia_inicio?: string
+        }
+        Relationships: []
+      }
+      icms_aliquotas_internas: {
+        Row: {
+          aliquota: number
+          created_at: string
+          created_by: string | null
+          fcp: number
+          fonte: string | null
+          id: string
+          observacao: string | null
+          uf: string
+          updated_at: string
+          vigencia_fim: string | null
+          vigencia_inicio: string
+        }
+        Insert: {
+          aliquota: number
+          created_at?: string
+          created_by?: string | null
+          fcp?: number
+          fonte?: string | null
+          id?: string
+          observacao?: string | null
+          uf: string
+          updated_at?: string
+          vigencia_fim?: string | null
+          vigencia_inicio?: string
+        }
+        Update: {
+          aliquota?: number
+          created_at?: string
+          created_by?: string | null
+          fcp?: number
+          fonte?: string | null
+          id?: string
+          observacao?: string | null
+          uf?: string
+          updated_at?: string
+          vigencia_fim?: string | null
+          vigencia_inicio?: string
+        }
+        Relationships: []
+      }
       invitations: {
         Row: {
           accepted_at: string | null
@@ -562,6 +649,7 @@ export type Database = {
           created_by: string | null
           default_tax_profile_id: string | null
           defaults: Json
+          icms_contribuinte: boolean
           id: string
           legal_name: string | null
           name: string
@@ -581,6 +669,7 @@ export type Database = {
           created_by?: string | null
           default_tax_profile_id?: string | null
           defaults?: Json
+          icms_contribuinte?: boolean
           id?: string
           legal_name?: string | null
           name: string
@@ -600,6 +689,7 @@ export type Database = {
           created_by?: string | null
           default_tax_profile_id?: string | null
           defaults?: Json
+          icms_contribuinte?: boolean
           id?: string
           legal_name?: string | null
           name?: string

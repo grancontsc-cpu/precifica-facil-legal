@@ -23,10 +23,24 @@ export const NOME_PAPEL: Record<PapelEfetivo, string> = {
   user: "Usuário",
 };
 
+/** Dados cadastrais da empresa, incluindo o contexto fiscal usado na precificação. */
+export interface Empresa {
+  id: string;
+  name: string;
+  cnpj: string | null;
+  uf: string | null;
+  regime: string | null;
+  icms_contribuinte: boolean | null;
+  defaults: unknown;
+  default_tax_profile_id: string | null;
+}
+
+const CAMPOS_ORG = "id, name, cnpj, uf, regime, icms_contribuinte, defaults, default_tax_profile_id";
+
 export interface Membership {
   organization_id: string;
   role: OrgRole;
-  organizations: { id: string; name: string; cnpj: string | null; defaults: unknown; default_tax_profile_id: string | null } | null;
+  organizations: Empresa | null;
 }
 
 interface AppContextValue {
@@ -39,8 +53,10 @@ interface AppContextValue {
   papel: PapelEfetivo;
   accountStatus: StatusConta | null;
   memberships: Membership[];
-  organizations: { id: string; name: string; cnpj: string | null; defaults: unknown; default_tax_profile_id: string | null }[];
+  organizations: Empresa[];
   orgId: string | null;
+  /** Empresa selecionada no momento. */
+  empresa: Empresa | null;
   setOrgId: (id: string) => void;
   /** Pode criar/editar dados da empresa selecionada (gestor ou administrador geral). */
   canEdit: boolean;
@@ -49,6 +65,7 @@ interface AppContextValue {
   loading: boolean;
   signOut: () => Promise<void>;
 }
+
 
 const AppContext = createContext<AppContextValue | null>(null);
 
@@ -105,7 +122,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("organization_members")
-        .select("organization_id, role, organizations(id, name, cnpj, defaults, default_tax_profile_id)")
+        .select(`organization_id, role, organizations(${CAMPOS_ORG})`)
         .eq("user_id", userId!)
         .eq("membership_status", "active");
       if (error) throw error;
@@ -119,10 +136,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("organizations")
-        .select("id, name, cnpj, defaults, default_tax_profile_id")
+        .select(CAMPOS_ORG)
         .order("name");
       if (error) throw error;
-      return data ?? [];
+      return (data ?? []) as unknown as Empresa[];
     },
   });
 
@@ -187,6 +204,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     memberships: membershipsQuery.data ?? [],
     organizations,
     orgId,
+    empresa: organizations.find((o) => o.id === orgId) ?? null,
     setOrgId,
     canEdit,
     licenca: licencaQuery.data ?? null,

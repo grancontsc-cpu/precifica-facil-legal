@@ -23,6 +23,7 @@ export type PurchaseTaxId =
   | "ibs"
   | "cbs"
   | "icmsSt"
+  | "icmsFronteira"
   | "outroCompra";
 
 export type SaleTaxId =
@@ -33,7 +34,42 @@ export type SaleTaxId =
   | "ibsVenda"
   | "cbsVenda"
   | "seletivoVenda"
+  | "dasVenda"
   | "outroVenda";
+
+/** Regime tributário da empresa que está precificando. */
+export type Regime = "simples" | "presumido" | "real" | "mei";
+
+/** Finalidade da compra (por enquanto o simulador cobre revenda). */
+export type FinalidadeCompra = "revenda";
+
+/**
+ * Contexto fiscal da operação: regime da empresa e trajeto da mercadoria.
+ * É a partir daqui que o motor deriva o ICMS de fronteira (DIFAL/antecipação).
+ */
+export interface OperacaoFiscal {
+  regime: Regime;
+  /** UF de onde a mercadoria está vindo. */
+  ufOrigem: string;
+  /** UF da empresa que está comprando. */
+  ufDestino: string;
+  finalidade: FinalidadeCompra;
+  /** Mercadoria importada (alíquota interestadual de 4%). */
+  importada: boolean;
+  /** Calcular o ICMS de fronteira automaticamente. */
+  difalAtivo: boolean;
+  /** Alíquota interna do destino em % (vinda da tabela ou ajustada). */
+  aliquotaInternaDestino: number | null;
+  /** Alíquota interestadual origem -> destino em %. */
+  aliquotaInterestadual: number | null;
+  /** Valor de fronteira informado manualmente (sobrepõe o cálculo). */
+  difalManual: number | null;
+  /** Sobrepõe a regra de crédito do regime (null = decide pelo regime). */
+  creditarDifal: boolean | null;
+  /** Alíquota efetiva do DAS em % (apenas Simples/MEI). */
+  aliquotaSimples: number;
+}
+
 
 export interface PurchaseTax {
   id: PurchaseTaxId;
@@ -116,7 +152,10 @@ export interface SimulationState {
   venda: VendaConfig;
   tributosVenda: SaleTax[];
   modoAvancado: boolean;
+  /** Contexto fiscal (regime + UFs). Opcional para simulações salvas antes desta versão. */
+  operacao?: OperacaoFiscal;
 }
+
 
 /* ------------------------------------------------------------------ */
 /* Resultados                                                          */
