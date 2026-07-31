@@ -2,8 +2,11 @@
 
 export type StatusLicenca = "trial" | "active" | "suspended" | "expired" | "canceled";
 
+/** Status como gravado no banco (inclui variantes que a UI normaliza). */
+export type StatusLicencaBanco = StatusLicenca | "courtesy" | "trial_expired";
+
 export interface Licenca {
-  status: StatusLicenca;
+  status: StatusLicencaBanco;
   plan: string;
   trial_started_at: string;
   trial_ends_at: string;
