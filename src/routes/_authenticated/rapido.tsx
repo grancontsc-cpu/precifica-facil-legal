@@ -20,6 +20,8 @@ import { REGIMES, simular } from "@/lib/pricing-engine";
 import { PainelFronteira } from "@/components/pricing/PainelFronteira";
 import { AliquotasTrajeto } from "@/components/pricing/AliquotasTrajeto";
 import { aplicarRegime, estadoInicial, operacaoPadrao } from "@/lib/pricing-defaults";
+import { SuposicoesFiscais } from "@/components/pricing/SuposicoesFiscais";
+import { ajustesVazios, aplicarAjustes, type AjustesRapido } from "@/lib/suposicoes-rapido";
 import { formatBRL } from "@/lib/format";
 import { useApp } from "@/hooks/useApp";
 import type { Regime, SimulationState } from "@/types/pricing";
@@ -87,6 +89,7 @@ function ModoRapido() {
   const [ufOrigem, setUfOrigem] = useState("");
   const [ufDestino, setUfDestino] = useState(empresa?.uf ?? "");
   const regime = regimeDaEmpresa(empresa?.regime);
+  const [ajustes, setAjustes] = useState<AjustesRapido>(ajustesVazios);
 
   const estado = useMemo<SimulationState>(() => {
     const base = aplicarRegime(estadoInicial(), regime);
@@ -94,18 +97,21 @@ function ModoRapido() {
       operacaoPadrao({ regime, ufOrigem, ufDestino: ufDestino || ufOrigem }),
       tabela,
     );
-    return {
-      ...base,
-      produto: {
-        ...base.produto,
-        nome: nome.trim(),
-        quantidade: quantidade || 1,
-        valorUnitario,
+    return aplicarAjustes(
+      {
+        ...base,
+        produto: {
+          ...base.produto,
+          nome: nome.trim(),
+          quantidade: quantidade || 1,
+          valorUnitario,
+        },
+        venda: { ...base.venda, margemDesejada: margem },
+        operacao,
       },
-      venda: { ...base.venda, margemDesejada: margem },
-      operacao,
-    };
-  }, [regime, ufOrigem, ufDestino, tabela, nome, quantidade, valorUnitario, margem]);
+      ajustes,
+    );
+  }, [regime, ufOrigem, ufDestino, tabela, nome, quantidade, valorUnitario, margem, ajustes]);
 
   const resultado = useMemo(() => simular(estado), [estado]);
   const recomendado = resultado.recomendado;
@@ -123,6 +129,7 @@ function ModoRapido() {
     setMargem(30);
     setUfOrigem("");
     setUfDestino(empresa?.uf ?? "");
+    setAjustes(ajustesVazios());
   };
 
   return (
@@ -281,6 +288,8 @@ function ModoRapido() {
                 </AlertDescription>
               </Alert>
             )}
+
+            <SuposicoesFiscais state={estado} ajustes={ajustes} onChange={setAjustes} />
 
             <PainelFronteira state={estado} resultado={resultado} compacto />
 
