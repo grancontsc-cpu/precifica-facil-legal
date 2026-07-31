@@ -4,6 +4,22 @@
  * mínimo 8 caracteres, maiúscula, minúscula, número, símbolo e sem espaços.
  */
 
+/** Tamanho mínimo exigido em todas as telas de senha. */
+export const REGRA_SENHA_TAMANHO_MINIMO = 8;
+
+/**
+ * Valida senha + confirmação com as mesmas mensagens em todas as telas.
+ * Retorna a mensagem de erro, ou null quando está tudo certo.
+ */
+export function validarParDeSenhas(senha: string, confirmacao?: string): string | null {
+  const problema = mensagemSenhaInvalida(senha);
+  if (problema) return problema;
+  if (typeof confirmacao === "string" && senha !== confirmacao) {
+    return "As senhas não conferem.";
+  }
+  return null;
+}
+
 export type CriterioSenha = {
   id: string;
   rotulo: string;
