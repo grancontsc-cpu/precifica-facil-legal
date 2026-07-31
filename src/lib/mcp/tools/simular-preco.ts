@@ -94,7 +94,7 @@ export default defineTool({
       },
       compra: {
         desembolso_total: resultado.compra.desembolsoTotal,
-        credito_total: resultado.compra.creditoTotal,
+        credito_total: resultado.compra.creditosTotais,
         custo_liquido_unitario: resultado.compra.custoLiquidoUnitario,
       },
       venda: {
