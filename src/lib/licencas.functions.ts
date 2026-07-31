@@ -35,13 +35,19 @@ export const listarLicencas = createServerFn({ method: "GET" })
     ]);
 
     const mapa = new Map((perfis ?? []).map((p) => [p.id, p]));
-    return (licencas ?? []).map((l) => ({
-      ...l,
-      full_name: mapa.get(l.user_id)?.full_name ?? null,
-      email: mapa.get(l.user_id)?.email ?? null,
-      account_status: mapa.get(l.user_id)?.account_status ?? null,
-      last_access_at: mapa.get(l.user_id)?.last_access_at ?? null,
-    }));
+    return (licencas ?? [])
+      .filter((l) => !!l.user_id)
+      .map((l) => {
+        const uid = l.user_id as string;
+        return {
+          ...l,
+          user_id: uid,
+          full_name: mapa.get(uid)?.full_name ?? null,
+          email: mapa.get(uid)?.email ?? null,
+          account_status: mapa.get(uid)?.account_status ?? null,
+          last_access_at: mapa.get(uid)?.last_access_at ?? null,
+        };
+      });
   });
 
 /** Altera a licença de um usuário. Somente Administrador Geral, com auditoria. */
