@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -18,7 +18,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useApp } from "@/hooks/useApp";
+import { supabase } from "@/integrations/supabase/client";
 import { AREAS_ADMIN, solicitarAcessoAdmin, type AreaAdmin } from "@/lib/solicitacao-admin.functions";
 
 /**
@@ -26,7 +26,11 @@ import { AREAS_ADMIN, solicitarAcessoAdmin, type AreaAdmin } from "@/lib/solicit
  * no servidor com a identidade da sessão e encaminhado ao Administrador Geral.
  */
 export function SolicitarAcessoAdmin({ className }: { className?: string }) {
-  const { email } = useApp();
+  const [email, setEmail] = useState<string | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? null));
+  }, []);
   const [aberto, setAberto] = useState(false);
   const [area, setArea] = useState<AreaAdmin>("painel_admin");
   const [mensagem, setMensagem] = useState("");
