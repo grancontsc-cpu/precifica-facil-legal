@@ -527,6 +527,7 @@ function ModoRapido() {
             {passo === 4 ? "Ver preço sugerido" : "Continuar"}
             <ArrowRight className="size-4" aria-hidden />
           </Button>
+          </div>
         ) : (
           <span />
         )}
