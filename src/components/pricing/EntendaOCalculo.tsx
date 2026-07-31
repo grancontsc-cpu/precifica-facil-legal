@@ -4,6 +4,10 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import {
+  eventoDetalhamentoResultado,
+  type ModoAnalytics,
+} from "@/lib/analytics-eventos";
 import { formatBRL, formatPercent, formatQuantidade } from "@/lib/format";
 import type { SimulationResult, SimulationState } from "@/types/pricing";
 
