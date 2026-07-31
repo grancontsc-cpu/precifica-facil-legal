@@ -39,12 +39,14 @@ import { Route as AuthenticatedCompararRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAuditoriaRouteImport } from './routes/_authenticated/auditoria'
 import { Route as AuthenticatedGestaoIndexRouteImport } from './routes/_authenticated/gestao/index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
+import { Route as ApiPublicSitemapPingRouteImport } from './routes/api/public/sitemap-ping'
 import { Route as AuthenticatedGestaoVinculosRouteImport } from './routes/_authenticated/gestao/vinculos'
 import { Route as AuthenticatedGestaoUsuariosRouteImport } from './routes/_authenticated/gestao/usuarios'
 import { Route as AuthenticatedGestaoConvitesRouteImport } from './routes/_authenticated/gestao/convites'
 import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authenticated/admin/usuarios'
 import { Route as AuthenticatedAdminSolicitacoesRouteImport } from './routes/_authenticated/admin/solicitacoes'
 import { Route as AuthenticatedAdminSimulacoesRouteImport } from './routes/_authenticated/admin/simulacoes'
+import { Route as AuthenticatedAdminSeoRouteImport } from './routes/_authenticated/admin/seo'
 import { Route as AuthenticatedAdminPerfisTributariosRouteImport } from './routes/_authenticated/admin/perfis-tributarios'
 import { Route as AuthenticatedAdminLicencasRouteImport } from './routes/_authenticated/admin/licencas'
 import { Route as AuthenticatedAdminEmpresasRouteImport } from './routes/_authenticated/admin/empresas'
@@ -202,6 +204,11 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/admin/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicSitemapPingRoute = ApiPublicSitemapPingRouteImport.update({
+  id: '/api/public/sitemap-ping',
+  path: '/api/public/sitemap-ping',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedGestaoVinculosRoute =
   AuthenticatedGestaoVinculosRouteImport.update({
     id: '/gestao/vinculos',
@@ -238,6 +245,11 @@ const AuthenticatedAdminSimulacoesRoute =
     path: '/admin/simulacoes',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminSeoRoute = AuthenticatedAdminSeoRouteImport.update({
+  id: '/admin/seo',
+  path: '/admin/seo',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAdminPerfisTributariosRoute =
   AuthenticatedAdminPerfisTributariosRouteImport.update({
     id: '/admin/perfis-tributarios',
@@ -309,12 +321,14 @@ export interface FileRoutesByFullPath {
   '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
   '/admin/licencas': typeof AuthenticatedAdminLicencasRoute
   '/admin/perfis-tributarios': typeof AuthenticatedAdminPerfisTributariosRoute
+  '/admin/seo': typeof AuthenticatedAdminSeoRoute
   '/admin/simulacoes': typeof AuthenticatedAdminSimulacoesRoute
   '/admin/solicitacoes': typeof AuthenticatedAdminSolicitacoesRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/gestao/convites': typeof AuthenticatedGestaoConvitesRoute
   '/gestao/usuarios': typeof AuthenticatedGestaoUsuariosRoute
   '/gestao/vinculos': typeof AuthenticatedGestaoVinculosRoute
+  '/api/public/sitemap-ping': typeof ApiPublicSitemapPingRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/gestao/': typeof AuthenticatedGestaoIndexRoute
 }
@@ -352,12 +366,14 @@ export interface FileRoutesByTo {
   '/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
   '/admin/licencas': typeof AuthenticatedAdminLicencasRoute
   '/admin/perfis-tributarios': typeof AuthenticatedAdminPerfisTributariosRoute
+  '/admin/seo': typeof AuthenticatedAdminSeoRoute
   '/admin/simulacoes': typeof AuthenticatedAdminSimulacoesRoute
   '/admin/solicitacoes': typeof AuthenticatedAdminSolicitacoesRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/gestao/convites': typeof AuthenticatedGestaoConvitesRoute
   '/gestao/usuarios': typeof AuthenticatedGestaoUsuariosRoute
   '/gestao/vinculos': typeof AuthenticatedGestaoVinculosRoute
+  '/api/public/sitemap-ping': typeof ApiPublicSitemapPingRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/gestao': typeof AuthenticatedGestaoIndexRoute
 }
@@ -397,12 +413,14 @@ export interface FileRoutesById {
   '/_authenticated/admin/empresas': typeof AuthenticatedAdminEmpresasRoute
   '/_authenticated/admin/licencas': typeof AuthenticatedAdminLicencasRoute
   '/_authenticated/admin/perfis-tributarios': typeof AuthenticatedAdminPerfisTributariosRoute
+  '/_authenticated/admin/seo': typeof AuthenticatedAdminSeoRoute
   '/_authenticated/admin/simulacoes': typeof AuthenticatedAdminSimulacoesRoute
   '/_authenticated/admin/solicitacoes': typeof AuthenticatedAdminSolicitacoesRoute
   '/_authenticated/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/_authenticated/gestao/convites': typeof AuthenticatedGestaoConvitesRoute
   '/_authenticated/gestao/usuarios': typeof AuthenticatedGestaoUsuariosRoute
   '/_authenticated/gestao/vinculos': typeof AuthenticatedGestaoVinculosRoute
+  '/api/public/sitemap-ping': typeof ApiPublicSitemapPingRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/gestao/': typeof AuthenticatedGestaoIndexRoute
 }
@@ -442,12 +460,14 @@ export interface FileRouteTypes {
     | '/admin/empresas'
     | '/admin/licencas'
     | '/admin/perfis-tributarios'
+    | '/admin/seo'
     | '/admin/simulacoes'
     | '/admin/solicitacoes'
     | '/admin/usuarios'
     | '/gestao/convites'
     | '/gestao/usuarios'
     | '/gestao/vinculos'
+    | '/api/public/sitemap-ping'
     | '/admin/'
     | '/gestao/'
   fileRoutesByTo: FileRoutesByTo
@@ -485,12 +505,14 @@ export interface FileRouteTypes {
     | '/admin/empresas'
     | '/admin/licencas'
     | '/admin/perfis-tributarios'
+    | '/admin/seo'
     | '/admin/simulacoes'
     | '/admin/solicitacoes'
     | '/admin/usuarios'
     | '/gestao/convites'
     | '/gestao/usuarios'
     | '/gestao/vinculos'
+    | '/api/public/sitemap-ping'
     | '/admin'
     | '/gestao'
   id:
@@ -529,12 +551,14 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/empresas'
     | '/_authenticated/admin/licencas'
     | '/_authenticated/admin/perfis-tributarios'
+    | '/_authenticated/admin/seo'
     | '/_authenticated/admin/simulacoes'
     | '/_authenticated/admin/solicitacoes'
     | '/_authenticated/admin/usuarios'
     | '/_authenticated/gestao/convites'
     | '/_authenticated/gestao/usuarios'
     | '/_authenticated/gestao/vinculos'
+    | '/api/public/sitemap-ping'
     | '/_authenticated/admin/'
     | '/_authenticated/gestao/'
   fileRoutesById: FileRoutesById
@@ -561,6 +585,7 @@ export interface RootRouteChildren {
   TesteExpiradoRoute: typeof TesteExpiradoRoute
   AppSplatRoute: typeof AppSplatRoute
   AppIndexRoute: typeof AppIndexRoute
+  ApiPublicSitemapPingRoute: typeof ApiPublicSitemapPingRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -775,6 +800,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/sitemap-ping': {
+      id: '/api/public/sitemap-ping'
+      path: '/api/public/sitemap-ping'
+      fullPath: '/api/public/sitemap-ping'
+      preLoaderRoute: typeof ApiPublicSitemapPingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/gestao/vinculos': {
       id: '/_authenticated/gestao/vinculos'
       path: '/gestao/vinculos'
@@ -815,6 +847,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/simulacoes'
       fullPath: '/admin/simulacoes'
       preLoaderRoute: typeof AuthenticatedAdminSimulacoesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/seo': {
+      id: '/_authenticated/admin/seo'
+      path: '/admin/seo'
+      fullPath: '/admin/seo'
+      preLoaderRoute: typeof AuthenticatedAdminSeoRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin/perfis-tributarios': {
@@ -876,6 +915,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminEmpresasRoute: typeof AuthenticatedAdminEmpresasRoute
   AuthenticatedAdminLicencasRoute: typeof AuthenticatedAdminLicencasRoute
   AuthenticatedAdminPerfisTributariosRoute: typeof AuthenticatedAdminPerfisTributariosRoute
+  AuthenticatedAdminSeoRoute: typeof AuthenticatedAdminSeoRoute
   AuthenticatedAdminSimulacoesRoute: typeof AuthenticatedAdminSimulacoesRoute
   AuthenticatedAdminSolicitacoesRoute: typeof AuthenticatedAdminSolicitacoesRoute
   AuthenticatedAdminUsuariosRoute: typeof AuthenticatedAdminUsuariosRoute
@@ -901,6 +941,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminLicencasRoute: AuthenticatedAdminLicencasRoute,
   AuthenticatedAdminPerfisTributariosRoute:
     AuthenticatedAdminPerfisTributariosRoute,
+  AuthenticatedAdminSeoRoute: AuthenticatedAdminSeoRoute,
   AuthenticatedAdminSimulacoesRoute: AuthenticatedAdminSimulacoesRoute,
   AuthenticatedAdminSolicitacoesRoute: AuthenticatedAdminSolicitacoesRoute,
   AuthenticatedAdminUsuariosRoute: AuthenticatedAdminUsuariosRoute,
@@ -936,17 +977,8 @@ const rootRouteChildren: RootRouteChildren = {
   TesteExpiradoRoute: TesteExpiradoRoute,
   AppSplatRoute: AppSplatRoute,
   AppIndexRoute: AppIndexRoute,
+  ApiPublicSitemapPingRoute: ApiPublicSitemapPingRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
