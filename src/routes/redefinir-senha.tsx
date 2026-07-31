@@ -75,10 +75,6 @@ function Pagina() {
       );
       return;
     }
-    if (false) {
-      toast.error("Não foi possível salvar a nova senha. Peça um novo link e tente novamente.");
-      return;
-    }
     toast.success("Senha atualizada.");
     navigate({ to: "/entrando", replace: true });
   };
