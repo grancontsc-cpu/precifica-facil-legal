@@ -287,13 +287,41 @@ function ModoRapido() {
             <AliquotasTrajeto ufOrigem={ufOrigem} ufDestino={ufDestino} />
 
             <p className="text-xs text-muted-foreground">
-              Regime considerado: {REGIMES.find((r) => r.id === regime)?.nome ?? regime}
-              {empresa?.regime ? " (cadastro da empresa)" : " (padrão)"}.
+              Regime considerado: {REGIMES.find((r) => r.id === regime)?.nome ?? regime}.
             </p>
           </div>
         ) : null}
 
         {passo === 4 ? (
+          <div className="space-y-4">
+            <div>
+              <h2 className="text-base font-semibold text-foreground">
+                Como esse produto é tributado?
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Duas perguntas rápidas. Se não souber, marque “Não sei” — assumimos que é
+                tributado, o que é mais prudente para o seu preço.
+              </p>
+            </div>
+            <PerguntasImpostos
+              state={estado}
+              regime={regime}
+              respostas={respostas}
+              onChange={(r) => {
+                eventoParametroFiscal({ modo: "rapido", campo: "impostos" });
+                setRespostas(r);
+              }}
+              aliquotaSimples={ajustes.aliquotaSimples}
+              onAliquotaSimples={(v) => {
+                eventoParametroFiscal({ modo: "rapido", campo: "aliquotaSimples" });
+                setAjustes((a) => ({ ...a, aliquotaSimples: v }));
+              }}
+            />
+          </div>
+        ) : null}
+
+        {passo === 5 ? (
+
           <div className="space-y-5">
             <div className="text-center">
               <p className="text-sm text-muted-foreground">Preço de venda sugerido por unidade</p>
