@@ -21,6 +21,7 @@ import { PainelFronteira } from "@/components/pricing/PainelFronteira";
 import { AliquotasTrajeto } from "@/components/pricing/AliquotasTrajeto";
 import { aplicarRegime, estadoInicial, operacaoPadrao } from "@/lib/pricing-defaults";
 import { SuposicoesFiscais } from "@/components/pricing/SuposicoesFiscais";
+import { ComparativoModos } from "@/components/pricing/ComparativoModos";
 import { ajustesVazios, aplicarAjustes, type AjustesRapido } from "@/lib/suposicoes-rapido";
 import { formatBRL } from "@/lib/format";
 import { useApp } from "@/hooks/useApp";
@@ -302,6 +303,8 @@ function ModoRapido() {
                 do simulador.
               </AlertDescription>
             </Alert>
+
+            <ComparativoModos state={estado} resultado={resultado} />
 
             <div className="flex flex-col gap-2 sm:flex-row">
               <Button className="flex-1" onClick={() => navigate({ to: "/simulador" })}>
