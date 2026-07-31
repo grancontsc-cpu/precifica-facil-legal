@@ -152,3 +152,16 @@ export function montarTabela(
   }
   return tabela;
 }
+
+/**
+ * Preenche a operação com as alíquotas vigentes do snapshot.
+ * Não sobrescreve ajustes manuais quando `manterManuais` é verdadeiro.
+ */
+export function sincronizarOperacao(
+  op: import("@/types/pricing").OperacaoFiscal,
+  tabela: TabelaAliquotas | null,
+): import("@/types/pricing").OperacaoFiscal {
+  const interna = aliquotaInterna(tabela, op.ufDestino);
+  const inter = aliquotaInterestadual(tabela, op.ufOrigem, op.ufDestino, op.importada);
+  return { ...op, aliquotaInternaDestino: interna, aliquotaInterestadual: inter };
+}
