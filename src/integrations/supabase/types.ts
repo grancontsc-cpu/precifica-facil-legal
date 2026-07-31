@@ -67,6 +67,39 @@ export type Database = {
           },
         ]
       }
+      app_analytics_events: {
+        Row: {
+          caminho: string | null
+          created_at: string
+          evento: string
+          id: string
+          modo: string | null
+          parametros: Json
+          sessao_id: string
+          user_id: string
+        }
+        Insert: {
+          caminho?: string | null
+          created_at?: string
+          evento: string
+          id?: string
+          modo?: string | null
+          parametros?: Json
+          sessao_id: string
+          user_id?: string
+        }
+        Update: {
+          caminho?: string | null
+          created_at?: string
+          evento?: string
+          id?: string
+          modo?: string | null
+          parametros?: Json
+          sessao_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       audit_logs: {
         Row: {
           action: string
@@ -1372,6 +1405,7 @@ export type Database = {
       is_organization_member: { Args: { _org: string }; Returns: boolean }
       is_super_admin: { Args: never; Returns: boolean }
       licenca_valida: { Args: { _user_id: string }; Returns: boolean }
+      metricas_precificacao: { Args: { _dias?: number }; Returns: Json }
       process_expired_trials: { Args: never; Returns: Json }
     }
     Enums: {
