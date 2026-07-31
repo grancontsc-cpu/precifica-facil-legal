@@ -64,7 +64,7 @@ function CadastrarPage() {
       });
       void registrarEventoEmail({
         data: {
-          tipo: error ? "confirmacao_enviada" : "confirmacao_enviada",
+          tipo: "confirmacao_enviada",
           email: emailLimpo,
           status: error ? "erro" : "ok",
           codigoErro: error?.code ?? undefined,

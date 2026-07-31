@@ -11,7 +11,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { verificarEmailCadastrado } from "@/lib/conta.functions";
 
 const TITULO = "Entrar — Precifica Grancont";
 const DESCRICAO =
@@ -50,33 +49,10 @@ function LoginPage() {
     });
   }, [navigate]);
 
-  const conferirEmail = async (valor: string) => {
-    const limpo = valor.trim().toLowerCase();
-    if (!limpo || !limpo.includes("@")) {
-      setSituacaoEmail("desconhecida");
-      return null;
-    }
-    try {
-      const { cadastrado } = await verificarEmailCadastrado({ data: { email: limpo } });
-      setSituacaoEmail(cadastrado ? "cadastrado" : "novo");
-      return cadastrado;
-    } catch {
-      setSituacaoEmail("desconhecida");
-      return null;
-    }
-  };
-
   const entrar = async (e: React.FormEvent) => {
     e.preventDefault();
     setCarregando(true);
     const emailLimpo = email.trim().toLowerCase();
-
-    const cadastrado = await conferirEmail(emailLimpo);
-    if (cadastrado === false) {
-      setCarregando(false);
-      setDialogo(true);
-      return;
-    }
 
     const { error } = await supabase.auth.signInWithPassword({
       email: emailLimpo,
