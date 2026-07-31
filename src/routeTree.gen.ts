@@ -32,6 +32,7 @@ import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as AppSplatRouteImport } from './routes/app.$'
 import { Route as AuthenticatedSimuladorRouteImport } from './routes/_authenticated/simulador'
 import { Route as AuthenticatedSimulacoesRouteImport } from './routes/_authenticated/simulacoes'
+import { Route as AuthenticatedRapidoRouteImport } from './routes/_authenticated/rapido'
 import { Route as AuthenticatedProdutosRouteImport } from './routes/_authenticated/produtos'
 import { Route as AuthenticatedPerfisRouteImport } from './routes/_authenticated/perfis'
 import { Route as AuthenticatedEmpresasRouteImport } from './routes/_authenticated/empresas'
@@ -166,6 +167,11 @@ const AuthenticatedSimuladorRoute = AuthenticatedSimuladorRouteImport.update({
 const AuthenticatedSimulacoesRoute = AuthenticatedSimulacoesRouteImport.update({
   id: '/simulacoes',
   path: '/simulacoes',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedRapidoRoute = AuthenticatedRapidoRouteImport.update({
+  id: '/rapido',
+  path: '/rapido',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedProdutosRoute = AuthenticatedProdutosRouteImport.update({
@@ -311,6 +317,7 @@ export interface FileRoutesByFullPath {
   '/empresas': typeof AuthenticatedEmpresasRoute
   '/perfis': typeof AuthenticatedPerfisRoute
   '/produtos': typeof AuthenticatedProdutosRoute
+  '/rapido': typeof AuthenticatedRapidoRoute
   '/simulacoes': typeof AuthenticatedSimulacoesRoute
   '/simulador': typeof AuthenticatedSimuladorRoute
   '/app/$': typeof AppSplatRoute
@@ -356,6 +363,7 @@ export interface FileRoutesByTo {
   '/empresas': typeof AuthenticatedEmpresasRoute
   '/perfis': typeof AuthenticatedPerfisRoute
   '/produtos': typeof AuthenticatedProdutosRoute
+  '/rapido': typeof AuthenticatedRapidoRoute
   '/simulacoes': typeof AuthenticatedSimulacoesRoute
   '/simulador': typeof AuthenticatedSimuladorRoute
   '/app/$': typeof AppSplatRoute
@@ -403,6 +411,7 @@ export interface FileRoutesById {
   '/_authenticated/empresas': typeof AuthenticatedEmpresasRoute
   '/_authenticated/perfis': typeof AuthenticatedPerfisRoute
   '/_authenticated/produtos': typeof AuthenticatedProdutosRoute
+  '/_authenticated/rapido': typeof AuthenticatedRapidoRoute
   '/_authenticated/simulacoes': typeof AuthenticatedSimulacoesRoute
   '/_authenticated/simulador': typeof AuthenticatedSimuladorRoute
   '/app/$': typeof AppSplatRoute
@@ -450,6 +459,7 @@ export interface FileRouteTypes {
     | '/empresas'
     | '/perfis'
     | '/produtos'
+    | '/rapido'
     | '/simulacoes'
     | '/simulador'
     | '/app/$'
@@ -495,6 +505,7 @@ export interface FileRouteTypes {
     | '/empresas'
     | '/perfis'
     | '/produtos'
+    | '/rapido'
     | '/simulacoes'
     | '/simulador'
     | '/app/$'
@@ -541,6 +552,7 @@ export interface FileRouteTypes {
     | '/_authenticated/empresas'
     | '/_authenticated/perfis'
     | '/_authenticated/produtos'
+    | '/_authenticated/rapido'
     | '/_authenticated/simulacoes'
     | '/_authenticated/simulador'
     | '/app/$'
@@ -751,6 +763,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSimulacoesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/rapido': {
+      id: '/_authenticated/rapido'
+      path: '/rapido'
+      fullPath: '/rapido'
+      preLoaderRoute: typeof AuthenticatedRapidoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/produtos': {
       id: '/_authenticated/produtos'
       path: '/produtos'
@@ -907,6 +926,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedEmpresasRoute: typeof AuthenticatedEmpresasRoute
   AuthenticatedPerfisRoute: typeof AuthenticatedPerfisRoute
   AuthenticatedProdutosRoute: typeof AuthenticatedProdutosRoute
+  AuthenticatedRapidoRoute: typeof AuthenticatedRapidoRoute
   AuthenticatedSimulacoesRoute: typeof AuthenticatedSimulacoesRoute
   AuthenticatedSimuladorRoute: typeof AuthenticatedSimuladorRoute
   AuthenticatedAdminAuditoriaRoute: typeof AuthenticatedAdminAuditoriaRoute
@@ -932,6 +952,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedEmpresasRoute: AuthenticatedEmpresasRoute,
   AuthenticatedPerfisRoute: AuthenticatedPerfisRoute,
   AuthenticatedProdutosRoute: AuthenticatedProdutosRoute,
+  AuthenticatedRapidoRoute: AuthenticatedRapidoRoute,
   AuthenticatedSimulacoesRoute: AuthenticatedSimulacoesRoute,
   AuthenticatedSimuladorRoute: AuthenticatedSimuladorRoute,
   AuthenticatedAdminAuditoriaRoute: AuthenticatedAdminAuditoriaRoute,
@@ -982,3 +1003,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

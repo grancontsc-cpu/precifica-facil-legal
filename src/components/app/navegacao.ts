@@ -11,6 +11,7 @@ import {
   Percent,
   Scale,
   Search,
+  Zap,
   ShieldQuestion,
   UserPlus,
   Users,
@@ -30,6 +31,13 @@ export interface ItemNav {
 
 /** Itens do dia a dia — sempre visíveis. */
 export const NAV_DIARIO: ItemNav[] = [
+  {
+    to: "/rapido",
+    label: "Modo rápido",
+    descricao: "Preço estimado em três passos",
+    icon: Zap,
+    acesso: "todos",
+  },
   {
     to: "/simulador",
     label: "Simulador",
