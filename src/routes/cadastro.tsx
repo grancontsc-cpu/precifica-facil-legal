@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { verificarEmailCadastrado } from "@/lib/conta.functions";
+import { registrarEventoEmail } from "@/lib/email-eventos.functions";
 
 const TITULO = "Criar conta — Precifica Grancont";
 const DESCRICAO =
@@ -52,13 +52,7 @@ function CadastrarPage() {
     }
     setCarregando(true);
     try {
-      const { cadastrado } = await verificarEmailCadastrado({ data: { email: emailLimpo } });
-      if (cadastrado) {
-        setCarregando(false);
-        toast.info("Este e-mail já está cadastrado. Faça login ou recupere sua senha.");
-        navigate({ to: "/login" });
-        return;
-      }
+      void registrarEventoEmail({ data: { tipo: "cadastro_solicitado", email: emailLimpo } }).catch(() => {});
 
       const { error } = await supabase.auth.signUp({
         email: emailLimpo,
@@ -68,10 +62,21 @@ function CadastrarPage() {
           data: { full_name: nome.trim(), company_name: empresa.trim() },
         },
       });
-      if (error) {
-        toast.error(error.message);
-        return;
+      void registrarEventoEmail({
+        data: {
+          tipo: "confirmacao_enviada",
+          email: emailLimpo,
+          status: error ? "erro" : "ok",
+          codigoErro: error?.code ?? undefined,
+          mensagemErro: error?.message ?? undefined,
+        },
+      }).catch(() => {});
+
+      if (!error) {
+        void registrarEventoEmail({ data: { tipo: "senha_criada", email: emailLimpo } }).catch(() => {});
       }
+
+      // Mensagem genérica: a tela é sempre a mesma, exista ou não uma conta com este e-mail.
       setEnviado(true);
     } finally {
       setCarregando(false);

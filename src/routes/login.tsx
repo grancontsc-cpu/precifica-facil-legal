@@ -1,9 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { CheckCircle2, Eye, EyeOff, Info, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-import { DialogoCadastrar } from "@/components/app/DialogoCadastrar";
 import { ReenviarConfirmacao } from "@/components/app/ReenviarConfirmacao";
 import { LogoGrancont } from "@/components/app/LogoGrancont";
 import { Button } from "@/components/ui/button";
@@ -11,7 +10,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { verificarEmailCadastrado } from "@/lib/conta.functions";
 
 const TITULO = "Entrar — Precifica Grancont";
 const DESCRICAO =
@@ -38,10 +36,6 @@ function LoginPage() {
   const [senha, setSenha] = useState("");
   const [mostrar, setMostrar] = useState(false);
   const [carregando, setCarregando] = useState(false);
-  const [situacaoEmail, setSituacaoEmail] = useState<"desconhecida" | "cadastrado" | "novo">(
-    "desconhecida",
-  );
-  const [dialogo, setDialogo] = useState(false);
   const [pendenteConfirmacao, setPendenteConfirmacao] = useState<string | null>(null);
 
   useEffect(() => {
@@ -50,33 +44,10 @@ function LoginPage() {
     });
   }, [navigate]);
 
-  const conferirEmail = async (valor: string) => {
-    const limpo = valor.trim().toLowerCase();
-    if (!limpo || !limpo.includes("@")) {
-      setSituacaoEmail("desconhecida");
-      return null;
-    }
-    try {
-      const { cadastrado } = await verificarEmailCadastrado({ data: { email: limpo } });
-      setSituacaoEmail(cadastrado ? "cadastrado" : "novo");
-      return cadastrado;
-    } catch {
-      setSituacaoEmail("desconhecida");
-      return null;
-    }
-  };
-
   const entrar = async (e: React.FormEvent) => {
     e.preventDefault();
     setCarregando(true);
     const emailLimpo = email.trim().toLowerCase();
-
-    const cadastrado = await conferirEmail(emailLimpo);
-    if (cadastrado === false) {
-      setCarregando(false);
-      setDialogo(true);
-      return;
-    }
 
     const { error } = await supabase.auth.signInWithPassword({
       email: emailLimpo,
@@ -179,23 +150,9 @@ function LoginPage() {
                 autoComplete="email"
                 placeholder="voce@suaempresa.com.br"
                 value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  setSituacaoEmail("desconhecida");
-                }}
-                onBlur={(e) => void conferirEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value)}
                 required
               />
-              {situacaoEmail === "cadastrado" && (
-                <p className="flex items-center gap-1.5 text-xs text-success">
-                  <CheckCircle2 className="h-3.5 w-3.5" aria-hidden /> E-mail já cadastrado.
-                </p>
-              )}
-              {situacaoEmail === "novo" && (
-                <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <Info className="h-3.5 w-3.5" aria-hidden /> E-mail ainda não cadastrado.
-                </p>
-              )}
             </div>
 
             <div className="space-y-2">
@@ -276,12 +233,6 @@ function LoginPage() {
         </div>
       </div>
       </main>
-
-      <DialogoCadastrar
-        aberto={dialogo}
-        email={email.trim().toLowerCase()}
-        onFechar={() => setDialogo(false)}
-      />
     </>
   );
 

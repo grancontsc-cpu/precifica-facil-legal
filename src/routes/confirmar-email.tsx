@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { registrarEventoEmail } from "@/lib/email-eventos.functions";
 
 const TITULO = "Confirme seu e-mail — Precifica Grancont";
 const DESCRICAO = "Confirme seu endereço de e-mail para ativar o acesso ao Precifica Grancont.";
@@ -33,8 +34,17 @@ function Pagina() {
       toast.error("Faça login novamente para reenviar a confirmação.");
       return;
     }
-    await supabase.auth.resend({ type: "signup", email });
-    toast.success("Enviamos um novo e-mail de confirmação.");
+    const { error } = await supabase.auth.resend({ type: "signup", email });
+    void registrarEventoEmail({
+      data: {
+        tipo: "confirmacao_reenviada",
+        email,
+        status: error ? "erro" : "ok",
+        codigoErro: error?.code ?? undefined,
+        mensagemErro: error?.message ?? undefined,
+      },
+    }).catch(() => {});
+    toast.success("Se a confirmação ainda estiver pendente, um novo link chegará em instantes.");
   };
 
   return (
