@@ -72,6 +72,10 @@ function CadastrarPage() {
         },
       }).catch(() => {});
 
+      if (!error) {
+        void registrarEventoEmail({ data: { tipo: "senha_criada", email: emailLimpo } }).catch(() => {});
+      }
+
       // Mensagem genérica: a tela é sempre a mesma, exista ou não uma conta com este e-mail.
       setEnviado(true);
     } finally {
