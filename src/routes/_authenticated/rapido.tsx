@@ -180,7 +180,7 @@ function ModoRapido() {
           Modo rápido
         </span>
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-          Preço de venda em três passos
+          Preço de venda em poucos passos
         </h1>
         <p className="text-sm text-muted-foreground">
           Uma estimativa imediata usando as alíquotas gerais do trajeto informado.
