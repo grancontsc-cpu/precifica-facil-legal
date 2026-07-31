@@ -104,7 +104,7 @@ export const atualizarLicenca = createServerFn({ method: "POST" })
       entity: "licenses",
       entity_id: data.userId,
       before_data: atual ?? null,
-      after_data: patch,
+      after_data: patch as Record<string, string | null>,
     });
 
     return { ok: true as const };
