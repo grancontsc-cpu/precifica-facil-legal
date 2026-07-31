@@ -14,6 +14,8 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { TemaProvider } from "../hooks/useTema";
 import { SITE_NOME, SITE_URL } from "../lib/seo-head";
+import { GA_MEASUREMENT_ID, registrarPageView } from "../lib/analytics";
+
 
 const TITULO_PADRAO = "Precifica Grancont — precificação tributária para empresas";
 const DESCRICAO_PADRAO =
@@ -104,8 +106,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:description", content: DESCRICAO_PADRAO },
     ],
     scripts: [
+      // Google tag (gtag.js) — carregada uma única vez em todo o site.
+      { async: true, src: `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}` },
+      {
+        children: `window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', '${GA_MEASUREMENT_ID}');`,
+      },
       {
         type: "application/ld+json",
+
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "SoftwareApplication",
@@ -159,6 +167,20 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const router = useRouter();
+
+  // A tag do GA envia o page_view inicial; navegações SPA precisam de envio manual.
+  useEffect(() => {
+    let anterior = window.location.pathname + window.location.search;
+    return router.subscribe("onResolved", () => {
+      const atual = window.location.pathname + window.location.search;
+      if (atual === anterior) return;
+      anterior = atual;
+      registrarPageView(atual);
+    });
+  }, [router]);
+
+
 
   return (
     <QueryClientProvider client={queryClient}>
