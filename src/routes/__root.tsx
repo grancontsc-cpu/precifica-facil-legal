@@ -14,7 +14,10 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { TemaProvider } from "../hooks/useTema";
 import { SITE_NOME, SITE_URL } from "../lib/seo-head";
-import { GA_MEASUREMENT_ID, registrarPageView } from "../lib/analytics";
+import { registrarPageView } from "../lib/analytics";
+import { analyticsPermitido } from "../lib/consentimento";
+import { ConsentimentoCookies } from "../components/app/ConsentimentoCookies";
+
 
 
 const TITULO_PADRAO = "Precifica Grancont — precificação tributária para empresas";
@@ -106,12 +109,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:description", content: DESCRICAO_PADRAO },
     ],
     scripts: [
-      // Google tag (gtag.js) — carregada uma única vez em todo o site.
-      { async: true, src: `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}` },
+      // O Google Analytics NÃO é carregado aqui: a tag só é injetada após o
+      // consentimento explícito do usuário (LGPD) — ver src/lib/consentimento.ts.
       {
-        children: `window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', '${GA_MEASUREMENT_ID}');`,
-      },
-      {
+
         type: "application/ld+json",
 
         children: JSON.stringify({
@@ -169,13 +170,15 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
 
-  // A tag do GA envia o page_view inicial; navegações SPA precisam de envio manual.
+  // A tag do GA (quando consentida) envia o page_view inicial;
+  // navegações SPA precisam de envio manual.
   useEffect(() => {
     let anterior = window.location.pathname + window.location.search;
     return router.subscribe("onResolved", () => {
       const atual = window.location.pathname + window.location.search;
       if (atual === anterior) return;
       anterior = atual;
+      if (!analyticsPermitido()) return;
       registrarPageView(atual);
     });
   }, [router]);
@@ -188,7 +191,9 @@ function RootComponent() {
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
         <Toaster />
+        <ConsentimentoCookies />
       </TemaProvider>
     </QueryClientProvider>
   );
+
 }
