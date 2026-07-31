@@ -8,6 +8,7 @@ import {
   eventoParametroFiscal,
   eventoSimulacaoIniciada,
   eventoSimular,
+  eventoSimulacaoConcluida,
 } from "@/lib/analytics-eventos";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -362,6 +363,14 @@ function ModoRapido() {
                   ufDestino: ufDestino || ufOrigem,
                   possuiResultado: !!recomendado,
                 });
+                if (recomendado) {
+                  eventoSimulacaoConcluida({
+                    modo: "rapido",
+                    regime,
+                    ufOrigem,
+                    ufDestino: ufDestino || ufOrigem,
+                  });
+                }
               }
               setPasso((p) => p + 1);
             }}
