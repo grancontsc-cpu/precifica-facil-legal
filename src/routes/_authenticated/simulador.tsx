@@ -476,12 +476,12 @@ function Simulador() {
   return (
 
     <TooltipProvider delayDuration={150}>
-      <div className="min-h-screen bg-background pb-28 lg:pb-10">
-        <header className="sticky top-0 z-30 border-b border-border bg-card/95 backdrop-blur">
+      <div className="min-h-screen bg-background pb-32 lg:pb-10">
+        <header className="border-b border-border bg-card">
           <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 sm:px-6">
             <div className="min-w-0">
               <h1 className="truncate text-lg font-semibold tracking-tight text-foreground sm:text-xl">
-                Precifica Grancont
+                Simulador de preço
               </h1>
               <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                 <Badge variant="outline" className="border-primary/30 text-primary">
@@ -491,17 +491,18 @@ function Simulador() {
               </div>
             </div>
             <div className="flex shrink-0 items-center gap-2">
-              <Button variant="outline" size="sm" onClick={novaSimulacao}>
+              <Button variant="outline" size="sm" className="h-10" onClick={novaSimulacao}>
                 <RotateCcw className="h-4 w-4" aria-hidden />
                 <span className="hidden sm:inline">Nova simulação</span>
               </Button>
-              <Button size="sm" onClick={salvarRascunho}>
+              <Button size="sm" className="h-10" onClick={salvarRascunho}>
                 <Save className="h-4 w-4" aria-hidden />
                 <span className="hidden sm:inline">Salvar rascunho</span>
               </Button>
             </div>
           </div>
         </header>
+
 
         <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
           <div className="mb-6">
