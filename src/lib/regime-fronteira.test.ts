@@ -155,11 +155,15 @@ describe("Simples Nacional e MEI na venda", () => {
 });
 
 describe("Validações do contexto fiscal", () => {
-  it("exige os estados de origem e destino", () => {
+  it("com os dois estados em branco apenas avisa, sem travar o cálculo", () => {
     const s = base("real", { ufOrigem: "", ufDestino: "" });
-    const campos = simular(s).issues.map((i) => i.campo);
-    expect(campos).toContain("ufOrigem");
-    expect(campos).toContain("ufDestino");
+    const issue = simular(s).issues.find((i) => i.campo === "ufOrigem");
+    expect(issue?.severidade).toBe("aviso");
+  });
+
+  it("trajeto pela metade é erro", () => {
+    expect(simular(base("real", { ufOrigem: "" })).issues.some((i) => i.campo === "ufOrigem" && i.severidade === "erro")).toBe(true);
+    expect(simular(base("real", { ufDestino: "" })).issues.some((i) => i.campo === "ufDestino" && i.severidade === "erro")).toBe(true);
   });
 
   it("avisa quando falta alíquota cadastrada para o trajeto", () => {
