@@ -42,17 +42,19 @@ function CadastrarPage() {
   const [empresa, setEmpresa] = useState("");
   const [email, setEmail] = useState(emailInicial ?? "");
   const [senha, setSenha] = useState("");
+  const [confirmacao, setConfirmacao] = useState("");
   const [carregando, setCarregando] = useState(false);
   const [enviado, setEnviado] = useState(false);
 
   const cadastrar = async (e: React.FormEvent) => {
     e.preventDefault();
     const emailLimpo = email.trim().toLowerCase();
-    const problema = mensagemSenhaInvalida(senha);
+    const problema = validarParDeSenhas(senha, confirmacao);
     if (problema) {
       toast.error(problema);
       return;
     }
+
     setCarregando(true);
     try {
       void registrarEventoEmail({ data: { tipo: "cadastro_solicitado", email: emailLimpo } }).catch(() => {});
