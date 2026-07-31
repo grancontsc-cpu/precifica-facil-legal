@@ -59,6 +59,7 @@ import { Route as AuthenticatedAdminEmailsRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAdminConvitesRouteImport } from './routes/_authenticated/admin/convites'
 import { Route as AuthenticatedAdminAuditoriaRouteImport } from './routes/_authenticated/admin/auditoria'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
+import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 
 const TesteExpiradoRoute = TesteExpiradoRouteImport.update({
   id: '/teste-expirado',
@@ -326,6 +327,11 @@ const Char91DotmcpChar93InvokeToolToolRoute =
     path: '/.mcp/invoke-tool/$tool',
     getParentRoute: () => rootRouteImport,
   } as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -359,6 +365,7 @@ export interface FileRoutesByFullPath {
   '/simulador': typeof AuthenticatedSimuladorRoute
   '/app/$': typeof AppSplatRoute
   '/app/': typeof AppIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/admin/auditoria': typeof AuthenticatedAdminAuditoriaRoute
   '/admin/convites': typeof AuthenticatedAdminConvitesRoute
@@ -410,6 +417,7 @@ export interface FileRoutesByTo {
   '/simulador': typeof AuthenticatedSimuladorRoute
   '/app/$': typeof AppSplatRoute
   '/app': typeof AppIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/admin/auditoria': typeof AuthenticatedAdminAuditoriaRoute
   '/admin/convites': typeof AuthenticatedAdminConvitesRoute
@@ -463,6 +471,7 @@ export interface FileRoutesById {
   '/_authenticated/simulador': typeof AuthenticatedSimuladorRoute
   '/app/$': typeof AppSplatRoute
   '/app/': typeof AppIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/_authenticated/admin/auditoria': typeof AuthenticatedAdminAuditoriaRoute
   '/_authenticated/admin/convites': typeof AuthenticatedAdminConvitesRoute
@@ -516,6 +525,7 @@ export interface FileRouteTypes {
     | '/simulador'
     | '/app/$'
     | '/app/'
+    | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/admin/auditoria'
     | '/admin/convites'
@@ -567,6 +577,7 @@ export interface FileRouteTypes {
     | '/simulador'
     | '/app/$'
     | '/app'
+    | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/admin/auditoria'
     | '/admin/convites'
@@ -619,6 +630,7 @@ export interface FileRouteTypes {
     | '/_authenticated/simulador'
     | '/app/$'
     | '/app/'
+    | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/_authenticated/admin/auditoria'
     | '/_authenticated/admin/convites'
@@ -664,6 +676,7 @@ export interface RootRouteChildren {
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   AppSplatRoute: typeof AppSplatRoute
   AppIndexRoute: typeof AppIndexRoute
+  DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiPublicSitemapPingRoute: typeof ApiPublicSitemapPingRoute
 }
@@ -1020,6 +1033,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/.lovable/oauth/consent': {
+      id: '/.lovable/oauth/consent'
+      path: '/.lovable/oauth/consent'
+      fullPath: '/.lovable/oauth/consent'
+      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -1107,6 +1127,7 @@ const rootRouteChildren: RootRouteChildren = {
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
   AppSplatRoute: AppSplatRoute,
   AppIndexRoute: AppIndexRoute,
+  DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiPublicSitemapPingRoute: ApiPublicSitemapPingRoute,
 }
