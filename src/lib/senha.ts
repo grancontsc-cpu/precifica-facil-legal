@@ -4,6 +4,22 @@
  * mínimo 8 caracteres, maiúscula, minúscula, número, símbolo e sem espaços.
  */
 
+/** Tamanho mínimo exigido em todas as telas de senha. */
+export const REGRA_SENHA_TAMANHO_MINIMO = 8;
+
+/**
+ * Valida senha + confirmação com as mesmas mensagens em todas as telas.
+ * Retorna a mensagem de erro, ou null quando está tudo certo.
+ */
+export function validarParDeSenhas(senha: string, confirmacao?: string): string | null {
+  const problema = mensagemSenhaInvalida(senha);
+  if (problema) return problema;
+  if (typeof confirmacao === "string" && senha !== confirmacao) {
+    return "As senhas não conferem.";
+  }
+  return null;
+}
+
 export type CriterioSenha = {
   id: string;
   rotulo: string;
@@ -17,7 +33,7 @@ export function avaliarSenha(senha: string): {
   valida: boolean;
 } {
   const criterios: CriterioSenha[] = [
-    { id: "tamanho", rotulo: "Pelo menos 8 caracteres", ok: senha.length >= 8 },
+    { id: "tamanho", rotulo: `Pelo menos ${REGRA_SENHA_TAMANHO_MINIMO} caracteres`, ok: senha.length >= REGRA_SENHA_TAMANHO_MINIMO },
     { id: "maiuscula", rotulo: "Uma letra maiúscula (A-Z)", ok: /[A-ZÀ-Þ]/.test(senha) },
     { id: "minuscula", rotulo: "Uma letra minúscula (a-z)", ok: /[a-zà-þ]/.test(senha) },
     { id: "numero", rotulo: "Um número (0-9)", ok: /[0-9]/.test(senha) },

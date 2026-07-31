@@ -4,7 +4,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import { ForcaSenha } from "@/components/app/ForcaSenha";
+import { CamposSenha } from "@/components/app/CamposSenha";
 import { ReenviarConfirmacao } from "@/components/app/ReenviarConfirmacao";
 import { LogoGrancont } from "@/components/app/LogoGrancont";
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { registrarEventoEmail } from "@/lib/email-eventos.functions";
-import { mensagemSenhaInvalida, traduzirErroSenha } from "@/lib/senha";
+import { traduzirErroSenha, validarParDeSenhas } from "@/lib/senha";
+
 
 const TITULO = "Criar conta — Precifica Grancont";
 const DESCRICAO =
@@ -41,17 +42,19 @@ function CadastrarPage() {
   const [empresa, setEmpresa] = useState("");
   const [email, setEmail] = useState(emailInicial ?? "");
   const [senha, setSenha] = useState("");
+  const [confirmacao, setConfirmacao] = useState("");
   const [carregando, setCarregando] = useState(false);
   const [enviado, setEnviado] = useState(false);
 
   const cadastrar = async (e: React.FormEvent) => {
     e.preventDefault();
     const emailLimpo = email.trim().toLowerCase();
-    const problema = mensagemSenhaInvalida(senha);
+    const problema = validarParDeSenhas(senha, confirmacao);
     if (problema) {
       toast.error(problema);
       return;
     }
+
     setCarregando(true);
     try {
       void registrarEventoEmail({ data: { tipo: "cadastro_solicitado", email: emailLimpo } }).catch(() => {});
@@ -144,20 +147,15 @@ function CadastrarPage() {
                   required
                 />
               </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="senha">Senha</Label>
-                <Input
-                  id="senha"
-                  type="password"
-                  autoComplete="new-password"
-                  minLength={8}
-                  value={senha}
-                  onChange={(e) => setSenha(e.target.value)}
-                  aria-describedby="forca-senha-cadastro"
-                  required
-                />
-                <ForcaSenha senha={senha} id="forca-senha-cadastro" className="pt-1" />
-              </div>
+              <CamposSenha
+                senha={senha}
+                onSenhaChange={setSenha}
+                confirmacao={confirmacao}
+                onConfirmacaoChange={setConfirmacao}
+                idSenha="senha"
+                disabled={carregando}
+              />
+
               <Button type="submit" className="w-full" disabled={carregando}>
                 {carregando ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : "Criar conta"}
               </Button>

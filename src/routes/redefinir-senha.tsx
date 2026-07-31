@@ -3,12 +3,11 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
-import { ForcaSenha } from "@/components/app/ForcaSenha";
+import { CamposSenha } from "@/components/app/CamposSenha";
 import { registrarEventoEmail } from "@/lib/email-eventos.functions";
-import { mensagemSenhaInvalida, traduzirErroSenha } from "@/lib/senha";
+import { traduzirErroSenha, validarParDeSenhas } from "@/lib/senha";
+
 
 const TITULO = "Redefinir senha — Precifica Grancont";
 const DESCRICAO = "Crie uma nova senha para o seu acesso ao Precifica Grancont.";
@@ -44,15 +43,12 @@ function Pagina() {
 
   const salvar = async (e: React.FormEvent) => {
     e.preventDefault();
-    const problema = mensagemSenhaInvalida(senha);
+    const problema = validarParDeSenhas(senha, confirmacao);
     if (problema) {
       toast.error(problema);
       return;
     }
-    if (senha !== confirmacao) {
-      toast.error("As senhas não conferem.");
-      return;
-    }
+
     setCarregando(true);
     const { data: sessao } = await supabase.auth.getUser();
     const { error } = await supabase.auth.updateUser({ password: senha });
@@ -89,30 +85,17 @@ function Pagina() {
           </p>
         ) : (
           <form className="mt-6 space-y-4" onSubmit={salvar}>
-            <div className="space-y-1.5">
-              <Label htmlFor="s1">Nova senha</Label>
-              <Input
-                id="s1"
-                type="password"
-                minLength={8}
-                value={senha}
-                onChange={(e) => setSenha(e.target.value)}
-                aria-describedby="forca-senha-nova"
-                required
-              />
-              <ForcaSenha senha={senha} id="forca-senha-nova" className="pt-1" />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="s2">Confirmar nova senha</Label>
-              <Input
-                id="s2"
-                type="password"
-                minLength={8}
-                value={confirmacao}
-                onChange={(e) => setConfirmacao(e.target.value)}
-                required
-              />
-            </div>
+            <CamposSenha
+              senha={senha}
+              onSenhaChange={setSenha}
+              confirmacao={confirmacao}
+              onConfirmacaoChange={setConfirmacao}
+              rotulo="Nova senha"
+              rotuloConfirmacao="Confirmar nova senha"
+              idSenha="nova-senha"
+              disabled={carregando}
+            />
+
             <Button type="submit" className="w-full" disabled={carregando}>
               Salvar nova senha
             </Button>
