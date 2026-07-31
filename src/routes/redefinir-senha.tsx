@@ -43,15 +43,12 @@ function Pagina() {
 
   const salvar = async (e: React.FormEvent) => {
     e.preventDefault();
-    const problema = mensagemSenhaInvalida(senha);
+    const problema = validarParDeSenhas(senha, confirmacao);
     if (problema) {
       toast.error(problema);
       return;
     }
-    if (senha !== confirmacao) {
-      toast.error("As senhas não conferem.");
-      return;
-    }
+
     setCarregando(true);
     const { data: sessao } = await supabase.auth.getUser();
     const { error } = await supabase.auth.updateUser({ password: senha });
