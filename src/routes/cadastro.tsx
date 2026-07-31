@@ -4,7 +4,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import { ForcaSenha } from "@/components/app/ForcaSenha";
+import { CamposSenha } from "@/components/app/CamposSenha";
 import { ReenviarConfirmacao } from "@/components/app/ReenviarConfirmacao";
 import { LogoGrancont } from "@/components/app/LogoGrancont";
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { registrarEventoEmail } from "@/lib/email-eventos.functions";
-import { mensagemSenhaInvalida, traduzirErroSenha } from "@/lib/senha";
+import { traduzirErroSenha, validarParDeSenhas } from "@/lib/senha";
+
 
 const TITULO = "Criar conta — Precifica Grancont";
 const DESCRICAO =
