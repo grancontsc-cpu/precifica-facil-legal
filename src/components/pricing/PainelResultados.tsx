@@ -120,7 +120,7 @@ export function PainelResultados({ resultado }: { resultado: SimulationResult })
           <>
             <div className="mt-3 rounded-lg bg-brand-soft px-4 py-3">
               <p className="text-xs font-medium text-primary">Preço final cobrado</p>
-              <p className="mt-1 text-3xl font-semibold tabular-nums text-primary">
+              <p className="num-destaque mt-1 text-3xl text-primary">
                 {formatBRL(recomendado.precoFinal)}
               </p>
               <p className="mt-1 text-xs text-primary/80">
