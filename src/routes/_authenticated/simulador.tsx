@@ -22,10 +22,26 @@ import { CardTributoCompra } from "@/components/pricing/CardTributoCompra";
 import { CardTributoVenda } from "@/components/pricing/CardTributoVenda";
 import { PainelResultados } from "@/components/pricing/PainelResultados";
 import { EntendaOCalculo } from "@/components/pricing/EntendaOCalculo";
-import { AlternadorModo } from "@/components/pricing/AlternadorModo";
+import {
+  AlternadorModo,
+  DESCRICAO_MODO,
+  modoValido,
+  type ModoSimulador,
+} from "@/components/pricing/AlternadorModo";
+import { ContextoFiscal } from "@/components/pricing/ContextoFiscal";
+import { useAliquotas } from "@/hooks/useAliquotas";
+import { sincronizarOperacao } from "@/lib/aliquotas";
 import { ResumoFlutuante } from "@/components/pricing/ResumoFlutuante";
 import { simular } from "@/lib/pricing-engine";
-import { CENARIOS, aplicarCenario, estadoExemplo, estadoInicial } from "@/lib/pricing-defaults";
+import {
+  CENARIOS,
+  aplicarCenario,
+  aplicarRegime,
+  estadoExemplo,
+  estadoInicial,
+  garantirOperacao,
+  operacaoPadrao,
+} from "@/lib/pricing-defaults";
 import { formatBRL, formatData } from "@/lib/format";
 import { BarraSimulacao } from "@/components/app/BarraSimulacao";
 import { ExportarSimulacao } from "@/components/report/ExportarSimulacao";
@@ -48,7 +64,9 @@ import {
   type TaxProfileRow,
 } from "@/lib/tax-profiles";
 import type {
+  OperacaoFiscal,
   ProdutoCompra,
+  Regime,
   PurchaseTax,
   SaleTax,
   ScenarioId,
@@ -143,6 +161,7 @@ function Simulador() {
   );
 
   const [state, setState] = useState<SimulationState>(() => estadoInicial());
+  const [modo, setModo] = useState<ModoSimulador>("simples");
   const [salvoEm, setSalvoEm] = useState<Date | null>(null);
   const [, setCarregado] = useState(false);
   const [titulo, setTitulo] = useState("Nova simulação");
@@ -308,6 +327,7 @@ function Simulador() {
     setCarregado(true);
   }, [simulacaoId]);
 
+  const { tabela } = useAliquotas();
   const resultado = useMemo(() => simular(state), [state]);
 
   const operacao = state.operacao ?? operacaoPadrao();
@@ -598,8 +618,11 @@ function Simulador() {
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="flex items-center gap-2">
                     <AlternadorModo
-                      avancado={state.modoAvancado}
-                      onChange={(v) => setState((s) => ({ ...s, modoAvancado: v }))}
+                      modo={modo}
+                      onChange={(v) => {
+                        setModo(v);
+                        setState((s) => ({ ...s, modoAvancado: v === "completo" }));
+                      }}
                     />
                     <Ajuda texto="No modo completo você edita base de cálculo, redução de base, percentual de crédito, valores manuais e observações." />
                   </div>
@@ -615,9 +638,7 @@ function Simulador() {
                   </div>
                 </div>
                 <p className="text-xs leading-relaxed text-muted-foreground">
-                  {state.modoAvancado
-                    ? "Modo completo: todos os detalhes de cada tributo ficam abertos para edição."
-                    : "Modo simples: preencha o que comprou, o quanto pagou e a margem desejada. O restante segue o perfil tributário da empresa."}
+                  {DESCRICAO_MODO[modo]}
                 </p>
               </div>
 
