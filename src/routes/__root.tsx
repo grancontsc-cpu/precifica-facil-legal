@@ -167,6 +167,20 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const router = useRouter();
+
+  // A tag do GA envia o page_view inicial; navegações SPA precisam de envio manual.
+  useEffect(() => {
+    let anterior = window.location.pathname + window.location.search;
+    return router.subscribe("onResolved", () => {
+      const atual = window.location.pathname + window.location.search;
+      if (atual === anterior) return;
+      anterior = atual;
+      registrarPageView(atual);
+    });
+  }, [router]);
+
+
 
   return (
     <QueryClientProvider client={queryClient}>
