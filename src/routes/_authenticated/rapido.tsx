@@ -464,16 +464,16 @@ function ModoRapido() {
         ) : null}
       </div>
 
-      {passo < 5 ? (
-        <div className="flex items-center justify-between gap-3">
-          <Button
-            variant="ghost"
-            onClick={() => setPasso((p) => Math.max(1, p - 1))}
-            disabled={passo === 1}
-          >
-            <ArrowLeft className="size-4" aria-hidden />
-            Voltar
-          </Button>
+      <div className="flex items-center justify-between gap-3">
+        <Button
+          variant="ghost"
+          onClick={() => irPara(Math.max(1, passo - 1))}
+          disabled={passo === 1}
+        >
+          <ArrowLeft className="size-4" aria-hidden />
+          Voltar
+        </Button>
+        {passo < 5 ? (
           <Button
             onClick={() => {
               if (passo === 4) {
@@ -493,15 +493,20 @@ function ModoRapido() {
                   });
                 }
               }
-              setPasso((p) => p + 1);
+              irPara(passo + 1);
             }}
             disabled={!podeAvancar}
           >
             {passo === 4 ? "Ver preço sugerido" : "Continuar"}
             <ArrowRight className="size-4" aria-hidden />
           </Button>
-        </div>
-      ) : null}
+        ) : (
+          <Button variant="outline" onClick={() => irPara(5)} disabled>
+            Preço calculado
+          </Button>
+        )}
+      </div>
+
 
 
       <p className="text-center text-xs text-muted-foreground">
