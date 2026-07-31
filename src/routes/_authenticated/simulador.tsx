@@ -310,6 +310,47 @@ function Simulador() {
 
   const resultado = useMemo(() => simular(state), [state]);
 
+  const operacao = state.operacao ?? operacaoPadrao();
+
+  const setOperacao = (patch: Partial<OperacaoFiscal>) =>
+    setState((s) => {
+      const base = { ...operacaoPadrao(), ...(s.operacao ?? {}), ...patch };
+      return { ...s, operacao: sincronizarOperacao(base, tabela) };
+    });
+
+  const setRegime = (regime: Regime) =>
+    setState((s) => {
+      const comRegime = aplicarRegime(garantirOperacao(s), regime);
+      return {
+        ...comRegime,
+        operacao: sincronizarOperacao(comRegime.operacao ?? operacaoPadrao(), tabela),
+      };
+    });
+
+  // Preenche o contexto fiscal com o cadastro da empresa e as alíquotas vigentes.
+  useEffect(() => {
+    setState((s) => {
+      const atual = { ...operacaoPadrao(), ...(s.operacao ?? {}) };
+      const proposta = {
+        ...atual,
+        ufDestino: atual.ufDestino || (empresa?.uf ?? ""),
+        regime: (atual.regime ?? "real") as Regime,
+      };
+      const sincronizada = sincronizarOperacao(proposta, tabela);
+      const igual = JSON.stringify(sincronizada) === JSON.stringify(s.operacao);
+      return igual ? s : { ...s, operacao: sincronizada };
+    });
+  }, [empresa?.uf, tabela]);
+
+  // O regime cadastrado da empresa vale como padrão da primeira simulação.
+  useEffect(() => {
+    const regimeEmpresa = empresa?.regime as Regime | undefined;
+    if (!regimeEmpresa || simulacaoId) return;
+    setState((s) =>
+      s.operacao?.regime && s.operacao.regime !== "real" ? s : aplicarRegime(garantirOperacao(s), regimeEmpresa),
+    );
+  }, [empresa?.regime, simulacaoId]);
+
   const nomeEmpresa =
     organizations?.find((o) => o.id === orgId)?.name ?? "Empresa não selecionada";
 
@@ -333,6 +374,7 @@ function Simulador() {
       ...s,
       tributosVenda: s.tributosVenda.map((t) => (t.id === id ? { ...t, ...patch } : t)),
     }));
+
 
   const cenarioAtual = CENARIOS.find((c) => c.id === state.cenario);
 
