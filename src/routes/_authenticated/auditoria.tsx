@@ -25,7 +25,9 @@ const ACOES: Record<string, string> = {
   insert: "criação",
   update: "alteração",
   delete: "exclusão",
+  solicitacao_acesso: "solicitação de acesso",
   acesso_negado_carregar: "tentativa negada de abrir",
+
   acesso_negado_salvar: "tentativa negada de salvar",
   acesso_negado_criar: "tentativa negada de criar",
   acesso_negado_duplicar: "tentativa negada de duplicar",
