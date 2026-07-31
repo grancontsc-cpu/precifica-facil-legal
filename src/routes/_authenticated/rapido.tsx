@@ -1,9 +1,14 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight, Info, RotateCcw, Zap } from "lucide-react";
 
 import { metaPagina } from "@/lib/seo-head";
 import { Button } from "@/components/ui/button";
+import {
+  eventoParametroFiscal,
+  eventoSimulacaoIniciada,
+  eventoSimular,
+} from "@/lib/analytics-eventos";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
@@ -91,6 +96,11 @@ function ModoRapido() {
   const [ufDestino, setUfDestino] = useState(empresa?.uf ?? "");
   const regime = regimeDaEmpresa(empresa?.regime);
   const [ajustes, setAjustes] = useState<AjustesRapido>(ajustesVazios);
+
+  // Abertura do modo rápido.
+  useEffect(() => {
+    eventoSimulacaoIniciada({ modo: "rapido", origem: "nova" });
+  }, []);
 
   const estado = useMemo<SimulationState>(() => {
     const base = aplicarRegime(estadoInicial(), regime);
@@ -329,7 +339,21 @@ function ModoRapido() {
             <ArrowLeft className="size-4" aria-hidden />
             Voltar
           </Button>
-          <Button onClick={() => setPasso((p) => p + 1)} disabled={!podeAvancar}>
+          <Button
+            onClick={() => {
+              if (passo === 3) {
+                eventoSimular({
+                  modo: "rapido",
+                  regime,
+                  ufOrigem,
+                  ufDestino: ufDestino || ufOrigem,
+                  possuiResultado: !!recomendado,
+                });
+              }
+              setPasso((p) => p + 1);
+            }}
+            disabled={!podeAvancar}
+          >
             {passo === 3 ? "Ver preço sugerido" : "Continuar"}
             <ArrowRight className="size-4" aria-hidden />
           </Button>
