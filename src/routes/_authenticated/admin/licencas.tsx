@@ -46,6 +46,7 @@ const CORES: Record<StatusLicenca, string> = {
   active: "border-emerald-500/40 text-emerald-600",
   suspended: "border-destructive/40 text-destructive",
   expired: "border-muted-foreground/40 text-muted-foreground",
+  canceled: "border-destructive/40 text-destructive",
 };
 
 function PainelLicencas() {
@@ -103,7 +104,7 @@ function PainelLicencas() {
       </header>
 
       <div className="flex flex-wrap gap-2">
-        {(["trial", "active", "suspended", "expired"] as StatusLicenca[]).map((s) => (
+        {(["trial", "active", "suspended", "expired", "canceled"] as StatusLicenca[]).map((s) => (
           <Badge key={s} variant="outline" className={CORES[s]}>
             {ROTULO_LICENCA[s]}: {resumo[s] ?? 0}
           </Badge>
