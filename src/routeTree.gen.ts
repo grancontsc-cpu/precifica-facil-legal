@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TesteExpiradoRouteImport } from './routes/teste-expirado'
 import { Route as RedefinirSenhaRouteImport } from './routes/redefinir-senha'
 import { Route as RecuperarSenhaRouteImport } from './routes/recuperar-senha'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LicencaSuspensaRouteImport } from './routes/licenca-suspensa'
 import { Route as EsqueciMinhaSenhaRouteImport } from './routes/esqueci-minha-senha'
@@ -37,6 +38,7 @@ import { Route as AuthenticatedCompararRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAuditoriaRouteImport } from './routes/_authenticated/auditoria'
 import { Route as AuthenticatedGestaoIndexRouteImport } from './routes/_authenticated/gestao/index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
+import { Route as AuthenticatedGestaoVinculosRouteImport } from './routes/_authenticated/gestao/vinculos'
 import { Route as AuthenticatedGestaoUsuariosRouteImport } from './routes/_authenticated/gestao/usuarios'
 import { Route as AuthenticatedGestaoConvitesRouteImport } from './routes/_authenticated/gestao/convites'
 import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authenticated/admin/usuarios'
@@ -62,6 +64,11 @@ const RedefinirSenhaRoute = RedefinirSenhaRouteImport.update({
 const RecuperarSenhaRoute = RecuperarSenhaRouteImport.update({
   id: '/recuperar-senha',
   path: '/recuperar-senha',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -189,6 +196,12 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/admin/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedGestaoVinculosRoute =
+  AuthenticatedGestaoVinculosRouteImport.update({
+    id: '/gestao/vinculos',
+    path: '/gestao/vinculos',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedGestaoUsuariosRoute =
   AuthenticatedGestaoUsuariosRouteImport.update({
     id: '/gestao/usuarios',
@@ -270,6 +283,7 @@ export interface FileRoutesByFullPath {
   '/esqueci-minha-senha': typeof EsqueciMinhaSenhaRoute
   '/licenca-suspensa': typeof LicencaSuspensaRoute
   '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
   '/teste-expirado': typeof TesteExpiradoRoute
@@ -293,6 +307,7 @@ export interface FileRoutesByFullPath {
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/gestao/convites': typeof AuthenticatedGestaoConvitesRoute
   '/gestao/usuarios': typeof AuthenticatedGestaoUsuariosRoute
+  '/gestao/vinculos': typeof AuthenticatedGestaoVinculosRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/gestao/': typeof AuthenticatedGestaoIndexRoute
 }
@@ -310,6 +325,7 @@ export interface FileRoutesByTo {
   '/esqueci-minha-senha': typeof EsqueciMinhaSenhaRoute
   '/licenca-suspensa': typeof LicencaSuspensaRoute
   '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
   '/teste-expirado': typeof TesteExpiradoRoute
@@ -333,6 +349,7 @@ export interface FileRoutesByTo {
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/gestao/convites': typeof AuthenticatedGestaoConvitesRoute
   '/gestao/usuarios': typeof AuthenticatedGestaoUsuariosRoute
+  '/gestao/vinculos': typeof AuthenticatedGestaoVinculosRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/gestao': typeof AuthenticatedGestaoIndexRoute
 }
@@ -352,6 +369,7 @@ export interface FileRoutesById {
   '/esqueci-minha-senha': typeof EsqueciMinhaSenhaRoute
   '/licenca-suspensa': typeof LicencaSuspensaRoute
   '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
   '/teste-expirado': typeof TesteExpiradoRoute
@@ -375,6 +393,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/_authenticated/gestao/convites': typeof AuthenticatedGestaoConvitesRoute
   '/_authenticated/gestao/usuarios': typeof AuthenticatedGestaoUsuariosRoute
+  '/_authenticated/gestao/vinculos': typeof AuthenticatedGestaoVinculosRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/gestao/': typeof AuthenticatedGestaoIndexRoute
 }
@@ -394,6 +413,7 @@ export interface FileRouteTypes {
     | '/esqueci-minha-senha'
     | '/licenca-suspensa'
     | '/login'
+    | '/onboarding'
     | '/recuperar-senha'
     | '/redefinir-senha'
     | '/teste-expirado'
@@ -417,6 +437,7 @@ export interface FileRouteTypes {
     | '/admin/usuarios'
     | '/gestao/convites'
     | '/gestao/usuarios'
+    | '/gestao/vinculos'
     | '/admin/'
     | '/gestao/'
   fileRoutesByTo: FileRoutesByTo
@@ -434,6 +455,7 @@ export interface FileRouteTypes {
     | '/esqueci-minha-senha'
     | '/licenca-suspensa'
     | '/login'
+    | '/onboarding'
     | '/recuperar-senha'
     | '/redefinir-senha'
     | '/teste-expirado'
@@ -457,6 +479,7 @@ export interface FileRouteTypes {
     | '/admin/usuarios'
     | '/gestao/convites'
     | '/gestao/usuarios'
+    | '/gestao/vinculos'
     | '/admin'
     | '/gestao'
   id:
@@ -475,6 +498,7 @@ export interface FileRouteTypes {
     | '/esqueci-minha-senha'
     | '/licenca-suspensa'
     | '/login'
+    | '/onboarding'
     | '/recuperar-senha'
     | '/redefinir-senha'
     | '/teste-expirado'
@@ -498,6 +522,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/usuarios'
     | '/_authenticated/gestao/convites'
     | '/_authenticated/gestao/usuarios'
+    | '/_authenticated/gestao/vinculos'
     | '/_authenticated/admin/'
     | '/_authenticated/gestao/'
   fileRoutesById: FileRoutesById
@@ -517,6 +542,7 @@ export interface RootRouteChildren {
   EsqueciMinhaSenhaRoute: typeof EsqueciMinhaSenhaRoute
   LicencaSuspensaRoute: typeof LicencaSuspensaRoute
   LoginRoute: typeof LoginRoute
+  OnboardingRoute: typeof OnboardingRoute
   RecuperarSenhaRoute: typeof RecuperarSenhaRoute
   RedefinirSenhaRoute: typeof RedefinirSenhaRoute
   TesteExpiradoRoute: typeof TesteExpiradoRoute
@@ -545,6 +571,13 @@ declare module '@tanstack/react-router' {
       path: '/recuperar-senha'
       fullPath: '/recuperar-senha'
       preLoaderRoute: typeof RecuperarSenhaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -722,6 +755,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/gestao/vinculos': {
+      id: '/_authenticated/gestao/vinculos'
+      path: '/gestao/vinculos'
+      fullPath: '/gestao/vinculos'
+      preLoaderRoute: typeof AuthenticatedGestaoVinculosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/gestao/usuarios': {
       id: '/_authenticated/gestao/usuarios'
       path: '/gestao/usuarios'
@@ -821,6 +861,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminUsuariosRoute: typeof AuthenticatedAdminUsuariosRoute
   AuthenticatedGestaoConvitesRoute: typeof AuthenticatedGestaoConvitesRoute
   AuthenticatedGestaoUsuariosRoute: typeof AuthenticatedGestaoUsuariosRoute
+  AuthenticatedGestaoVinculosRoute: typeof AuthenticatedGestaoVinculosRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedGestaoIndexRoute: typeof AuthenticatedGestaoIndexRoute
 }
@@ -845,6 +886,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminUsuariosRoute: AuthenticatedAdminUsuariosRoute,
   AuthenticatedGestaoConvitesRoute: AuthenticatedGestaoConvitesRoute,
   AuthenticatedGestaoUsuariosRoute: AuthenticatedGestaoUsuariosRoute,
+  AuthenticatedGestaoVinculosRoute: AuthenticatedGestaoVinculosRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   AuthenticatedGestaoIndexRoute: AuthenticatedGestaoIndexRoute,
 }
@@ -867,6 +909,7 @@ const rootRouteChildren: RootRouteChildren = {
   EsqueciMinhaSenhaRoute: EsqueciMinhaSenhaRoute,
   LicencaSuspensaRoute: LicencaSuspensaRoute,
   LoginRoute: LoginRoute,
+  OnboardingRoute: OnboardingRoute,
   RecuperarSenhaRoute: RecuperarSenhaRoute,
   RedefinirSenhaRoute: RedefinirSenhaRoute,
   TesteExpiradoRoute: TesteExpiradoRoute,

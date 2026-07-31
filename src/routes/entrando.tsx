@@ -44,7 +44,7 @@ function Entrando() {
         /* provisionamento tolerante a falha: o guarda de acesso decide o destino */
       }
 
-      const [{ data: perfil }, { data: globais }, { data: vinculos }] = await Promise.all([
+      const [{ data: perfil }, { data: globais }, { data: vinculos }, { data: pedidoPendente }] = await Promise.all([
         supabase.from("profiles").select("account_status").eq("id", user.id).maybeSingle(),
         supabase.from("global_user_roles").select("role").eq("user_id", user.id),
         supabase
@@ -52,6 +52,12 @@ function Entrando() {
           .select("role")
           .eq("user_id", user.id)
           .eq("membership_status", "active"),
+        supabase
+          .from("organization_join_requests")
+          .select("id")
+          .eq("user_id", user.id)
+          .eq("status", "pending")
+          .maybeSingle(),
       ]);
 
       const { data: licenca } = await supabase
@@ -84,7 +90,7 @@ function Entrando() {
                 : superAdmin
                   ? "/admin"
                   : (vinculos ?? []).length === 0
-                    ? "/acesso-negado"
+                    ? (pedidoPendente ? "/aguardando-aprovacao" : "/onboarding")
                     : gestor
                       ? "/gestao"
                       : "/simulador";

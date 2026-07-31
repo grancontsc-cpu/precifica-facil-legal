@@ -9,7 +9,6 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import {
   Select,
@@ -145,7 +144,7 @@ function Simulador() {
 
   const [state, setState] = useState<SimulationState>(() => estadoInicial());
   const [salvoEm, setSalvoEm] = useState<Date | null>(null);
-  const [carregado, setCarregado] = useState(false);
+  const [, setCarregado] = useState(false);
   const [titulo, setTitulo] = useState("Nova simulação");
   const [perfilId, setPerfilId] = useState<string | null>(null);
   const [produtoId, setProdutoId] = useState<string | null>(produtoQuery ?? null);
@@ -904,9 +903,6 @@ function Simulador() {
         </main>
 
         <ResumoFlutuante resultado={resultado} />
-
-
-        {carregado ? <Toaster position="top-center" /> : null}
       </div>
     </TooltipProvider>
   );

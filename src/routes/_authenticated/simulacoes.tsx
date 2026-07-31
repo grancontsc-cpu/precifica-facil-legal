@@ -6,7 +6,6 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Toaster } from "@/components/ui/sonner";
 import {
   Select,
   SelectContent,
@@ -188,7 +187,6 @@ function SimulacoesPage() {
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
-      <Toaster />
       <h1 className="text-xl font-semibold tracking-tight text-foreground">Histórico de simulações</h1>
       <p className="mt-1 text-sm text-muted-foreground">
         Cada simulação guarda uma cópia imutável do perfil tributário usado no momento do cálculo.

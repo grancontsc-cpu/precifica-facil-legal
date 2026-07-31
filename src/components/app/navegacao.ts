@@ -11,6 +11,7 @@ import {
   Percent,
   Scale,
   ShieldQuestion,
+  UserPlus,
   Users,
   type LucideIcon,
 } from "lucide-react";
@@ -79,6 +80,13 @@ export const NAV_GESTAO: ItemNav[] = [
     label: "Usuários",
     descricao: "Quem pode usar o sistema na sua empresa",
     icon: Users,
+    acesso: "manager",
+  },
+  {
+    to: "/gestao/vinculos",
+    label: "Pedidos de vínculo",
+    descricao: "Aprove quem pediu acesso à sua empresa",
+    icon: UserPlus,
     acesso: "manager",
   },
   {
