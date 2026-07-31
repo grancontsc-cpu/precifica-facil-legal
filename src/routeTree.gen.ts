@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TesteExpiradoRouteImport } from './routes/teste-expirado'
 import { Route as RedefinirSenhaRouteImport } from './routes/redefinir-senha'
 import { Route as RecuperarSenhaRouteImport } from './routes/recuperar-senha'
 import { Route as LoginRouteImport } from './routes/login'
@@ -42,6 +43,11 @@ import { Route as AuthenticatedAdminEmpresasRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminConvitesRouteImport } from './routes/_authenticated/admin/convites'
 import { Route as AuthenticatedAdminAuditoriaRouteImport } from './routes/_authenticated/admin/auditoria'
 
+const TesteExpiradoRoute = TesteExpiradoRouteImport.update({
+  id: '/teste-expirado',
+  path: '/teste-expirado',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RedefinirSenhaRoute = RedefinirSenhaRouteImport.update({
   id: '/redefinir-senha',
   path: '/redefinir-senha',
@@ -226,6 +232,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
+  '/teste-expirado': typeof TesteExpiradoRoute
   '/auditoria': typeof AuthenticatedAuditoriaRoute
   '/comparar': typeof AuthenticatedCompararRoute
   '/empresas': typeof AuthenticatedEmpresasRoute
@@ -259,6 +266,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
+  '/teste-expirado': typeof TesteExpiradoRoute
   '/auditoria': typeof AuthenticatedAuditoriaRoute
   '/comparar': typeof AuthenticatedCompararRoute
   '/empresas': typeof AuthenticatedEmpresasRoute
@@ -294,6 +302,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
+  '/teste-expirado': typeof TesteExpiradoRoute
   '/_authenticated/auditoria': typeof AuthenticatedAuditoriaRoute
   '/_authenticated/comparar': typeof AuthenticatedCompararRoute
   '/_authenticated/empresas': typeof AuthenticatedEmpresasRoute
@@ -329,6 +338,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/recuperar-senha'
     | '/redefinir-senha'
+    | '/teste-expirado'
     | '/auditoria'
     | '/comparar'
     | '/empresas'
@@ -362,6 +372,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/recuperar-senha'
     | '/redefinir-senha'
+    | '/teste-expirado'
     | '/auditoria'
     | '/comparar'
     | '/empresas'
@@ -396,6 +407,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/recuperar-senha'
     | '/redefinir-senha'
+    | '/teste-expirado'
     | '/_authenticated/auditoria'
     | '/_authenticated/comparar'
     | '/_authenticated/empresas'
@@ -431,10 +443,18 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   RecuperarSenhaRoute: typeof RecuperarSenhaRoute
   RedefinirSenhaRoute: typeof RedefinirSenhaRoute
+  TesteExpiradoRoute: typeof TesteExpiradoRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/teste-expirado': {
+      id: '/teste-expirado'
+      path: '/teste-expirado'
+      fullPath: '/teste-expirado'
+      preLoaderRoute: typeof TesteExpiradoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/redefinir-senha': {
       id: '/redefinir-senha'
       path: '/redefinir-senha'
@@ -724,6 +744,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   RecuperarSenhaRoute: RecuperarSenhaRoute,
   RedefinirSenhaRoute: RedefinirSenhaRoute,
+  TesteExpiradoRoute: TesteExpiradoRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
