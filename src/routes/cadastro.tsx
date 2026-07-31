@@ -147,20 +147,15 @@ function CadastrarPage() {
                   required
                 />
               </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="senha">Senha</Label>
-                <Input
-                  id="senha"
-                  type="password"
-                  autoComplete="new-password"
-                  minLength={8}
-                  value={senha}
-                  onChange={(e) => setSenha(e.target.value)}
-                  aria-describedby="forca-senha-cadastro"
-                  required
-                />
-                <ForcaSenha senha={senha} id="forca-senha-cadastro" className="pt-1" />
-              </div>
+              <CamposSenha
+                senha={senha}
+                onSenhaChange={setSenha}
+                confirmacao={confirmacao}
+                onConfirmacaoChange={setConfirmacao}
+                idSenha="senha"
+                disabled={carregando}
+              />
+
               <Button type="submit" className="w-full" disabled={carregando}>
                 {carregando ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : "Criar conta"}
               </Button>
