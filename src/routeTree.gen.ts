@@ -13,6 +13,7 @@ import { Route as TesteExpiradoRouteImport } from './routes/teste-expirado'
 import { Route as RedefinirSenhaRouteImport } from './routes/redefinir-senha'
 import { Route as RecuperarSenhaRouteImport } from './routes/recuperar-senha'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as LicencaSuspensaRouteImport } from './routes/licenca-suspensa'
 import { Route as EntrandoRouteImport } from './routes/entrando'
 import { Route as ConfirmarEmailRouteImport } from './routes/confirmar-email'
 import { Route as CadastroRouteImport } from './routes/cadastro'
@@ -61,6 +62,11 @@ const RecuperarSenhaRoute = RecuperarSenhaRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LicencaSuspensaRoute = LicencaSuspensaRouteImport.update({
+  id: '/licenca-suspensa',
+  path: '/licenca-suspensa',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EntrandoRoute = EntrandoRouteImport.update({
@@ -229,6 +235,7 @@ export interface FileRoutesByFullPath {
   '/cadastro': typeof CadastroRoute
   '/confirmar-email': typeof ConfirmarEmailRoute
   '/entrando': typeof EntrandoRoute
+  '/licenca-suspensa': typeof LicencaSuspensaRoute
   '/login': typeof LoginRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
@@ -263,6 +270,7 @@ export interface FileRoutesByTo {
   '/cadastro': typeof CadastroRoute
   '/confirmar-email': typeof ConfirmarEmailRoute
   '/entrando': typeof EntrandoRoute
+  '/licenca-suspensa': typeof LicencaSuspensaRoute
   '/login': typeof LoginRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
@@ -299,6 +307,7 @@ export interface FileRoutesById {
   '/cadastro': typeof CadastroRoute
   '/confirmar-email': typeof ConfirmarEmailRoute
   '/entrando': typeof EntrandoRoute
+  '/licenca-suspensa': typeof LicencaSuspensaRoute
   '/login': typeof LoginRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
@@ -335,6 +344,7 @@ export interface FileRouteTypes {
     | '/cadastro'
     | '/confirmar-email'
     | '/entrando'
+    | '/licenca-suspensa'
     | '/login'
     | '/recuperar-senha'
     | '/redefinir-senha'
@@ -369,6 +379,7 @@ export interface FileRouteTypes {
     | '/cadastro'
     | '/confirmar-email'
     | '/entrando'
+    | '/licenca-suspensa'
     | '/login'
     | '/recuperar-senha'
     | '/redefinir-senha'
@@ -404,6 +415,7 @@ export interface FileRouteTypes {
     | '/cadastro'
     | '/confirmar-email'
     | '/entrando'
+    | '/licenca-suspensa'
     | '/login'
     | '/recuperar-senha'
     | '/redefinir-senha'
@@ -440,6 +452,7 @@ export interface RootRouteChildren {
   CadastroRoute: typeof CadastroRoute
   ConfirmarEmailRoute: typeof ConfirmarEmailRoute
   EntrandoRoute: typeof EntrandoRoute
+  LicencaSuspensaRoute: typeof LicencaSuspensaRoute
   LoginRoute: typeof LoginRoute
   RecuperarSenhaRoute: typeof RecuperarSenhaRoute
   RedefinirSenhaRoute: typeof RedefinirSenhaRoute
@@ -474,6 +487,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/licenca-suspensa': {
+      id: '/licenca-suspensa'
+      path: '/licenca-suspensa'
+      fullPath: '/licenca-suspensa'
+      preLoaderRoute: typeof LicencaSuspensaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/entrando': {
@@ -741,6 +761,7 @@ const rootRouteChildren: RootRouteChildren = {
   CadastroRoute: CadastroRoute,
   ConfirmarEmailRoute: ConfirmarEmailRoute,
   EntrandoRoute: EntrandoRoute,
+  LicencaSuspensaRoute: LicencaSuspensaRoute,
   LoginRoute: LoginRoute,
   RecuperarSenhaRoute: RecuperarSenhaRoute,
   RedefinirSenhaRoute: RedefinirSenhaRoute,

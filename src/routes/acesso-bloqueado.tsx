@@ -1,16 +1,15 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { ShieldAlert } from "lucide-react";
-import { useEffect, useState } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
 
-import { SolicitarAcessoAdmin } from "@/components/app/SolicitarAcessoAdmin";
-import { Button } from "@/components/ui/button";
+import { Carregando } from "@/components/app/GuardaAcesso";
 import { supabase } from "@/integrations/supabase/client";
-import { avaliarLicenca, type Licenca } from "@/lib/licencas";
+import { avaliarLicenca, rotaBloqueio, type Licenca } from "@/lib/licencas";
 
 const TITULO = "Acesso bloqueado — Precifica Grancont";
 const DESCRICAO =
-  "Seu acesso ao Precifica Grancont está suspenso. Solicite a liberação da licença ao Administrador Grancont.";
+  "Seu acesso ao Precifica Grancont está bloqueado. Solicite a liberação da licença ao Administrador Grancont.";
 
+/** Rota legada: encaminha para o aviso específico (teste expirado ou licença suspensa). */
 export const Route = createFileRoute("/acesso-bloqueado")({
   head: () => ({
     meta: [
@@ -28,51 +27,27 @@ export const Route = createFileRoute("/acesso-bloqueado")({
 });
 
 function Pagina() {
-  const [motivo, setMotivo] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     (async () => {
       const { data: sessao } = await supabase.auth.getUser();
-      if (!sessao.user) return;
+      if (!sessao.user) {
+        navigate({ to: "/login", replace: true });
+        return;
+      }
       const { data } = await supabase
         .from("licenses")
         .select("status, plan, trial_started_at, trial_ends_at, activated_at, expires_at, notes")
         .eq("user_id", sessao.user.id)
         .maybeSingle();
-      setMotivo(avaliarLicenca((data as Licenca | null) ?? null).motivo);
+      navigate({ to: rotaBloqueio(avaliarLicenca((data as Licenca | null) ?? null)), replace: true });
     })();
-  }, []);
+  }, [navigate]);
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-background px-4 py-10">
-      <div className="w-full max-w-md rounded-xl border border-border bg-card p-6 text-center shadow-[var(--shadow-card)]">
-        <ShieldAlert className="mx-auto h-8 w-8 text-destructive" aria-hidden />
-        <h1 className="mt-3 text-lg font-semibold text-foreground">Acesso suspenso</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          {motivo ?? "Seu acesso está temporariamente suspenso."}
-        </p>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Para continuar utilizando o simulador, solicite a liberação da licença ao Administrador Grancont.
-        </p>
-
-        <div className="mt-6 space-y-2">
-          <SolicitarAcessoAdmin className="w-full" />
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={async () => {
-              await supabase.auth.signOut();
-              window.location.href = "/login";
-            }}
-          >
-            Sair
-          </Button>
-        </div>
-
-        <Link to="/login" className="mt-3 inline-block text-xs text-primary hover:underline">
-          Voltar para o login
-        </Link>
-      </div>
+    <main className="min-h-screen bg-background">
+      <Carregando texto="Verificando sua licença…" />
     </main>
   );
 }
