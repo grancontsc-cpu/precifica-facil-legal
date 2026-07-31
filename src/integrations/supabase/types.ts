@@ -126,6 +126,75 @@ export type Database = {
         }
         Relationships: []
       }
+      email_events: {
+        Row: {
+          created_at: string
+          error_code: string | null
+          error_message: string | null
+          event_type: string
+          id: string
+          normalized_email: string | null
+          provider: string
+          provider_status: string | null
+          request_reference: string | null
+          request_status: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          error_code?: string | null
+          error_message?: string | null
+          event_type: string
+          id?: string
+          normalized_email?: string | null
+          provider?: string
+          provider_status?: string | null
+          request_reference?: string | null
+          request_status?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          error_code?: string | null
+          error_message?: string | null
+          event_type?: string
+          id?: string
+          normalized_email?: string | null
+          provider?: string
+          provider_status?: string | null
+          request_reference?: string | null
+          request_status?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      features: {
+        Row: {
+          active: boolean
+          created_at: string
+          description: string | null
+          feature_key: string
+          id: string
+          name: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          feature_key: string
+          id?: string
+          name: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          feature_key?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       global_user_roles: {
         Row: {
           created_at: string
@@ -206,47 +275,235 @@ export type Database = {
           },
         ]
       }
+      license_events: {
+        Row: {
+          actor_user_id: string | null
+          created_at: string
+          event_type: string
+          id: string
+          license_id: string | null
+          new_expiration: string | null
+          new_status: string | null
+          organization_id: string | null
+          previous_expiration: string | null
+          previous_status: string | null
+          reason: string | null
+        }
+        Insert: {
+          actor_user_id?: string | null
+          created_at?: string
+          event_type: string
+          id?: string
+          license_id?: string | null
+          new_expiration?: string | null
+          new_status?: string | null
+          organization_id?: string | null
+          previous_expiration?: string | null
+          previous_status?: string | null
+          reason?: string | null
+        }
+        Update: {
+          actor_user_id?: string | null
+          created_at?: string
+          event_type?: string
+          id?: string
+          license_id?: string | null
+          new_expiration?: string | null
+          new_status?: string | null
+          organization_id?: string | null
+          previous_expiration?: string | null
+          previous_status?: string | null
+          reason?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "license_events_license_id_fkey"
+            columns: ["license_id"]
+            isOneToOne: false
+            referencedRelation: "licenses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "license_events_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      license_feature_overrides: {
+        Row: {
+          configuration: Json
+          created_at: string
+          enabled: boolean
+          feature_id: string
+          id: string
+          license_id: string
+          updated_at: string
+        }
+        Insert: {
+          configuration?: Json
+          created_at?: string
+          enabled?: boolean
+          feature_id: string
+          id?: string
+          license_id: string
+          updated_at?: string
+        }
+        Update: {
+          configuration?: Json
+          created_at?: string
+          enabled?: boolean
+          feature_id?: string
+          id?: string
+          license_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "license_feature_overrides_feature_id_fkey"
+            columns: ["feature_id"]
+            isOneToOne: false
+            referencedRelation: "features"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "license_feature_overrides_license_id_fkey"
+            columns: ["license_id"]
+            isOneToOne: false
+            referencedRelation: "licenses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       licenses: {
         Row: {
           activated_at: string | null
+          activated_by: string | null
           created_at: string
           expires_at: string | null
+          id: string
           notes: string | null
+          organization_id: string | null
           plan: string
+          plan_id: string | null
+          starts_at: string | null
           status: string
+          suspended_at: string | null
+          suspended_by: string | null
+          suspension_reason: string | null
           trial_ends_at: string
           trial_started_at: string
           updated_at: string
           updated_by: string | null
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           activated_at?: string | null
+          activated_by?: string | null
           created_at?: string
           expires_at?: string | null
+          id?: string
           notes?: string | null
+          organization_id?: string | null
           plan?: string
+          plan_id?: string | null
+          starts_at?: string | null
           status?: string
+          suspended_at?: string | null
+          suspended_by?: string | null
+          suspension_reason?: string | null
           trial_ends_at?: string
           trial_started_at?: string
           updated_at?: string
           updated_by?: string | null
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           activated_at?: string | null
+          activated_by?: string | null
           created_at?: string
           expires_at?: string | null
+          id?: string
           notes?: string | null
+          organization_id?: string | null
           plan?: string
+          plan_id?: string | null
+          starts_at?: string | null
           status?: string
+          suspended_at?: string | null
+          suspended_by?: string | null
+          suspension_reason?: string | null
           trial_ends_at?: string
           trial_started_at?: string
           updated_at?: string
           updated_by?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "licenses_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "licenses_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organization_join_requests: {
+        Row: {
+          created_at: string
+          id: string
+          normalized_cnpj: string | null
+          organization_id: string | null
+          requested_name: string | null
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          normalized_cnpj?: string | null
+          organization_id?: string | null
+          requested_name?: string | null
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          normalized_cnpj?: string | null
+          organization_id?: string | null
+          requested_name?: string | null
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "organization_join_requests_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       organization_members: {
         Row: {
@@ -299,6 +556,7 @@ export type Database = {
         Row: {
           active: boolean
           archived_at: string | null
+          city: string | null
           cnpj: string | null
           created_at: string
           created_by: string | null
@@ -307,7 +565,9 @@ export type Database = {
           id: string
           legal_name: string | null
           name: string
+          normalized_cnpj: string | null
           regime: string | null
+          status: string
           trade_name: string | null
           uf: string | null
           updated_at: string
@@ -315,6 +575,7 @@ export type Database = {
         Insert: {
           active?: boolean
           archived_at?: string | null
+          city?: string | null
           cnpj?: string | null
           created_at?: string
           created_by?: string | null
@@ -323,7 +584,9 @@ export type Database = {
           id?: string
           legal_name?: string | null
           name: string
+          normalized_cnpj?: string | null
           regime?: string | null
+          status?: string
           trade_name?: string | null
           uf?: string | null
           updated_at?: string
@@ -331,6 +594,7 @@ export type Database = {
         Update: {
           active?: boolean
           archived_at?: string | null
+          city?: string | null
           cnpj?: string | null
           created_at?: string
           created_by?: string | null
@@ -339,7 +603,9 @@ export type Database = {
           id?: string
           legal_name?: string | null
           name?: string
+          normalized_cnpj?: string | null
           regime?: string | null
+          status?: string
           trade_name?: string | null
           uf?: string | null
           updated_at?: string
@@ -353,6 +619,84 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      plan_features: {
+        Row: {
+          configuration: Json
+          created_at: string
+          enabled: boolean
+          feature_id: string
+          id: string
+          plan_id: string
+          updated_at: string
+        }
+        Insert: {
+          configuration?: Json
+          created_at?: string
+          enabled?: boolean
+          feature_id: string
+          id?: string
+          plan_id: string
+          updated_at?: string
+        }
+        Update: {
+          configuration?: Json
+          created_at?: string
+          enabled?: boolean
+          feature_id?: string
+          id?: string
+          plan_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plan_features_feature_id_fkey"
+            columns: ["feature_id"]
+            isOneToOne: false
+            referencedRelation: "features"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plan_features_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      plans: {
+        Row: {
+          created_at: string
+          default_duration_days: number | null
+          description: string | null
+          id: string
+          name: string
+          plan_type: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          default_duration_days?: number | null
+          description?: string | null
+          id?: string
+          name: string
+          plan_type?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          default_duration_days?: number | null
+          description?: string | null
+          id?: string
+          name?: string
+          plan_type?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       products: {
         Row: {
@@ -417,7 +761,12 @@ export type Database = {
           full_name: string | null
           id: string
           last_access_at: string | null
+          normalized_email: string | null
           phone: string | null
+          privacy_accepted_at: string | null
+          privacy_version: string | null
+          terms_accepted_at: string | null
+          terms_version: string | null
           updated_at: string
         }
         Insert: {
@@ -429,7 +778,12 @@ export type Database = {
           full_name?: string | null
           id: string
           last_access_at?: string | null
+          normalized_email?: string | null
           phone?: string | null
+          privacy_accepted_at?: string | null
+          privacy_version?: string | null
+          terms_accepted_at?: string | null
+          terms_version?: string | null
           updated_at?: string
         }
         Update: {
@@ -441,7 +795,12 @@ export type Database = {
           full_name?: string | null
           id?: string
           last_access_at?: string | null
+          normalized_email?: string | null
           phone?: string | null
+          privacy_accepted_at?: string | null
+          privacy_version?: string | null
+          terms_accepted_at?: string | null
+          terms_version?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -802,6 +1161,56 @@ export type Database = {
           },
         ]
       }
+      trial_claims: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          normalized_cnpj: string | null
+          normalized_email: string | null
+          organization_id: string | null
+          reason: string | null
+          status: string
+          trial_ends_at: string
+          trial_started_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          normalized_cnpj?: string | null
+          normalized_email?: string | null
+          organization_id?: string | null
+          reason?: string | null
+          status?: string
+          trial_ends_at: string
+          trial_started_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          normalized_cnpj?: string | null
+          normalized_email?: string | null
+          organization_id?: string | null
+          reason?: string | null
+          status?: string
+          trial_ends_at?: string
+          trial_started_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trial_claims_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -829,11 +1238,35 @@ export type Database = {
     }
     Functions: {
       bootstrap_grancont_admin: { Args: never; Returns: boolean }
+      bootstrap_super_admin: { Args: never; Returns: boolean }
       can_access_simulation: { Args: { _sim: string }; Returns: boolean }
+      can_manage_license: { Args: { _org: string }; Returns: boolean }
       can_manage_org_users: { Args: { _org: string }; Returns: boolean }
       can_read_simulation: { Args: { _sim: string }; Returns: boolean }
+      can_use_feature: {
+        Args: { _feature_key: string; _org: string }
+        Returns: boolean
+      }
       can_write_simulation: { Args: { _sim: string }; Returns: boolean }
+      complete_customer_onboarding: {
+        Args: {
+          p_city?: string
+          p_cnpj?: string
+          p_company_name: string
+          p_full_name: string
+          p_privacy_version?: string
+          p_state?: string
+          p_terms_version?: string
+        }
+        Returns: Json
+      }
+      has_active_license: { Args: { _org: string }; Returns: boolean }
+      has_active_trial: { Args: { _org: string }; Returns: boolean }
       has_org_role: { Args: { _org: string; _role: string }; Returns: boolean }
+      has_organization_role: {
+        Args: { _org: string; _role: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -841,12 +1274,15 @@ export type Database = {
         }
         Returns: boolean
       }
+      has_valid_access: { Args: { _org: string }; Returns: boolean }
       is_active_user: { Args: never; Returns: boolean }
       is_grancont_admin: { Args: never; Returns: boolean }
       is_org_admin: { Args: { _org: string }; Returns: boolean }
       is_org_member: { Args: { _org: string }; Returns: boolean }
+      is_organization_member: { Args: { _org: string }; Returns: boolean }
       is_super_admin: { Args: never; Returns: boolean }
       licenca_valida: { Args: { _user_id: string }; Returns: boolean }
+      process_expired_trials: { Args: never; Returns: Json }
     }
     Enums: {
       app_role: "grancont_admin"
