@@ -267,6 +267,13 @@ export function estadoExemplo(): SimulationState {
     rateioPorUnidade: 0,
   };
   s.cenario = "atual";
+  s.operacao = operacaoPadrao({
+    regime: "real",
+    ufOrigem: "SP",
+    ufDestino: "SP",
+    aliquotaInternaDestino: 18,
+    aliquotaInterestadual: null,
+  });
   s.tributosCompra = tributosCompraPadrao().map((t) => {
     if (t.id === "icms") return { ...t, enabled: true, rate: 18, treatment: "incluido" as const, creditMode: "integral" as const };
     if (t.id === "pis") return { ...t, enabled: true, rate: 1.65, treatment: "incluido" as const, creditMode: "integral" as const };

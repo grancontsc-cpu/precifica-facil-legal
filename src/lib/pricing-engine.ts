@@ -565,14 +565,24 @@ export function validar(state: SimulationState): ValidationIssue[] {
   const op = state.operacao;
 
   if (op) {
-    if (!op.ufOrigem) {
+    // Sem nenhuma UF informada a simulação segue: apenas não há fronteira a
+    // calcular. Com apenas uma delas o trajeto fica indefinido — isso é erro.
+    if (!op.ufOrigem && !op.ufDestino) {
+      if (op.difalAtivo) {
+        issues.push({
+          campo: "ufOrigem",
+          mensagem:
+            "Informe os estados de origem e destino para considerar o ICMS de fronteira na compra.",
+          severidade: "aviso",
+        });
+      }
+    } else if (!op.ufOrigem) {
       issues.push({
         campo: "ufOrigem",
         mensagem: "Informe o estado de origem da mercadoria.",
         severidade: "erro",
       });
-    }
-    if (!op.ufDestino) {
+    } else if (!op.ufDestino) {
       issues.push({
         campo: "ufDestino",
         mensagem: "Informe o estado de destino (o estado da sua empresa).",
