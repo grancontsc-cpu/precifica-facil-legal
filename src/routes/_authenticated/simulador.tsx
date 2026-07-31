@@ -644,8 +644,68 @@ function Simulador() {
                 </p>
               </div>
 
-
               <Secao
+                numero="Contexto fiscal"
+                titulo="Regime e trajeto da mercadoria"
+                descricao="O regime da empresa e os estados de origem e destino definem o ICMS de fronteira e se ele vira crédito ou custo."
+              >
+                <ContextoFiscal
+                  operacao={operacao}
+                  onChange={setOperacao}
+                  onRegime={setRegime}
+                  avancado={modo === "completo"}
+                  compacto={modo === "rapido"}
+                />
+              </Secao>
+
+              {modo === "rapido" ? (
+                <>
+                  <Secao
+                    numero="Seção 1"
+                    titulo="Produto e preço"
+                    descricao="O essencial para uma estimativa rápida do preço de venda."
+                  >
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <CampoTexto
+                        label="Nome do produto"
+                        value={state.produto.nome}
+                        onChange={(v) => setProduto({ nome: v })}
+                        placeholder="Ex.: Café torrado e moído 500g"
+                        className="sm:col-span-2"
+                      />
+                      <CampoNumero
+                        label="Valor unitário de compra"
+                        value={state.produto.valorUnitario}
+                        onChange={(v) => setProduto({ valorUnitario: v })}
+                        prefixo="R$"
+                      />
+                      <CampoNumero
+                        label="Quantidade"
+                        value={state.produto.quantidade}
+                        onChange={(v) => setProduto({ quantidade: v })}
+                      />
+                      <CampoNumero
+                        label="Margem desejada"
+                        value={state.venda.margemDesejada}
+                        onChange={(v) => setVenda({ margemDesejada: v })}
+                        sufixo="%"
+                        className="sm:col-span-2"
+                      />
+                    </div>
+                  </Secao>
+                  <Alert>
+                    <Info className="size-4" />
+                    <AlertDescription>
+                      Este é um valor aproximado: o modo rápido usa apenas as alíquotas gerais do
+                      trajeto informado. Para precificar com precisão — com créditos, despesas de
+                      venda, frete e benefícios fiscais — use o modo Simples ou o modo Completo.
+                    </AlertDescription>
+                  </Alert>
+                </>
+              ) : (
+                <>
+              <Secao
+
                 numero="Seção 1"
                 titulo="Produto e compra"
                 descricao="Informe o que foi comprado e quanto foi pago ao fornecedor."
