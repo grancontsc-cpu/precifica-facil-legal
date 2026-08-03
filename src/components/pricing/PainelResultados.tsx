@@ -28,7 +28,7 @@ function Linha({
         >
           {rotulo}
         </span>
-        {ajuda ? <Ajuda texto={ajuda} /> : null}
+        {ajuda ? <Ajuda texto={ajuda} rotulo={rotulo} /> : null}
       </div>
       <span
         className={cn(
