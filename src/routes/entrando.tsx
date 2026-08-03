@@ -101,7 +101,7 @@ function Entrando() {
 
   return (
     <main className="min-h-screen bg-background">
-      <Carregando texto="Verificando seu acesso…" />
+      <Carregando marca texto="Verificando seu acesso…" />
     </main>
   );
 }
