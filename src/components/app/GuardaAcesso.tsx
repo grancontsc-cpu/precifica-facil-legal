@@ -16,13 +16,18 @@ export function Carregando({
 }) {
   return (
     <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4">
-      {marca ? <LogoGrancont className="h-9 w-auto" /> : null}
-      <p className="flex items-center gap-2 text-sm text-muted-foreground">
+      {marca ? <LogoGrancont className="h-9" decorativa /> : null}
+      <p
+        role="status"
+        aria-live="polite"
+        className="flex items-center gap-2 text-sm text-muted-foreground"
+      >
         <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
         {texto}
       </p>
     </div>
   );
+
 }
 
 

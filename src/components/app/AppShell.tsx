@@ -121,7 +121,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             aria-label="Precifica Grancont — ir para o simulador"
             title="Ir para o simulador"
           >
-            <LogoGrancont className="h-6 sm:h-7" />
+            <LogoGrancont className="h-6 sm:h-7" decorativa />
           </Link>
 
 
