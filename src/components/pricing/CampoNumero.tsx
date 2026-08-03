@@ -130,19 +130,26 @@ export function CampoTexto({
   className,
 }: CampoTextoProps) {
   const id = useId();
+  const ajudaId = `${id}-ajuda`;
   return (
     <div className={cn("space-y-1.5", className)}>
       <div className="flex items-center gap-1.5">
         <Label htmlFor={id} className="text-xs font-medium text-muted-foreground">
           {label}
         </Label>
-        {ajuda ? <Ajuda texto={ajuda} /> : null}
+        {ajuda ? <Ajuda texto={ajuda} rotulo={label} /> : null}
       </div>
+      {ajuda ? (
+        <span id={ajudaId} className="sr-only">
+          {ajuda}
+        </span>
+      ) : null}
       <Input
         id={id}
         value={value}
         placeholder={placeholder}
         autoComplete="off"
+        aria-describedby={ajuda ? ajudaId : undefined}
         onChange={(e) => onChange(e.target.value)}
         className="h-11 text-base"
       />
@@ -150,19 +157,21 @@ export function CampoTexto({
   );
 }
 
-export function Ajuda({ texto }: { texto: string }) {
+/** Botão de ajuda contextual. `rotulo` identifica o campo para leitores de tela. */
+export function Ajuda({ texto, rotulo }: { texto: string; rotulo?: string }) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
         <button
           type="button"
-          aria-label={`Ajuda: ${texto}`}
+          aria-label={rotulo ? `Ajuda sobre ${rotulo}` : "Ajuda"}
           className="rounded-full text-muted-foreground transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
         >
           <HelpCircle className="h-3.5 w-3.5" aria-hidden />
         </button>
       </TooltipTrigger>
       <TooltipContent className="max-w-xs text-xs leading-relaxed">{texto}</TooltipContent>
+
     </Tooltip>
   );
 }
