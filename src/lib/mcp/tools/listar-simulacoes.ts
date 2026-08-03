@@ -1,4 +1,4 @@
-import { filtroIlike } from "./filtro-busca";
+import { MAX_BUSCA, filtroIlike } from "./filtro-busca";
 import { defineTool } from "@lovable.dev/mcp-js";
 import { z } from "zod";
 import { erro, ok, supabaseForUser } from "../supabase";
