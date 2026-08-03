@@ -134,6 +134,23 @@ function ProdutosPage() {
         </p>
       )}
 
+      <div className="mt-6 flex flex-wrap items-center gap-3">
+        <Input
+          placeholder="Pesquisar por nome, SKU ou NCM"
+          value={busca}
+          onChange={(e) => setBusca(e.target.value)}
+          className="max-w-sm"
+          aria-label="Pesquisar produtos"
+        />
+        <p className="text-sm text-muted-foreground" role="status" aria-live="polite">
+          {produtos.isLoading
+            ? "Carregando produtos…"
+            : `${lista.length} ${lista.length === 1 ? "produto encontrado" : "produtos encontrados"}`}
+          {busca !== buscaDebounce ? " · atualizando…" : ""}
+        </p>
+      </div>
+
+
       <section className="mt-6 overflow-x-auto rounded-xl border border-border bg-card">
         <table className="w-full text-sm">
           <thead className="bg-surface text-left text-xs uppercase tracking-wide text-muted-foreground">
