@@ -79,7 +79,7 @@ export function LogoInicio({ naRotaInicial }: { naRotaInicial: boolean }) {
                 setConfirmando(true);
               }}
             >
-              <LogoGrancont className="h-6 sm:h-7" decorativa />
+              <LogoGrancont className="h-7 sm:h-8" decorativa />
             </Link>
           </TooltipTrigger>
           {/* A dica é apenas visual: o Radix já associa a descrição ao link,
