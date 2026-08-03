@@ -160,12 +160,15 @@ function ProdutosPage() {
                 </td>
               </tr>
             ))}
-            {!produtos.isLoading && (produtos.data ?? []).length === 0 ? (
+            {!produtos.isLoading && lista.length === 0 ? (
               <tr>
                 <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
-                  Nenhum produto cadastrado ainda.
+                  {buscaDebounce.trim()
+                    ? "Nenhum produto encontrado para esta busca."
+                    : "Nenhum produto cadastrado ainda."}
                 </td>
               </tr>
+
             ) : null}
           </tbody>
         </table>
