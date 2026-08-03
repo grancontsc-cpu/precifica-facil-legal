@@ -115,9 +115,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen bg-background pb-16 lg:pb-0">
       <header className="sticky top-0 z-30 border-b border-border bg-card/95 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2.5 sm:px-6">
-          <Link to="/simulador" className="shrink-0" aria-label="Precifica Grancont — início">
+          <Link
+            to="/simulador"
+            className="shrink-0 rounded-md transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            aria-label="Precifica Grancont — ir para o simulador"
+            title="Ir para o simulador"
+          >
             <LogoGrancont className="h-7 w-auto" />
           </Link>
+
 
           <nav aria-label="Navegação principal" className="ml-4 hidden items-center gap-1 lg:flex">
             {NAV_DIARIO.map((item) => (
