@@ -1172,6 +1172,8 @@ function Simulador() {
         </main>
 
         <ResumoFlutuante resultado={resultado} />
+        <VoltarAoTopo />
+
       </div>
     </TooltipProvider>
   );
