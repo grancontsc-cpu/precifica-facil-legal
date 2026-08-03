@@ -31,7 +31,8 @@ import {
 } from "@/components/ui/select";
 import { useApp } from "@/hooks/useApp";
 import { cn } from "@/lib/utils";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { LogoInicio } from "@/components/app/LogoInicio";
+import { ProvedorAlteracoesPendentes } from "@/hooks/useAlteracoesPendentes";
 
 
 function LinkTopo({ item, ativo }: { item: ItemNav; ativo: boolean }) {
@@ -114,33 +115,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const empresaAtual = organizations.find((o) => o.id === orgId);
 
   return (
+    <ProvedorAlteracoesPendentes>
     <div className="min-h-screen bg-background pb-16 lg:pb-0">
       <header className="sticky top-0 z-30 border-b border-border bg-card/95 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center gap-2 px-3 py-2.5 sm:gap-3 sm:px-6">
-          <TooltipProvider delayDuration={200}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Link
-                  to="/simulador"
-                  className={cn(
-                    "flex shrink-0 items-center rounded-md px-1.5 py-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-                    itemAtivo(pathname, "/simulador")
-                      ? "bg-primary/10 ring-1 ring-primary/30"
-                      : "hover:opacity-80",
-                  )}
-                  aria-label="Precifica Grancont — ir para o simulador"
-                  aria-current={itemAtivo(pathname, "/simulador") ? "page" : undefined}
-                >
-                  <LogoGrancont className="h-6 sm:h-7" decorativa />
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent side="bottom" align="start">
-                {itemAtivo(pathname, "/simulador")
-                  ? "Você já está no simulador"
-                  : "Ir para o simulador de precificação"}
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <LogoInicio naRotaInicial={itemAtivo(pathname, "/simulador")} />
+
 
 
 
@@ -199,5 +179,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       <NavegacaoMobile ehGestor={ehGestor} isSuperAdmin={isSuperAdmin} />
     </div>
+    </ProvedorAlteracoesPendentes>
   );
 }
