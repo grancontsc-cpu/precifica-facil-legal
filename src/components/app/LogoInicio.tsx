@@ -1,4 +1,4 @@
-import { useId, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
   AlertDialog,
@@ -25,7 +25,6 @@ export function LogoInicio({ naRotaInicial }: { naRotaInicial: boolean }) {
   const { pendente } = useAlteracoesPendentes();
   const [confirmando, setConfirmando] = useState(false);
   const [tooltipAberto, setTooltipAberto] = useState(false);
-  const dicaId = useId();
 
   // Texto lido pelo leitor de tela como descrição (aria-describedby) do link.
   const dica = pendente
