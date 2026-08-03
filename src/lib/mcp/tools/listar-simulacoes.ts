@@ -1,3 +1,4 @@
+import { filtroIlike } from "./filtro-busca";
 import { defineTool } from "@lovable.dev/mcp-js";
 import { z } from "zod";
 import { erro, ok, supabaseForUser } from "../supabase";
@@ -29,7 +30,10 @@ export default defineTool({
       .limit(limite ?? 10);
 
     if (status) query = query.eq("status", status);
-    if (busca) query = query.or(`titulo.ilike.%${busca}%,produto_nome.ilike.%${busca}%`);
+    if (busca) {
+      const filtro = filtroIlike(["titulo", "produto_nome"], busca);
+      if (filtro) query = query.or(filtro);
+    }
 
     const { data, error } = await query;
     if (error) return erro(error.message);
