@@ -22,29 +22,49 @@ export function LogoGrancont({
    */
   decorativa?: boolean;
 }) {
-  const base = "block w-auto max-w-full select-none object-contain";
+  // `shrink-0` evita que o iOS Safari comprima a imagem dentro de flex
+  // containers; width/height intrínsecos reservam a proporção antes do load
+  // (evita salto de layout no Chrome Android e altura 0 no WebKit).
+  const base = "block w-auto max-w-full shrink-0 select-none object-contain";
+  const dimensoes = { width: 1268, height: 300 };
   const acessibilidade = decorativa
     ? ({ alt: "", "aria-hidden": true as const, role: "presentation" as const })
     : { alt };
 
   if (variante === "clara") {
-    return <img src={logoBranca.url} {...acessibilidade} className={`${base} ${className}`} />;
+    return (
+      <img
+        src={logoBranca.url}
+        {...dimensoes}
+        {...acessibilidade}
+        className={`${base} ${className}`}
+      />
+    );
   }
   if (variante === "escura") {
-    return <img src={logoRoxo.url} {...acessibilidade} className={`${base} ${className}`} />;
+    return (
+      <img src={logoRoxo.url} {...dimensoes} {...acessibilidade} className={`${base} ${className}`} />
+    );
   }
 
   // As duas versões usam o mesmo texto alternativo: a oculta usa `display:none`,
   // que leitores de tela ignoram — não há leitura duplicada.
   return (
     <>
-      <img src={logoRoxo.url} {...acessibilidade} className={`${base} ${className} dark:hidden`} />
+      <img
+        src={logoRoxo.url}
+        {...dimensoes}
+        {...acessibilidade}
+        className={`${base} ${className} dark:hidden`}
+      />
       <img
         src={logoBranca.url}
+        {...dimensoes}
         {...acessibilidade}
         className={`${base} ${className} hidden dark:block`}
       />
     </>
+
 
   );
 }
