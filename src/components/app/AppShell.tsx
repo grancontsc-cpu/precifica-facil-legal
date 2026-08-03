@@ -145,7 +145,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             {organizations.length > 1 ? (
               <Select value={orgId ?? undefined} onValueChange={setOrgId}>
                 <SelectTrigger
-                  className="h-10 w-[150px] sm:w-[210px]"
+                  className="h-10 w-[120px] min-w-0 shrink sm:w-[210px]"
                   aria-label="Empresa selecionada"
                 >
                   <SelectValue placeholder="Escolher empresa" />
