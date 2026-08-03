@@ -24,11 +24,8 @@ jobs:
       - name: Instalar dependências
         run: bun install --frozen-lockfile
 
-      - name: Lint
-        run: bun run lint
-
-      - name: Verificação de tipos
-        run: bun run typecheck
-
-      - name: Testes
-        run: bun run test
+      # Mesmo comando que roda localmente: `bun run verificar`
+      # (lint -> tipos -> testes). Não duplicar passos aqui para o
+      # CI e o ambiente local nunca divergirem.
+      - name: Lint, tipos e testes
+        run: bun run verificar
