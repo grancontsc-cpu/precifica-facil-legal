@@ -189,7 +189,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       /* ignora */
     }
     await supabase.auth.signOut();
-    navigate({ to: "/login", replace: true });
+    navigate({ to: "/login", search: { next: undefined }, replace: true });
   };
 
   const value: AppContextValue = {

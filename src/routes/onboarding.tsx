@@ -51,7 +51,7 @@ function OnboardingPage() {
     try {
       const { data: sessao } = await supabase.auth.getUser();
       if (!sessao.user) {
-        navigate({ to: "/login", replace: true });
+        navigate({ to: "/login", search: { next: undefined }, replace: true });
         return;
       }
 

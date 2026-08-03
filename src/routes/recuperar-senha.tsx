@@ -86,7 +86,7 @@ function Pagina() {
           </form>
         )}
 
-        <Link to="/login" className="mt-4 inline-block text-xs text-primary hover:underline">
+        <Link to="/login" search={{ next: undefined }} className="mt-4 inline-block text-xs text-primary hover:underline">
           Voltar para o login
         </Link>
       </div>

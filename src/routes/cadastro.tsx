@@ -109,7 +109,7 @@ function CadastrarPage() {
               Não recebeu? Confira a caixa de spam e o lixo eletrônico, e confirme se o endereço está correto.
             </p>
             <ReenviarConfirmacao email={email} className="mt-5 text-left" />
-            <Link to="/login" className="mt-6 inline-block text-sm text-primary hover:underline">
+            <Link to="/login" search={{ next: undefined }} className="mt-6 inline-block text-sm text-primary hover:underline">
               Voltar para o login
             </Link>
           </div>
@@ -172,7 +172,7 @@ function CadastrarPage() {
 
             <p className="mt-6 border-t border-border pt-4 text-xs text-muted-foreground">
               Já tem conta?{" "}
-              <Link to="/login" className="text-primary hover:underline">
+              <Link to="/login" search={{ next: undefined }} className="text-primary hover:underline">
                 Entrar
               </Link>
             </p>

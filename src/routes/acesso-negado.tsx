@@ -44,7 +44,7 @@ export const Route = createFileRoute("/acesso-negado")({
             Sair
           </Button>
         </div>
-        <Link to="/login" className="mt-3 inline-block text-xs text-primary hover:underline">
+        <Link to="/login" search={{ next: undefined }} className="mt-3 inline-block text-xs text-primary hover:underline">
           Ir para o login
         </Link>
       </div>

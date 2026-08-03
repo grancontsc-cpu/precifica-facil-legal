@@ -37,7 +37,7 @@ export const Route = createFileRoute("/aguardando-aprovacao")({
         >
           Sair
         </Button>
-        <Link to="/login" className="mt-3 inline-block text-xs text-primary hover:underline">
+        <Link to="/login" search={{ next: undefined }} className="mt-3 inline-block text-xs text-primary hover:underline">
           Voltar para o login
         </Link>
       </div>

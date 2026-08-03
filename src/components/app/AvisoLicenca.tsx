@@ -60,7 +60,7 @@ export function AvisoLicenca({ variante, titulo, descricao }: Props) {
           </Button>
         </div>
 
-        <Link to="/login" className="mt-3 inline-block text-xs text-primary hover:underline">
+        <Link to="/login" search={{ next: undefined }} className="mt-3 inline-block text-xs text-primary hover:underline">
           Voltar para o login
         </Link>
       </div>

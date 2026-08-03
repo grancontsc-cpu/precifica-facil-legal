@@ -30,7 +30,7 @@ function Pagina() {
     (async () => {
       const { data: sessao } = await supabase.auth.getUser();
       if (!sessao.user) {
-        navigate({ to: "/login", replace: true });
+        navigate({ to: "/login", search: { next: undefined }, replace: true });
         return;
       }
       const { data } = await supabase
