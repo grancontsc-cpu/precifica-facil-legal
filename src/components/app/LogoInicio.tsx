@@ -80,7 +80,10 @@ export function LogoInicio({ naRotaInicial }: { naRotaInicial: boolean }) {
                 setConfirmando(true);
               }}
             >
-              <LogoGrancont className="h-7 sm:h-8" decorativa />
+              {/* Altura relativa à fonte: acompanha o aumento do sistema
+                  (até 200%) com teto para não dominar o cabeçalho. */}
+              <LogoGrancont className="h-[2em] max-h-10 sm:h-[2.2em] sm:max-h-12" decorativa />
+
             </Link>
           </TooltipTrigger>
           {/* A dica é apenas visual: o Radix já associa a descrição ao link,
