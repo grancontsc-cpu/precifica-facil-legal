@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
   AlertDialog,
@@ -25,6 +25,9 @@ export function LogoInicio({ naRotaInicial }: { naRotaInicial: boolean }) {
   const { pendente } = useAlteracoesPendentes();
   const [confirmando, setConfirmando] = useState(false);
   const [tooltipAberto, setTooltipAberto] = useState(false);
+  const linkRef = useRef<HTMLAnchorElement | null>(null);
+  // Evita devolver o foco ao link quando o fechamento acontece por navegação.
+  const navegando = useRef(false);
 
   // Texto lido pelo leitor de tela como descrição (aria-describedby) do link.
   const dica = pendente
@@ -36,12 +39,23 @@ export function LogoInicio({ naRotaInicial }: { naRotaInicial: boolean }) {
   const irParaSimulador = () =>
     void navigate({ to: "/simulador", search: { simulacao: undefined, produto: undefined } });
 
+  /**
+   * Fecha a dica e devolve o foco ao link. Necessário porque a dica pode ser
+   * fechada por Esc, por clique fora ou pela abertura da confirmação — em
+   * todos os casos o teclado deve continuar do mesmo ponto da ordem de tab.
+   */
+  const fecharTooltip = useCallback((devolverFoco = true) => {
+    setTooltipAberto(false);
+    if (devolverFoco) linkRef.current?.focus({ preventScroll: true });
+  }, []);
+
   return (
     <>
       <TooltipProvider delayDuration={200}>
         <Tooltip open={tooltipAberto} onOpenChange={setTooltipAberto}>
           <TooltipTrigger asChild>
             <Link
+              ref={linkRef}
               to="/simulador"
               search={{ simulacao: undefined, produto: undefined }}
               className={cn(
@@ -51,7 +65,15 @@ export function LogoInicio({ naRotaInicial }: { naRotaInicial: boolean }) {
               )}
               aria-label="Precifica Grancont — ir para o simulador"
               aria-current={naRotaInicial ? "page" : undefined}
+              // Esc fecha a dica sem sair do link (o cabeçalho continua na ordem de tab).
+              onKeyDown={(e) => {
+                if (e.key === "Escape" && tooltipAberto) {
+                  e.stopPropagation();
+                  fecharTooltip();
+                }
+              }}
               onClick={(e) => {
+                setTooltipAberto(false);
                 if (!pendente) return;
                 e.preventDefault();
                 setConfirmando(true);
@@ -62,14 +84,32 @@ export function LogoInicio({ naRotaInicial }: { naRotaInicial: boolean }) {
           </TooltipTrigger>
           {/* A dica é apenas visual: o Radix já associa a descrição ao link,
               e o nome acessível do link não repete esse texto. */}
-          <TooltipContent side="bottom" align="start">
+          <TooltipContent
+            side="bottom"
+            align="start"
+            // A dica nunca recebe foco: o Tab sai do link direto para o próximo
+            // item do cabeçalho, sem parada intermediária.
+            tabIndex={-1}
+            onEscapeKeyDown={(e) => {
+              e.preventDefault();
+              fecharTooltip();
+            }}
+            onPointerDownOutside={() => fecharTooltip(false)}
+          >
             {dica}
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
 
-
-      <AlertDialog open={confirmando} onOpenChange={setConfirmando}>
+      <AlertDialog
+        open={confirmando}
+        onOpenChange={(aberto) => {
+          setConfirmando(aberto);
+          // Ao fechar a confirmação por Esc ou clique fora, o foco volta ao link.
+          if (!aberto && !navegando.current) fecharTooltip();
+          if (aberto) navegando.current = false;
+        }}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Descartar alterações não salvas?</AlertDialogTitle>
@@ -82,7 +122,11 @@ export function LogoInicio({ naRotaInicial }: { naRotaInicial: boolean }) {
             <AlertDialogCancel>Continuar editando</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
+                // Navegação intencional: não devolve o foco ao link, a nova
+                // rota assume a ordem de tab.
+                navegando.current = true;
                 setConfirmando(false);
+                setTooltipAberto(false);
                 irParaSimulador();
               }}
             >
