@@ -31,6 +31,10 @@ function ProdutosPage() {
   const { orgId, canEdit, userId } = useApp();
   const qc = useQueryClient();
   const [form, setForm] = useState({ nome: "", sku: "", ncm: "", unidade: "unidade", valor: "0" });
+  const [busca, setBusca] = useState("");
+  // Campo responde na hora; o filtro recalcula quando o usuário pausa a digitação.
+  const buscaDebounce = useDebounce(busca, 300);
+
 
   const produtos = useQuery({
     queryKey: ["products", orgId],
