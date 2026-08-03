@@ -46,9 +46,6 @@ function LinkTopo({ item, ativo }: { item: ItemNav; ativo: boolean }) {
   );
 }
 
-
-
-
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { organizations, orgId, setOrgId, isSuperAdmin, memberships, situacaoLicenca } = useApp();
   const pathname = useRouterState({ select: (s) => s.location.pathname });

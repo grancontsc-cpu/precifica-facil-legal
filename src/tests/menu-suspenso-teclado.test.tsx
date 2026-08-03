@@ -24,7 +24,12 @@ import type { ItemNav } from "@/components/app/navegacao";
 afterEach(cleanup);
 
 const ITENS: ItemNav[] = [
-  { to: "/gestao/empresas", label: "Empresas", descricao: "Cadastro de empresas", icon: ShieldCheck },
+  {
+    to: "/gestao/empresas",
+    label: "Empresas",
+    descricao: "Cadastro de empresas",
+    icon: ShieldCheck,
+  },
   { to: "/gestao/vinculos", label: "Vínculos", descricao: "Solicitações de acesso", icon: Users },
   { to: "/gestao/licencas", label: "Licenças", descricao: "Planos e assinaturas", icon: Settings },
 ] as ItemNav[];
