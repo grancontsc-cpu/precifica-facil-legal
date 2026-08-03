@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { CalendarClock, ShieldAlert } from "lucide-react";
 import { useEffect, useState } from "react";
 
+import { LogoGrancont } from "@/components/app/LogoGrancont";
 import { SolicitarAcessoAdmin } from "@/components/app/SolicitarAcessoAdmin";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
