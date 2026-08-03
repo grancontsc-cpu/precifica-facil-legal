@@ -1,8 +1,8 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { ChevronDown, ShieldCheck } from "lucide-react";
 
 import { Glossario } from "@/components/app/Glossario";
 import { MenuConta } from "@/components/app/MenuConta";
+import { MenuSuspenso } from "@/components/app/MenuSuspenso";
 import { NavegacaoMobile } from "@/components/app/NavegacaoMobile";
 import {
   NAV_ADMIN,
@@ -12,15 +12,7 @@ import {
   type ItemNav,
 } from "@/components/app/navegacao";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 import {
   Select,
   SelectContent,
