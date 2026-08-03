@@ -6,17 +6,19 @@ export const MAX_BUSCA = 100;
  *
  * Etapas, nesta ordem:
  * 1. Normalização Unicode (NFKC) para evitar variantes visuais do mesmo caractere.
- * 2. Remoção de caracteres de controle (inclui quebras de linha e tabulações).
- * 3. Remoção de caracteres com significado sintático no PostgREST
+ * 2. Remoção de caracteres invisíveis (zero-width, hífen suave, BOM, word joiner).
+ * 3. Remoção de caracteres de controle (inclui quebras de linha e tabulações).
+ * 4. Remoção de caracteres com significado sintático no PostgREST
  *    (vírgula, ponto, parênteses, aspas, barra invertida) e dos curingas do LIKE.
- * 4. Colapso de espaços duplicados + trim.
- * 5. Corte em MAX_BUSCA caracteres, com novo trim para não deixar espaço final.
+ * 5. Colapso de espaços duplicados + trim.
+ * 6. Corte em MAX_BUSCA caracteres, com novo trim para não deixar espaço final.
  */
 export function sanitizarBusca(texto: unknown): string {
   if (typeof texto !== "string") return "";
 
   return texto
     .normalize("NFKC")
+    .replace(/[\u00ad\u200b-\u200f\u2028\u2029\u2060\ufeff]/g, "")
     // eslint-disable-next-line no-control-regex
     .replace(/[\u0000-\u001f\u007f]/g, " ")
     .replace(/[,.()"'\\%_*]/g, " ")

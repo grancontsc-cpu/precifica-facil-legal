@@ -25,6 +25,40 @@ describe("sanitizarBusca", () => {
     expect(sanitizarBusca("ｐｒｏｄｕｔｏ")).toBe("produto");
   });
 
+  it("preserva acentos e normaliza NFD para NFC/NFKC", () => {
+    const decomposto = "cafe\u0301 c\u0327amara"; // café câmara (com combinantes)
+    const limpo = sanitizarBusca(decomposto);
+    expect(limpo).toBe("café çamara".normalize("NFKC"));
+    expect(limpo).toBe(limpo.normalize("NFKC"));
+  });
+
+  it("mantém acentos maiúsculos e ç em largura total", () => {
+    expect(sanitizarBusca("ＡÇÚＣＡＲ")).toBe("AÇÚCAR");
+  });
+
+  it("converte espaços especiais (NBSP, fino, ideográfico) em espaço simples", () => {
+    expect(sanitizarBusca("caf\u00e9\u00a0com\u2009leite\u3000quente")).toBe(
+      "café com leite quente",
+    );
+  });
+
+  it("remove caracteres invisíveis (zero-width, BOM, hífen suave)", () => {
+    expect(sanitizarBusca("\ufeffpro\u200bdu\u200dto\u00adx")).toBe("produtox");
+  });
+
+  it("remove marcas de direção e separadores de linha Unicode", () => {
+    expect(sanitizarBusca("a\u200eb\u200fc\u2028d\u2029e")).toBe("abcde");
+  });
+
+  it("retorna vazio quando o texto tem apenas caracteres invisíveis", () => {
+    expect(sanitizarBusca("\u200b\u200b\u00ad\ufeff")).toBe("");
+    expect(sanitizarBusca("\u00a0\u2009\u3000")).toBe("");
+  });
+
+  it("normaliza ligaduras e frações antes de montar o filtro", () => {
+    expect(sanitizarBusca("caﬁné ½ kg")).toBe("cafiné 1⁄2 kg");
+  });
+
   it("retorna vazio para entradas inválidas", () => {
     expect(sanitizarBusca(undefined)).toBe("");
     expect(sanitizarBusca("   ,,,   ")).toBe("");
