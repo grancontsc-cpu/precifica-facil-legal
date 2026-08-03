@@ -943,7 +943,11 @@ function Simulador() {
                 titulo="Cenário tributário"
                 descricao="O cenário apenas ativa ou desativa tributos. Todas as alíquotas e tratamentos continuam editáveis."
               >
-                <div className="grid gap-3 sm:grid-cols-2">
+                <div
+                  role="group"
+                  aria-label="Escolha do cenário tributário"
+                  className="grid gap-3 sm:grid-cols-2"
+                >
                   {CENARIOS.map((c) => {
                     const ativo = state.cenario === c.id;
                     return (
@@ -952,6 +956,8 @@ function Simulador() {
                         type="button"
                         onClick={() => setState((s) => aplicarCenario(s, c.id as ScenarioId))}
                         aria-pressed={ativo}
+                        aria-label={`Cenário ${c.nome}`}
+                        aria-describedby={`cenario-${c.id}-descricao`}
                         className={`rounded-lg border p-4 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                           ativo
                             ? "border-primary bg-brand-soft"
@@ -959,11 +965,17 @@ function Simulador() {
                         }`}
                       >
                         <p className="text-sm font-semibold text-foreground">{c.nome}</p>
-                        <p className="mt-1 text-xs text-muted-foreground">{c.descricao}</p>
+                        <p
+                          id={`cenario-${c.id}-descricao`}
+                          className="mt-1 text-xs text-muted-foreground"
+                        >
+                          {c.descricao}
+                        </p>
                       </button>
                     );
                   })}
                 </div>
+
                 {state.cenario === "transicao2026" ? (
                   <Alert className="mt-4">
                     <Info className="h-4 w-4" aria-hidden />
