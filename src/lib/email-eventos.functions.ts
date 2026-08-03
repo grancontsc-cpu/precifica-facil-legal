@@ -106,7 +106,11 @@ export const registrarEventoEmail = createServerFn({ method: "POST" })
         user_id: userId,
         provider: verificado ? "supabase_auth" : "supabase_auth_nao_verificado",
         request_status: data.status,
-        error_code: verificado ? codigo : codigo && CODIGOS_ERRO_PERMITIDOS.has(codigo) ? codigo : null,
+        error_code: verificado
+          ? codigo
+          : codigo && CODIGOS_ERRO_PERMITIDOS.has(codigo)
+            ? codigo
+            : null,
         // Texto livre só é aceito de chamadas autenticadas.
         error_message: verificado ? (data.mensagemErro ?? null) : null,
         request_reference: verificado ? (data.referencia ?? null) : null,
@@ -117,4 +121,3 @@ export const registrarEventoEmail = createServerFn({ method: "POST" })
 
     return { ok: true as const };
   });
-
