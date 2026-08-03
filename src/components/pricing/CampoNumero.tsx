@@ -132,7 +132,7 @@ export function Ajuda({ texto }: { texto: string }) {
         <button
           type="button"
           aria-label={`Ajuda: ${texto}`}
-          className="rounded-full text-muted-foreground outline-none transition-colors hover:text-primary focus-visible:ring-2 focus-visible:ring-ring"
+          className="rounded-full text-muted-foreground transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
         >
           <HelpCircle className="h-3.5 w-3.5" aria-hidden />
         </button>
