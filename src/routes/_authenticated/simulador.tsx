@@ -744,7 +744,11 @@ function Simulador() {
                         setState((s) => ({ ...s, modoAvancado: v === "completo" }));
                       }}
                     />
-                    <Ajuda texto="No modo completo você edita base de cálculo, redução de base, percentual de crédito, valores manuais e observações." />
+                    <Ajuda
+                      rotulo="nível de detalhe da simulação"
+                      texto="No modo completo você edita base de cálculo, redução de base, percentual de crédito, valores manuais e observações."
+                    />
+
                   </div>
                   <div className="flex flex-wrap gap-2">
                     <Button variant="ghost" size="sm" className="h-10" onClick={carregarExemplo}>
