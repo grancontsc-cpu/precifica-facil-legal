@@ -39,7 +39,7 @@ export function NavegacaoMobile({ ehGestor, isSuperAdmin }: Props) {
 
   return (
     <nav
-      aria-label="Navegação principal"
+      aria-label="Navegação rápida"
       className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden"
     >
       <div className="grid grid-cols-4">
@@ -50,6 +50,7 @@ export function NavegacaoMobile({ ehGestor, isSuperAdmin }: Props) {
             <Link
               key={item.to}
               to={item.to}
+              aria-current={ativo ? "page" : undefined}
               className={cn(
                 "flex min-h-[56px] flex-col items-center justify-center gap-1 px-1 py-2 text-[11px] font-medium",
                 ativo ? "text-primary" : "text-muted-foreground",
@@ -60,6 +61,7 @@ export function NavegacaoMobile({ ehGestor, isSuperAdmin }: Props) {
             </Link>
           );
         })}
+
 
         <Sheet open={aberto} onOpenChange={setAberto}>
           <SheetTrigger
