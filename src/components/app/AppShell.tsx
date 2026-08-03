@@ -2,6 +2,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { ChevronDown, ShieldCheck } from "lucide-react";
 
 import { Glossario } from "@/components/app/Glossario";
+import { LogoGrancont } from "@/components/app/LogoGrancont";
 import { MenuConta } from "@/components/app/MenuConta";
 import { NavegacaoMobile } from "@/components/app/NavegacaoMobile";
 import {
@@ -114,11 +115,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen bg-background pb-16 lg:pb-0">
       <header className="sticky top-0 z-30 border-b border-border bg-card/95 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2.5 sm:px-6">
-          <Link
-            to="/simulador"
-            className="shrink-0 text-base font-semibold tracking-tight text-foreground"
-          >
-            Precifica <span className="text-primary">Grancont</span>
+          <Link to="/simulador" className="shrink-0" aria-label="Precifica Grancont — início">
+            <LogoGrancont className="h-7 w-auto" />
           </Link>
 
           <nav aria-label="Navegação principal" className="ml-4 hidden items-center gap-1 lg:flex">

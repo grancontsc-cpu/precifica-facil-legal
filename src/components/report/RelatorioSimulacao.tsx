@@ -43,7 +43,7 @@ export function RelatorioSimulacao({ rel }: { rel: Relatorio }) {
     <article id="relatorio-impressao" className="rel-print bg-card p-6 text-foreground">
       <header className="flex items-start justify-between gap-6 border-b-2 border-primary pb-3">
         <div className="text-primary">
-          <LogoGrancont className="h-12 w-auto" />
+          <LogoGrancont className="h-12 w-auto" variante="escura" />
         </div>
         <div className="text-right text-[11px] text-muted-foreground">
           <p className="text-sm font-semibold text-foreground">Relatório de precificação</p>
