@@ -11,6 +11,8 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "format:check": "prettier --check .",
+    "verificar": "bun run lint && bun run typecheck && bun run test",
     "test:watch": "vitest",
     "format": "prettier --write ."
   },
