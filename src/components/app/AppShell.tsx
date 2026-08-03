@@ -2,7 +2,6 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { ChevronDown, ShieldCheck } from "lucide-react";
 
 import { Glossario } from "@/components/app/Glossario";
-import { LogoGrancont } from "@/components/app/LogoGrancont";
 import { MenuConta } from "@/components/app/MenuConta";
 import { NavegacaoMobile } from "@/components/app/NavegacaoMobile";
 import {

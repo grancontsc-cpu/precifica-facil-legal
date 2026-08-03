@@ -89,6 +89,7 @@ export function NavegacaoMobile({ ehGestor, isSuperAdmin }: Props) {
                       return (
                         <li key={item.to}>
                           <Link
+                            aria-current={ativo ? "page" : undefined}
                             to={item.to}
                             onClick={() => setAberto(false)}
                             className={cn(
