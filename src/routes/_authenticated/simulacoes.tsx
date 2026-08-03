@@ -1,7 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { metaPagina } from "@/lib/seo-head";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { avaliarBusca } from "@/lib/busca-aviso";
 import { useDebounce } from "@/hooks/useDebounce";
+
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -76,8 +78,10 @@ function SimulacoesPage() {
     },
   });
 
+  const avaliacao = useMemo(() => avaliarBusca(buscaDebounce), [buscaDebounce]);
+
   const lista = useMemo(() => {
-    const termo = buscaDebounce.trim().toLowerCase();
+    const termo = avaliacao.termo.toLowerCase();
     // Defesa em profundidade: além da RLS, filtra o que o usuário pode ver.
     const visiveis = filtrarSimulacoesVisiveis(
       ctxAcesso,
@@ -93,7 +97,8 @@ function SimulacoesPage() {
       if (!termo) return true;
       return `${s.titulo} ${s.produto_nome ?? ""} ${s.tax_profile_name ?? ""}`.toLowerCase().includes(termo);
     });
-  }, [simulacoes.data, buscaDebounce, situacao, ctxAcesso]);
+  }, [simulacoes.data, avaliacao.termo, situacao, ctxAcesso]);
+
 
   const podeAlterar = (s: { organization_id: string; created_by: string | null }) =>
     avaliarAcessoSimulacao(ctxAcesso, {
@@ -218,6 +223,17 @@ function SimulacoesPage() {
           : `${lista.length} ${lista.length === 1 ? "simulação encontrada" : "simulações encontradas"}`}
         {busca !== buscaDebounce ? " · atualizando…" : ""}
       </p>
+
+      {avaliacao.aviso ? (
+        <p
+          className="mt-2 rounded-lg border border-border bg-surface px-3 py-2 text-xs text-muted-foreground"
+          role="status"
+          aria-live="polite"
+        >
+          {avaliacao.aviso}
+        </p>
+      ) : null}
+
 
 
 

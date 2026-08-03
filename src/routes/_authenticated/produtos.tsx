@@ -1,7 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { metaPagina } from "@/lib/seo-head";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { avaliarBusca } from "@/lib/busca-aviso";
 import { useDebounce } from "@/hooks/useDebounce";
+
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -50,14 +52,17 @@ function ProdutosPage() {
     },
   });
 
+  const avaliacao = useMemo(() => avaliarBusca(buscaDebounce), [buscaDebounce]);
+
   const lista = useMemo(() => {
-    const termo = buscaDebounce.trim().toLowerCase();
+    const termo = avaliacao.termo.toLowerCase();
     const todos = produtos.data ?? [];
     if (!termo) return todos;
     return todos.filter((p) =>
       `${p.nome} ${p.sku ?? ""} ${p.ncm ?? ""}`.toLowerCase().includes(termo),
     );
-  }, [produtos.data, buscaDebounce]);
+  }, [produtos.data, avaliacao.termo]);
+
 
 
   const criar = useMutation({
@@ -149,6 +154,17 @@ function ProdutosPage() {
           {busca !== buscaDebounce ? " · atualizando…" : ""}
         </p>
       </div>
+
+      {avaliacao.aviso ? (
+        <p
+          className="mt-2 rounded-lg border border-border bg-surface px-3 py-2 text-xs text-muted-foreground"
+          role="status"
+          aria-live="polite"
+        >
+          {avaliacao.aviso}
+        </p>
+      ) : null}
+
 
 
       <section className="mt-6 overflow-x-auto rounded-xl border border-border bg-card">
