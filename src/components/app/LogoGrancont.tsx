@@ -34,21 +34,17 @@ export function LogoGrancont({
     return <img src={logoRoxo.url} {...acessibilidade} className={`${base} ${className}`} />;
   }
 
+  // As duas versões usam o mesmo texto alternativo: a oculta usa `display:none`,
+  // que leitores de tela ignoram — não há leitura duplicada.
   return (
     <>
-      <img
-        src={logoRoxo.url}
-        {...acessibilidade}
-        className={`${base} ${className} dark:hidden`}
-      />
-      {/* A versão do tema oculto é sempre decorativa: evita nome duplicado. */}
+      <img src={logoRoxo.url} {...acessibilidade} className={`${base} ${className} dark:hidden`} />
       <img
         src={logoBranca.url}
-        alt=""
-        aria-hidden
-        role="presentation"
+        {...acessibilidade}
         className={`${base} ${className} hidden dark:block`}
       />
     </>
+
   );
 }
