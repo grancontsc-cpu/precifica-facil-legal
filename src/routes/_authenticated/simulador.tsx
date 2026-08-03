@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { metaPagina } from "@/lib/seo-head";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -131,13 +131,25 @@ function Secao({
   children: React.ReactNode;
   acao?: React.ReactNode;
 }) {
+  const id = useId();
+  const tituloId = `${id}-titulo`;
+  const descricaoId = `${id}-descricao`;
   return (
-    <section className="rounded-xl border border-border bg-card p-5 shadow-[var(--shadow-card)]">
+    <section
+      aria-labelledby={tituloId}
+      aria-describedby={descricaoId}
+      className="rounded-xl border border-border bg-card p-5 shadow-[var(--shadow-card)]"
+    >
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
         <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-wide text-primary">{numero}</p>
-          <h2 className="mt-0.5 text-lg font-semibold text-foreground">{titulo}</h2>
-          <p className="mt-1 text-sm text-muted-foreground">{descricao}</p>
+          <h2 id={tituloId} className="mt-0.5 text-lg font-semibold text-foreground">
+            <span className="sr-only">{numero} — </span>
+            {titulo}
+          </h2>
+          <p id={descricaoId} className="mt-1 text-sm text-muted-foreground">
+            {descricao}
+          </p>
         </div>
         {acao ? <div className="shrink-0">{acao}</div> : null}
       </div>
@@ -145,6 +157,7 @@ function Secao({
     </section>
   );
 }
+
 
 function Simulador() {
   const {
@@ -630,7 +643,7 @@ function Simulador() {
 
     <TooltipProvider delayDuration={150}>
       <div className="min-h-screen bg-background pb-32 lg:pb-10">
-        <header className="border-b border-border bg-card">
+        <header aria-label="Cabeçalho do simulador" className="border-b border-border bg-card">
           <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 sm:px-6">
             <div className="min-w-0">
               <h1 className="truncate text-lg font-semibold tracking-tight text-foreground sm:text-xl">
@@ -638,17 +651,33 @@ function Simulador() {
               </h1>
               <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                 <Badge variant="outline" className="border-primary/30 text-primary">
+                  <span className="sr-only">Cenário tributário: </span>
                   {cenarioAtual?.nome ?? "Personalizado"}
                 </Badge>
-                {salvoEm ? <span>Rascunho salvo em {formatData(salvoEm)}</span> : null}
+                {salvoEm ? (
+                  <span role="status" aria-live="polite">
+                    Rascunho salvo em {formatData(salvoEm)}
+                  </span>
+                ) : null}
               </div>
             </div>
-            <div className="flex shrink-0 items-center gap-2">
-              <Button variant="outline" size="sm" className="h-10" onClick={novaSimulacao}>
+            <div role="group" aria-label="Ações rápidas" className="flex shrink-0 items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-10"
+                onClick={novaSimulacao}
+                aria-label="Iniciar nova simulação"
+              >
                 <RotateCcw className="h-4 w-4" aria-hidden />
                 <span className="hidden sm:inline">Nova simulação</span>
               </Button>
-              <Button size="sm" className="h-10" onClick={salvarRascunho}>
+              <Button
+                size="sm"
+                className="h-10"
+                onClick={salvarRascunho}
+                aria-label="Salvar rascunho da simulação"
+              >
                 <Save className="h-4 w-4" aria-hidden />
                 <span className="hidden sm:inline">Salvar rascunho</span>
               </Button>
@@ -657,7 +686,8 @@ function Simulador() {
         </header>
 
 
-        <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
+        <main aria-label="Formulário e resultados da simulação" className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
+
           <div className="mb-6">
             <BarraSimulacao
               titulo={titulo}
@@ -714,7 +744,11 @@ function Simulador() {
                         setState((s) => ({ ...s, modoAvancado: v === "completo" }));
                       }}
                     />
-                    <Ajuda texto="No modo completo você edita base de cálculo, redução de base, percentual de crédito, valores manuais e observações." />
+                    <Ajuda
+                      rotulo="nível de detalhe da simulação"
+                      texto="No modo completo você edita base de cálculo, redução de base, percentual de crédito, valores manuais e observações."
+                    />
+
                   </div>
                   <div className="flex flex-wrap gap-2">
                     <Button variant="ghost" size="sm" className="h-10" onClick={carregarExemplo}>
@@ -913,7 +947,11 @@ function Simulador() {
                 titulo="Cenário tributário"
                 descricao="O cenário apenas ativa ou desativa tributos. Todas as alíquotas e tratamentos continuam editáveis."
               >
-                <div className="grid gap-3 sm:grid-cols-2">
+                <div
+                  role="group"
+                  aria-label="Escolha do cenário tributário"
+                  className="grid gap-3 sm:grid-cols-2"
+                >
                   {CENARIOS.map((c) => {
                     const ativo = state.cenario === c.id;
                     return (
@@ -922,6 +960,8 @@ function Simulador() {
                         type="button"
                         onClick={() => setState((s) => aplicarCenario(s, c.id as ScenarioId))}
                         aria-pressed={ativo}
+                        aria-label={`Cenário ${c.nome}`}
+                        aria-describedby={`cenario-${c.id}-descricao`}
                         className={`rounded-lg border p-4 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                           ativo
                             ? "border-primary bg-brand-soft"
@@ -929,11 +969,17 @@ function Simulador() {
                         }`}
                       >
                         <p className="text-sm font-semibold text-foreground">{c.nome}</p>
-                        <p className="mt-1 text-xs text-muted-foreground">{c.descricao}</p>
+                        <p
+                          id={`cenario-${c.id}-descricao`}
+                          className="mt-1 text-xs text-muted-foreground"
+                        >
+                          {c.descricao}
+                        </p>
                       </button>
                     );
                   })}
                 </div>
+
                 {state.cenario === "transicao2026" ? (
                   <Alert className="mt-4">
                     <Info className="h-4 w-4" aria-hidden />
@@ -973,7 +1019,7 @@ function Simulador() {
                   value={state.venda.modo}
                   onValueChange={(v) => setVenda({ modo: v as VendaConfig["modo"] })}
                 >
-                  <TabsList className="w-full">
+                  <TabsList aria-label="Forma de cálculo da venda" className="w-full">
                     <TabsTrigger value="margem" className="flex-1">
                       Calcular preço pela margem
                     </TabsTrigger>

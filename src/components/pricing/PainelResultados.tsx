@@ -28,7 +28,7 @@ function Linha({
         >
           {rotulo}
         </span>
-        {ajuda ? <Ajuda texto={ajuda} /> : null}
+        {ajuda ? <Ajuda texto={ajuda} rotulo={rotulo} /> : null}
       </div>
       <span
         className={cn(
@@ -48,9 +48,9 @@ export function PainelResultados({ resultado }: { resultado: SimulationResult })
   const avisos = resultado.issues.filter((i) => i.severidade === "aviso");
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" aria-label="Resultados da simulação" role="region">
       {erros.length > 0 ? (
-        <Alert variant="destructive">
+        <Alert variant="destructive" role="alert">
           <AlertTriangle className="h-4 w-4" aria-hidden />
           <AlertDescription>
             <ul className="list-disc space-y-1 pl-4 text-sm">
@@ -63,24 +63,27 @@ export function PainelResultados({ resultado }: { resultado: SimulationResult })
       ) : null}
 
       {resultado.impossivel ? (
-        <Alert variant="destructive">
+        <Alert variant="destructive" role="alert">
           <AlertTriangle className="h-4 w-4" aria-hidden />
           <AlertDescription className="text-sm">{resultado.mensagemImpossivel}</AlertDescription>
         </Alert>
       ) : null}
 
       {avisos.map((a, i) => (
-        <Alert key={`${a.campo}-${i}`}>
+        <Alert key={`${a.campo}-${i}`} role="status">
           <AlertTriangle className="h-4 w-4" aria-hidden />
           <AlertDescription className="text-sm">{a.mensagem}</AlertDescription>
         </Alert>
       ))}
 
       <section
-        aria-label="Resumo da compra"
+        aria-labelledby="resumo-compra-titulo"
         className="rounded-xl border border-border bg-card p-5 shadow-[var(--shadow-panel)]"
       >
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        <h3
+          id="resumo-compra-titulo"
+          className="text-xs font-semibold uppercase tracking-wide text-muted-foreground"
+        >
           Compra
         </h3>
         <div className="mt-2 divide-y divide-border">
@@ -110,15 +113,18 @@ export function PainelResultados({ resultado }: { resultado: SimulationResult })
       </section>
 
       <section
-        aria-label="Resumo da venda"
+        aria-labelledby="resumo-venda-titulo"
         className="rounded-xl border border-border bg-card p-5 shadow-[var(--shadow-panel)]"
       >
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        <h3
+          id="resumo-venda-titulo"
+          className="text-xs font-semibold uppercase tracking-wide text-muted-foreground"
+        >
           Venda
         </h3>
         {recomendado ? (
           <>
-            <div className="mt-3 rounded-lg bg-brand-soft px-4 py-3">
+            <div className="mt-3 rounded-lg bg-brand-soft px-4 py-3" role="status" aria-live="polite">
               <p className="text-xs font-medium text-primary">Preço final cobrado</p>
               <p className="num-destaque mt-1 text-3xl text-primary">
                 {formatBRL(recomendado.precoFinal)}
@@ -128,6 +134,7 @@ export function PainelResultados({ resultado }: { resultado: SimulationResult })
                 {formatBRL(recomendado.resultadoUnidade)} por unidade
               </p>
             </div>
+
             <div className="mt-3 divide-y divide-border">
               <Linha
                 rotulo="Preço mínimo sem margem"

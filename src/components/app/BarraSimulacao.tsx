@@ -55,7 +55,10 @@ export function BarraSimulacao({
   acoes,
 }: Props) {
   return (
-    <section className="rounded-xl border border-border bg-card p-4 shadow-[var(--shadow-card)]">
+    <section
+      aria-label="Identificação e ações da simulação"
+      className="rounded-xl border border-border bg-card p-4 shadow-[var(--shadow-card)]"
+    >
       <div className="grid gap-3 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)_auto] lg:items-end">
         <div className="space-y-1.5">
           <Label htmlFor="sim-titulo">Nome da simulação</Label>
@@ -69,9 +72,11 @@ export function BarraSimulacao({
         </div>
 
         <div className="space-y-1.5">
-          <Label>Perfil tributário</Label>
+          <Label id="sim-perfil-rotulo" htmlFor="sim-perfil">
+            Perfil tributário
+          </Label>
           <Select value={perfilId ?? "manual"} onValueChange={onPerfil} disabled={!podeEditar}>
-            <SelectTrigger>
+            <SelectTrigger id="sim-perfil" aria-labelledby="sim-perfil-rotulo sim-perfil">
               <SelectValue placeholder="Selecione" />
             </SelectTrigger>
             <SelectContent>
@@ -86,9 +91,11 @@ export function BarraSimulacao({
         </div>
 
         <div className="space-y-1.5">
-          <Label>Produto</Label>
+          <Label id="sim-produto-rotulo" htmlFor="sim-produto">
+            Produto
+          </Label>
           <Select value={produtoId ?? "avulso"} onValueChange={onProduto} disabled={!podeEditar}>
-            <SelectTrigger>
+            <SelectTrigger id="sim-produto" aria-labelledby="sim-produto-rotulo sim-produto">
               <SelectValue placeholder="Selecione" />
             </SelectTrigger>
             <SelectContent>
@@ -102,20 +109,26 @@ export function BarraSimulacao({
           </Select>
         </div>
 
-        <div className="flex flex-wrap gap-2">
+        <div role="group" aria-label="Ações da simulação" className="flex flex-wrap gap-2">
           {acoes}
           {simulacaoSalva && podeEditar ? (
-            <Button variant="outline" size="sm" onClick={onDuplicar}>
+            <Button variant="outline" size="sm" onClick={onDuplicar} aria-label="Duplicar simulação">
               <Copy className="h-4 w-4" aria-hidden />
               <span className="hidden sm:inline">Duplicar</span>
             </Button>
           ) : null}
-          <Button size="sm" onClick={onSalvar} disabled={!podeEditar || salvando}>
+          <Button
+            size="sm"
+            onClick={onSalvar}
+            disabled={!podeEditar || salvando}
+            aria-label={simulacaoSalva ? "Salvar alterações da simulação" : "Salvar simulação"}
+          >
             <Save className="h-4 w-4" aria-hidden />
             <span className="hidden sm:inline">{simulacaoSalva ? "Salvar alterações" : "Salvar simulação"}</span>
           </Button>
         </div>
       </div>
+
 
       {camposBloqueados.length > 0 || camposAlterados.length > 0 ? (
         <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-border pt-3 text-xs">
