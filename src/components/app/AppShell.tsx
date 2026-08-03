@@ -74,7 +74,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           {/* `flex-wrap` + altura mínima: a barra cresce em vez de cortar
               conteúdo quando a fonte do sistema está ampliada. */}
           <div className="mx-auto flex min-h-16 max-w-7xl flex-wrap items-center gap-2 px-3 py-2.5 sm:gap-3 sm:px-6">
-
             <LogoInicio naRotaInicial={itemAtivo(pathname, "/simulador")} />
 
             <nav
