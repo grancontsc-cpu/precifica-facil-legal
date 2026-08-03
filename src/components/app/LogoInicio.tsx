@@ -59,8 +59,8 @@ export function LogoInicio({ naRotaInicial }: { naRotaInicial: boolean }) {
               to="/simulador"
               search={{ simulacao: undefined, produto: undefined }}
               className={cn(
-                "flex min-h-11 shrink-0 basis-auto items-center whitespace-nowrap rounded-md px-2 py-1.5 transition-all",
-                "max-w-[60vw] sm:max-w-none",
+                "flex min-h-11 shrink-0 basis-auto items-center rounded-md px-2 py-1.5 transition-all",
+                "max-w-[min(60vw,18rem)] sm:max-w-[22rem]",
                 naRotaInicial ? "bg-primary/15 ring-1 ring-primary/50" : "hover:opacity-80",
               )}
               aria-label="Precifica Grancont — ir para o simulador"
@@ -79,7 +79,9 @@ export function LogoInicio({ naRotaInicial }: { naRotaInicial: boolean }) {
                 setConfirmando(true);
               }}
             >
-              <LogoGrancont className="h-7 sm:h-8" decorativa />
+              {/* Altura relativa à fonte: acompanha o aumento do sistema
+                  (até 200%) com teto para não dominar o cabeçalho. */}
+              <LogoGrancont className="h-[2em] max-h-10 sm:h-[2.2em] sm:max-h-12" decorativa />
             </Link>
           </TooltipTrigger>
           {/* A dica é apenas visual: o Radix já associa a descrição ao link,

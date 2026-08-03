@@ -57,10 +57,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <div className="min-h-screen bg-background pb-16 lg:pb-0">
         {/* Atalho de teclado: visível apenas ao receber foco (primeiro Tab).
           Em telas pequenas ocupa a largura disponível e mantém alvo de toque
-          de 44px com contraste alto sobre o fundo. */}
+          de 44px com contraste alto sobre o fundo. Com fonte ampliada (até
+          200%) o texto quebra em mais de uma linha em vez de vazar da tela. */}
         <a
           href="#conteudo-principal"
-          className="sr-only z-50 inline-flex min-h-11 items-center rounded-md bg-primary px-4 py-2.5 text-sm font-semibold leading-snug text-primary-foreground shadow-lg ring-1 ring-primary-foreground/30 focus-visible:not-sr-only focus-visible:absolute focus-visible:left-3 focus-visible:right-3 focus-visible:top-3 focus-visible:w-auto focus-visible:max-w-[calc(100vw-1.5rem)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring sm:focus-visible:right-auto sm:text-base focus:not-sr-only focus:absolute focus:left-3 focus:top-3"
+          className="sr-only z-50 inline-flex min-h-11 items-center text-balance rounded-md bg-primary px-4 py-2.5 text-sm font-semibold leading-snug text-primary-foreground shadow-lg ring-1 ring-primary-foreground/30 focus-visible:not-sr-only focus-visible:absolute focus-visible:left-3 focus-visible:right-3 focus-visible:top-3 focus-visible:h-auto focus-visible:w-auto focus-visible:max-w-[calc(100vw-1.5rem)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring sm:focus-visible:right-auto sm:focus-visible:max-w-[min(28rem,calc(100vw-1.5rem))] sm:text-base focus:not-sr-only focus:absolute focus:left-3 focus:top-3 focus:h-auto"
         >
           Pular para o simulador
         </a>
@@ -70,7 +71,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           aria-label="Cabeçalho do Precifica Grancont"
           className="sticky top-0 z-30 border-b border-border bg-card/95 backdrop-blur"
         >
-          <div className="mx-auto flex max-w-7xl items-center gap-2 px-3 py-2.5 sm:gap-3 sm:px-6">
+          {/* `flex-wrap` + altura mínima: a barra cresce em vez de cortar
+              conteúdo quando a fonte do sistema está ampliada. */}
+          <div className="mx-auto flex min-h-16 max-w-7xl flex-wrap items-center gap-2 px-3 py-2.5 sm:gap-3 sm:px-6">
             <LogoInicio naRotaInicial={itemAtivo(pathname, "/simulador")} />
 
             <nav
