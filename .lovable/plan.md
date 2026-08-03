@@ -1,28 +1,34 @@
-## Conectar o Precifica Grancont ao GitHub
+# Corrigir o CI que falha no GitHub
 
-Importante: a conexão com o GitHub é feita por você na interface do Lovable — eu não consigo criar o repositório nem enviar o código por conta própria. Depois de conectado, a sincronização é bidirecional e automática (o que eu alterar aqui vai para o repositório, e o que você enviar ao repositório volta para cá).
+## Por que está falhando
 
-### Passo a passo
+O e-mail do GitHub é do workflow "CI" (arquivo `.github/workflows/ci.yml`), que a cada push roda três verificações: **lint**, **verificação de tipos** e **testes**. O app funciona normalmente no preview porque o Vite não roda essas checagens — só o CI roda. Rodei as mesmas checagens agora e encontrei duas causas reais:
 
-1. No editor do Lovable, abra o menu **+** (canto inferior esquerdo do chat) → **GitHub** → **Connect project**.
-2. Autorize o aplicativo **Lovable** no GitHub (login + permissão).
-3. Escolha a conta ou organização onde o repositório será criado (ex.: sua conta pessoal ou a conta da Grancont).
-4. Clique em **Create Repository**. O Lovable cria o repositório e envia todo o código atual do projeto.
-5. Confira no GitHub se os arquivos apareceram (pasta `src/`, `supabase/`, `package.json`, testes etc.).
+1. **Formatação (lint)** — o ESLint está configurado com o Prettier como regra de erro. Hoje **110 arquivos** estão fora do padrão de formatação, gerando **2.348 erros**. Nenhum deles é bug de lógica: são quebras de linha, vírgulas e indentação. Isso sozinho já derruba o job.
 
-### Observações importantes
+2. **Tipos (typecheck)** — **13 erros** em 12 arquivos, todos da mesma causa: a rota `/login` passou a exigir o parâmetro de busca `next` (`validateSearch`), mas links e redirecionamentos para `/login` espalhados pelo app (`AvisoLicenca`, `useApp`, `_authenticated/route`, `auth`, `cadastro`, `entrando`, `onboarding`, `recuperar-senha`, `acesso-negado`, `acesso-bloqueado`, `aguardando-aprovacao`, `confirmar-email`) não informam esse parâmetro.
 
-- **Segredos não vão para o repositório.** Chaves do backend (Cloud/banco, `SUPABASE_SERVICE_ROLE_KEY`, `LOVABLE_API_KEY`, etc.) continuam guardadas no Lovable e não são versionadas. Se você for rodar o projeto localmente ou em outro host, precisará configurar as variáveis de ambiente lá.
-- **Dados do banco não são exportados pelo GitHub.** O repositório leva apenas o código e as migrações SQL. Para exportar os dados, use Cloud → Advanced settings → Export data.
-- **Uma conta GitHub por conta Lovable.** Se já houver outra conta conectada, será preciso trocar antes.
-- **Repositório privado** é o recomendado, já que o projeto contém regras de negócio fiscais e a estrutura completa do sistema multiempresa.
+Também vale ajustar o workflow: o projeto tem `bun.lock` e `package-lock.json` ao mesmo tempo, e o CI usa `npm ci`, que quebra sempre que o `package-lock.json` fica defasado em relação ao `package.json`.
 
-### O que eu faço depois que você conectar
+## O que fazer
 
-Assim que o repositório existir, posso (se você quiser) preparar o projeto para colaboração externa:
+### 1. Normalizar a formatação
+- Rodar o Prettier em todo o projeto (`prettier --write .`) e confirmar `eslint .` limpo.
+- Nenhuma mudança de comportamento: só formatação.
 
-- Um `README.md` com visão geral, stack, como rodar localmente, variáveis de ambiente necessárias e como executar a suíte de testes (241+ testes).
-- Um `.env.example` documentando as variáveis públicas (`VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, GA ID) sem expor nada sensível.
-- Um workflow de GitHub Actions rodando lint, typecheck e testes a cada push/pull request, para proteger o motor de precificação contra regressões.
+### 2. Corrigir os 13 erros de tipo do `/login`
+- Em cada link/redirecionamento para `/login`, passar `search: { next: undefined }` (ou o caminho de retorno correto, quando fizer sentido — por exemplo em `_authenticated/route.tsx` e `entrando.tsx`, onde faz sentido preservar a rota que o usuário tentou abrir).
+- Manter o comportamento atual de retorno seguro (`destinoSeguro`).
 
-Se quiser esses três itens, me avise depois de conectar (ou já aprove este plano e eu deixo tudo pronto para o momento em que a conexão for feita).
+### 3. Deixar o CI estável
+- Alinhar o workflow ao gerenciador realmente usado: instalar com Bun (`oven-sh/setup-bun` + `bun install --frozen-lockfile`) e rodar `bun run lint`, `bun run typecheck`, `bun run test`.
+- Manter só um lockfile como fonte de verdade para evitar o erro clássico de `npm ci` com lock defasado.
+
+### 4. Validar
+- Rodar localmente lint, typecheck e a suíte completa (267 testes) antes de subir, para o próximo push já sair verde.
+
+## Detalhes técnicos
+
+- Verificações rodadas: `npx eslint .` (2.348 erros, todos `prettier/prettier`), `tsc --noEmit` (13 erros: TS2741/TS2345, todos "Property 'search' is missing ... /login").
+- Causa raiz dos tipos: `createFileRoute("/login")` com `validateSearch` torna `search` obrigatório em `<Link to="/login">`, `navigate({ to: "/login" })` e `redirect({ to: "/login" })`.
+- Nada no motor de precificação (`src/lib/pricing-engine.ts`) é alterado; as regras fiscais e os testes permanecem intactos.
