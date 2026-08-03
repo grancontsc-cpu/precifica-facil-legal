@@ -62,9 +62,11 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">
+        <LogoGrancont className="mx-auto h-9 w-auto" />
+        <h1 className="mt-8 text-xl font-semibold tracking-tight text-foreground">
           Não conseguimos abrir esta tela
         </h1>
+
         <p className="mt-2 text-sm text-muted-foreground">
           Nenhum dado da sua simulação foi perdido. Tente novamente ou volte ao início.
         </p>
