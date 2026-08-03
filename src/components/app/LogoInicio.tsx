@@ -37,9 +37,11 @@ export function LogoInicio({ naRotaInicial }: { naRotaInicial: boolean }) {
               to="/simulador"
               search={{ simulacao: undefined, produto: undefined }}
               className={cn(
-                "flex shrink-0 items-center rounded-md px-1.5 py-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                "flex shrink-0 basis-auto items-center whitespace-nowrap rounded-md px-1.5 py-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                "max-w-[45vw] sm:max-w-none",
                 naRotaInicial ? "bg-primary/10 ring-1 ring-primary/30" : "hover:opacity-80",
               )}
+
               aria-label="Precifica Grancont — ir para o simulador"
               aria-current={naRotaInicial ? "page" : undefined}
               onClick={(e) => {
