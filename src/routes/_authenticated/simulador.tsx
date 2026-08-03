@@ -296,7 +296,11 @@ function Simulador() {
     const linha = simulacaoQuery.data;
     if (!linha || !acessoSimulacao?.podeLer) return;
     const snapshot = linha.input_snapshot as unknown as SimulationState | null;
-    if (snapshot?.produto) setState(snapshot);
+    if (snapshot?.produto) {
+      setState(snapshot);
+      setSnapshotSalvo(JSON.stringify(snapshot));
+    }
+
     setTitulo(linha.titulo);
     setPerfilId(linha.tax_profile_id);
     setProdutoId(linha.product_id);
