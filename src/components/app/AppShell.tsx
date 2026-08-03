@@ -124,14 +124,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       >
         Pular para o simulador
       </a>
-      <header className="sticky top-0 z-30 border-b border-border bg-card/95 backdrop-blur">
+      <header
+        role="banner"
+        aria-label="Cabeçalho do Precifica Grancont"
+        className="sticky top-0 z-30 border-b border-border bg-card/95 backdrop-blur"
+      >
         <div className="mx-auto flex max-w-7xl items-center gap-2 px-3 py-2.5 sm:gap-3 sm:px-6">
 
           <LogoInicio naRotaInicial={itemAtivo(pathname, "/simulador")} />
-
-
-
-
 
           <nav aria-label="Navegação principal" className="ml-4 hidden items-center gap-1 lg:flex">
             {NAV_DIARIO.map((item) => (
@@ -145,7 +145,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             ) : null}
           </nav>
 
-          <div className="ml-auto flex min-w-0 items-center gap-2">
+          <div
+            role="group"
+            aria-label="Ferramentas da conta e da empresa"
+            className="ml-auto flex min-w-0 items-center gap-2"
+          >
 
             <div className="hidden lg:block">
               <Glossario />
@@ -168,6 +172,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </Select>
             ) : empresaAtual ? (
               <Badge variant="outline" className="hidden max-w-[220px] truncate sm:inline-flex">
+                <span className="sr-only">Empresa atual: </span>
                 {empresaAtual.name}
               </Badge>
             ) : null}
@@ -176,7 +181,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
 
         {situacaoLicenca.emTeste && situacaoLicenca.liberado && (
-          <div className="border-t border-border bg-primary/10 px-4 py-2 text-center text-xs text-foreground sm:px-6">
+          <div
+            role="status"
+            aria-live="polite"
+            className="border-t border-border bg-primary/10 px-4 py-2 text-center text-xs text-foreground sm:px-6"
+          >
             Teste gratuito: <strong>{situacaoLicenca.diasRestantes} dia(s)</strong> restantes.
             Depois desse prazo, o acesso depende da liberação do Administrador Grancont.
           </div>
@@ -186,6 +195,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <div id="conteudo-principal" tabIndex={-1} className="focus:outline-none">
         {children}
       </div>
+
 
 
       <NavegacaoMobile ehGestor={ehGestor} isSuperAdmin={isSuperAdmin} />
