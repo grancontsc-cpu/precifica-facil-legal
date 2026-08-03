@@ -105,7 +105,7 @@ function LoginPage() {
           }}
         />
         <div className="relative">
-          <LogoGrancont className="h-9 w-auto brightness-0 invert" />
+          <LogoGrancont className="h-9 w-auto" variante="clara" />
         </div>
 
         <div className="relative max-w-md">
