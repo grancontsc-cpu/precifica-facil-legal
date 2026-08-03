@@ -18,22 +18,21 @@ export type AvaliacaoBusca = {
 export function avaliarBusca(texto: string): AvaliacaoBusca {
   const original = texto ?? "";
   const termo = sanitizarBusca(original);
-  const semCorte = sanitizarBusca(original.slice(0, MAX_BUSCA * 4)).length;
 
   const excedeu = original.trim().length > MAX_BUSCA;
-  const normalizado = !excedeu && original.trim() !== termo && original.trim().length > 0;
+  const normalizado = !excedeu && original.trim().length > 0 && original.trim() !== termo;
 
   let aviso: string | null = null;
   if (excedeu) {
     aviso =
       `A busca usa no máximo ${MAX_BUSCA} caracteres — o restante foi ignorado. ` +
-      "Reduza o texto para poucas palavras-chave (nome, SKU ou NCM).";
+      "Reduza o texto para poucas palavras-chave.";
   } else if (normalizado) {
     aviso =
       "Ajustamos o texto da busca: pontuação, símbolos (, . ( ) \" ' \\ % _ *) e espaços " +
       `repetidos são removidos. Buscando por: “${termo}”.`;
   }
 
-  void semCorte;
   return { termo, excedeu, normalizado, aviso };
 }
+
