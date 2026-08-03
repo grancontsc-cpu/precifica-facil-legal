@@ -17,6 +17,8 @@ import { SITE_NOME, SITE_URL } from "../lib/seo-head";
 import { registrarPageView } from "../lib/analytics";
 import { analyticsPermitido } from "../lib/consentimento";
 import { ConsentimentoCookies } from "../components/app/ConsentimentoCookies";
+import { LogoGrancont } from "../components/app/LogoGrancont";
+
 
 
 
@@ -28,10 +30,12 @@ function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <p className="num-destaque text-6xl font-bold text-primary/25">404</p>
+        <LogoGrancont className="mx-auto h-9 w-auto" />
+        <p className="num-destaque mt-8 text-6xl font-bold text-primary/25">404</p>
         <h1 className="mt-3 text-xl font-semibold tracking-tight text-foreground">
           Página não encontrada
         </h1>
+
         <p className="mt-2 text-sm text-muted-foreground">
           O endereço acessado não existe ou foi movido para outro lugar.
         </p>
@@ -58,9 +62,11 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">
+        <LogoGrancont className="mx-auto h-9 w-auto" />
+        <h1 className="mt-8 text-xl font-semibold tracking-tight text-foreground">
           Não conseguimos abrir esta tela
         </h1>
+
         <p className="mt-2 text-sm text-muted-foreground">
           Nenhum dado da sua simulação foi perdido. Tente novamente ou volte ao início.
         </p>

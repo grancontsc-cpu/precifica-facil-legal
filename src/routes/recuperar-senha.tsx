@@ -3,6 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { LogoGrancont } from "@/components/app/LogoGrancont";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -62,6 +63,7 @@ function Pagina() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background px-4 py-10">
       <div className="w-full max-w-md rounded-xl border border-border bg-card p-6 shadow-[var(--shadow-card)]">
+        <LogoGrancont className="mb-6 h-8 w-auto" />
         <h1 className="text-lg font-semibold text-foreground">Recuperar senha</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Informe seu e-mail para receber o link de criação de nova senha.

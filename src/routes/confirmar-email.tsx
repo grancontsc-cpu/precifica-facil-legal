@@ -3,6 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { MailCheck } from "lucide-react";
 import { toast } from "sonner";
 
+import { LogoGrancont } from "@/components/app/LogoGrancont";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { registrarEventoEmail } from "@/lib/email-eventos.functions";
@@ -46,6 +47,7 @@ function Pagina() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background px-4 py-10">
       <div className="w-full max-w-md rounded-xl border border-border bg-card p-6 text-center shadow-[var(--shadow-card)]">
+        <LogoGrancont className="mx-auto mb-6 h-8 w-auto" />
         <MailCheck className="mx-auto h-8 w-8 text-primary" aria-hidden />
         <h1 className="mt-3 text-lg font-semibold text-foreground">Confirme seu e-mail</h1>
         <p className="mt-2 text-sm text-muted-foreground">

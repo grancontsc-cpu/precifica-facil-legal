@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { CalendarClock, ShieldAlert } from "lucide-react";
 import { useEffect, useState } from "react";
 
+import { LogoGrancont } from "@/components/app/LogoGrancont";
 import { SolicitarAcessoAdmin } from "@/components/app/SolicitarAcessoAdmin";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -34,6 +35,7 @@ export function AvisoLicenca({ variante, titulo, descricao }: Props) {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background px-4 py-10">
       <div className="w-full max-w-md rounded-xl border border-border bg-card p-6 text-center shadow-[var(--shadow-card)]">
+        <LogoGrancont className="mx-auto mb-6 h-8 w-auto" />
         <Icone
           className={`mx-auto h-8 w-8 ${variante === "teste" ? "text-primary" : "text-destructive"}`}
           aria-hidden

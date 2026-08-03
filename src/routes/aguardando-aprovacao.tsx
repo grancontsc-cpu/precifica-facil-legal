@@ -2,6 +2,7 @@ import { metaPagina } from "@/lib/seo-head";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Hourglass } from "lucide-react";
 
+import { LogoGrancont } from "@/components/app/LogoGrancont";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -20,6 +21,7 @@ export const Route = createFileRoute("/aguardando-aprovacao")({
   component: () => (
     <main className="flex min-h-screen items-center justify-center bg-background px-4 py-10">
       <div className="w-full max-w-md rounded-xl border border-border bg-card p-6 text-center shadow-[var(--shadow-card)]">
+        <LogoGrancont className="mx-auto mb-6 h-8 w-auto" />
         <Hourglass className="mx-auto h-8 w-8 text-primary" aria-hidden />
         <h1 className="mt-3 text-lg font-semibold text-foreground">Aguardando aprovação</h1>
         <p className="mt-2 text-sm text-muted-foreground">

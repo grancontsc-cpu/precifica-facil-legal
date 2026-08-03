@@ -2,17 +2,29 @@ import { useNavigate } from "@tanstack/react-router";
 import { Loader2 } from "lucide-react";
 import { useEffect, type ReactNode } from "react";
 
+import { LogoGrancont } from "@/components/app/LogoGrancont";
 import { useApp } from "@/hooks/useApp";
 import { rotaBloqueio } from "@/lib/licencas";
 
-export function Carregando({ texto = "Carregando…" }: { texto?: string }) {
+export function Carregando({
+  texto = "Carregando…",
+  marca = false,
+}: {
+  texto?: string;
+  /** Exibe a logomarca — usar em telas fora do AppShell (que já tem a marca no topo). */
+  marca?: boolean;
+}) {
   return (
-    <div className="flex min-h-[50vh] items-center justify-center gap-2 text-sm text-muted-foreground">
-      <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-      {texto}
+    <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4">
+      {marca ? <LogoGrancont className="h-9 w-auto" /> : null}
+      <p className="flex items-center gap-2 text-sm text-muted-foreground">
+        <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+        {texto}
+      </p>
     </div>
   );
 }
+
 
 /** Bloqueia a renderização até resolver sessão, situação da conta e papel. */
 export function GuardaStatus({ children }: { children: ReactNode }) {

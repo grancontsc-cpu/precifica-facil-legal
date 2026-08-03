@@ -44,7 +44,7 @@ function Pagina() {
 
   return (
     <main className="min-h-screen bg-background">
-      <Carregando texto="Verificando sua licença…" />
+      <Carregando marca texto="Verificando sua licença…" />
     </main>
   );
 }
