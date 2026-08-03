@@ -1,7 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { metaPagina } from "@/lib/seo-head";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { avaliarBusca } from "@/lib/busca-aviso";
 import { useDebounce } from "@/hooks/useDebounce";
+
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
