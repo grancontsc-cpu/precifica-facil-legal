@@ -43,6 +43,8 @@ import { useAlteracoesPendentes } from "@/hooks/useAlteracoesPendentes";
 import { useAliquotas } from "@/hooks/useAliquotas";
 import { sincronizarOperacao } from "@/lib/aliquotas";
 import { ResumoFlutuante } from "@/components/pricing/ResumoFlutuante";
+import { VoltarAoTopo } from "@/components/app/VoltarAoTopo";
+
 import { simular } from "@/lib/pricing-engine";
 import {
   CENARIOS,
