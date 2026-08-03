@@ -15,7 +15,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { registrarEventoEmail } from "@/lib/email-eventos.functions";
 import { traduzirErroSenha, validarParDeSenhas } from "@/lib/senha";
 
-
 const TITULO = "Criar conta — Precifica Grancont";
 const DESCRICAO =
   "Crie sua conta no Precifica Grancont, confirme o e-mail e teste o simulador de precificação tributária por 30 dias sem limites.";
@@ -56,7 +55,9 @@ function CadastrarPage() {
 
     setCarregando(true);
     try {
-      void registrarEventoEmail({ data: { tipo: "cadastro_solicitado", email: emailLimpo } }).catch(() => {});
+      void registrarEventoEmail({ data: { tipo: "cadastro_solicitado", email: emailLimpo } }).catch(
+        () => {},
+      );
 
       const { error } = await supabase.auth.signUp({
         email: emailLimpo,
@@ -83,7 +84,9 @@ function CadastrarPage() {
       }
 
       if (!error) {
-        void registrarEventoEmail({ data: { tipo: "senha_criada", email: emailLimpo } }).catch(() => {});
+        void registrarEventoEmail({ data: { tipo: "senha_criada", email: emailLimpo } }).catch(
+          () => {},
+        );
       }
 
       // Mensagem genérica: a tela é sempre a mesma, exista ou não uma conta com este e-mail.
@@ -102,20 +105,28 @@ function CadastrarPage() {
             <MailCheck className="mx-auto h-9 w-9 text-primary" aria-hidden />
             <h1 className="mt-3 text-lg font-semibold text-foreground">Confirme seu e-mail</h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              Enviamos um link de confirmação para <span className="font-medium text-foreground">{email}</span>. Abra o
-              link para ativar a conta e iniciar seus 30 dias de teste gratuito.
+              Enviamos um link de confirmação para{" "}
+              <span className="font-medium text-foreground">{email}</span>. Abra o link para ativar
+              a conta e iniciar seus 30 dias de teste gratuito.
             </p>
             <p className="mt-2 text-xs text-muted-foreground">
-              Não recebeu? Confira a caixa de spam e o lixo eletrônico, e confirme se o endereço está correto.
+              Não recebeu? Confira a caixa de spam e o lixo eletrônico, e confirme se o endereço
+              está correto.
             </p>
             <ReenviarConfirmacao email={email} className="mt-5 text-left" />
-            <Link to="/login" search={{ next: undefined }} className="mt-6 inline-block text-sm text-primary hover:underline">
+            <Link
+              to="/login"
+              search={{ next: undefined }}
+              className="mt-6 inline-block text-sm text-primary hover:underline"
+            >
               Voltar para o login
             </Link>
           </div>
         ) : (
           <>
-            <h1 className="mt-5 text-xl font-semibold tracking-tight text-foreground">Criar sua conta</h1>
+            <h1 className="mt-5 text-xl font-semibold tracking-tight text-foreground">
+              Criar sua conta
+            </h1>
             <p className="mt-1 text-sm text-muted-foreground">
               Confirmação por e-mail e 30 dias de teste gratuito, sem limites.
             </p>
@@ -123,7 +134,13 @@ function CadastrarPage() {
             <form className="mt-6 space-y-4" onSubmit={cadastrar}>
               <div className="space-y-1.5">
                 <Label htmlFor="nome">Seu nome</Label>
-                <Input id="nome" value={nome} onChange={(e) => setNome(e.target.value)} required maxLength={120} />
+                <Input
+                  id="nome"
+                  value={nome}
+                  onChange={(e) => setNome(e.target.value)}
+                  required
+                  maxLength={120}
+                />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="empresa">Empresa</Label>
@@ -156,23 +173,32 @@ function CadastrarPage() {
               />
 
               <Button type="submit" className="w-full" disabled={carregando}>
-                {carregando ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : "Criar conta"}
+                {carregando ? (
+                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                ) : (
+                  "Criar conta"
+                )}
               </Button>
             </form>
 
             <ul className="mt-5 space-y-1.5 text-xs text-muted-foreground">
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="h-3.5 w-3.5 text-primary" aria-hidden /> Acesso completo por 30 dias
+                <CheckCircle2 className="h-3.5 w-3.5 text-primary" aria-hidden /> Acesso completo
+                por 30 dias
               </li>
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="h-3.5 w-3.5 text-primary" aria-hidden /> Após o período, a liberação depende do
-                Administrador Grancont
+                <CheckCircle2 className="h-3.5 w-3.5 text-primary" aria-hidden /> Após o período, a
+                liberação depende do Administrador Grancont
               </li>
             </ul>
 
             <p className="mt-6 border-t border-border pt-4 text-xs text-muted-foreground">
               Já tem conta?{" "}
-              <Link to="/login" search={{ next: undefined }} className="text-primary hover:underline">
+              <Link
+                to="/login"
+                search={{ next: undefined }}
+                className="text-primary hover:underline"
+              >
                 Entrar
               </Link>
             </p>

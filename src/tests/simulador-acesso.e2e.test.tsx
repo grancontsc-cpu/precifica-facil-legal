@@ -54,14 +54,19 @@ vi.mock("@/integrations/supabase/client", () => {
 });
 
 const registrarNegativa = vi.fn();
-vi.mock("@/lib/registro-seguranca", () => ({ registrarNegativa: (e: unknown) => registrarNegativa(e) }));
+vi.mock("@/lib/registro-seguranca", () => ({
+  registrarNegativa: (e: unknown) => registrarNegativa(e),
+}));
 
 const navigate = vi.fn();
 vi.mock("@tanstack/react-router", async (importOriginal) => {
   const actual = await importOriginal<Record<string, unknown>>();
   return {
     ...actual,
-    createFileRoute: () => (opts: Record<string, unknown>) => ({ ...opts, useSearch: () => buscaSearch() }),
+    createFileRoute: () => (opts: Record<string, unknown>) => ({
+      ...opts,
+      useSearch: () => buscaSearch(),
+    }),
     useNavigate: () => navigate,
   };
 });
@@ -75,7 +80,9 @@ const appState = {
   userId: "user-1" as string | null,
   email: "user@empresa.com",
   nome: "Usuária",
-  organizations: [{ id: "org-a", name: "Empresa A", cnpj: null, defaults: null, default_tax_profile_id: null }],
+  organizations: [
+    { id: "org-a", name: "Empresa A", cnpj: null, defaults: null, default_tax_profile_id: null },
+  ],
   memberships: [{ organization_id: "org-a", role: "manager" as "manager" | "user" }],
   isSuperAdmin: false,
   isGrancontAdmin: false,
@@ -169,9 +176,7 @@ describe("URL com simulação de outra empresa", () => {
     await screen.findByText("Simulação indisponível");
 
     expect(
-      escritas.filter(
-        (e) => e.operacao !== "select" && e.tabela !== "app_analytics_events",
-      ),
+      escritas.filter((e) => e.operacao !== "select" && e.tabela !== "app_analytics_events"),
     ).toHaveLength(0);
   });
 
@@ -218,9 +223,7 @@ describe("URL com simulação de outro usuário na mesma empresa", () => {
 
     await screen.findByText("Simulação indisponível");
     expect(
-      escritas.filter(
-        (e) => e.operacao !== "select" && e.tabela !== "app_analytics_events",
-      ),
+      escritas.filter((e) => e.operacao !== "select" && e.tabela !== "app_analytics_events"),
     ).toHaveLength(0);
     appState.canEdit = true;
   });
@@ -242,9 +245,7 @@ describe("conta suspensa e sessão ausente", () => {
 
     await screen.findByText("Conta sem acesso");
     expect(
-      escritas.filter(
-        (e) => e.operacao !== "select" && e.tabela !== "app_analytics_events",
-      ),
+      escritas.filter((e) => e.operacao !== "select" && e.tabela !== "app_analytics_events"),
     ).toHaveLength(0);
   });
 });

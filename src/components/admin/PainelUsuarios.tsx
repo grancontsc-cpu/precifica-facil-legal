@@ -12,7 +12,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { useApp, type StatusConta } from "@/hooks/useApp";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -72,12 +79,16 @@ export function PainelUsuarios({ escopoOrgId }: { escopoOrgId: string | null }) 
       return (data ?? [])
         .filter((r) => !!(r as { profiles: unknown }).profiles)
         .map((r) => {
-          const p = (r as unknown as { profiles: Omit<Linha, "role" | "organization_id" | "organizacao"> }).profiles;
+          const p = (
+            r as unknown as { profiles: Omit<Linha, "role" | "organization_id" | "organizacao"> }
+          ).profiles;
           return {
             ...p,
             role: (r as unknown as { role: "manager" | "user" }).role,
             organization_id: (r as unknown as { organization_id: string }).organization_id,
-            organizacao: (r as unknown as { organizations: { name: string } | null }).organizations?.name ?? "—",
+            organizacao:
+              (r as unknown as { organizations: { name: string } | null }).organizations?.name ??
+              "—",
           } as Linha;
         });
     },
@@ -89,7 +100,8 @@ export function PainelUsuarios({ escopoOrgId }: { escopoOrgId: string | null }) 
       toast.success("Alteração aplicada.");
       void qc.invalidateQueries({ queryKey: ["admin", "usuarios"] });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Não foi possível concluir a ação."),
+    onError: (e) =>
+      toast.error(e instanceof Error ? e.message : "Não foi possível concluir a ação."),
   });
 
   const lista = (usuarios.data ?? []).filter((u) => {
@@ -151,7 +163,11 @@ export function PainelUsuarios({ escopoOrgId }: { escopoOrgId: string | null }) 
                       onValueChange={(role) =>
                         acao.mutate(() =>
                           alterarPapelMembro({
-                            data: { userId: u.id, organizationId: u.organization_id, role: role as "manager" | "user" },
+                            data: {
+                              userId: u.id,
+                              organizationId: u.organization_id,
+                              role: role as "manager" | "user",
+                            },
                           }),
                         )
                       }
@@ -174,7 +190,9 @@ export function PainelUsuarios({ escopoOrgId }: { escopoOrgId: string | null }) 
                   </Badge>
                 </TableCell>
                 <TableCell className="hidden lg:table-cell text-xs text-muted-foreground">
-                  {u.last_access_at ? new Date(u.last_access_at).toLocaleString("pt-BR") : "Nunca acessou"}
+                  {u.last_access_at
+                    ? new Date(u.last_access_at).toLocaleString("pt-BR")
+                    : "Nunca acessou"}
                 </TableCell>
                 <TableCell>
                   <div className="flex flex-wrap justify-end gap-1">
@@ -186,7 +204,11 @@ export function PainelUsuarios({ escopoOrgId }: { escopoOrgId: string | null }) 
                         onClick={() =>
                           acao.mutate(() =>
                             alterarStatusUsuario({
-                              data: { userId: u.id, organizationId: u.organization_id, status: "suspended" },
+                              data: {
+                                userId: u.id,
+                                organizationId: u.organization_id,
+                                status: "suspended",
+                              },
                             }),
                           )
                         }
@@ -200,7 +222,11 @@ export function PainelUsuarios({ escopoOrgId }: { escopoOrgId: string | null }) 
                         onClick={() =>
                           acao.mutate(() =>
                             alterarStatusUsuario({
-                              data: { userId: u.id, organizationId: u.organization_id, status: "active" },
+                              data: {
+                                userId: u.id,
+                                organizationId: u.organization_id,
+                                status: "active",
+                              },
                             }),
                           )
                         }
@@ -213,8 +239,11 @@ export function PainelUsuarios({ escopoOrgId }: { escopoOrgId: string | null }) 
                       variant="ghost"
                       onClick={() =>
                         acao.mutate(async () => {
-                          const r = await enviarRecuperacaoSenha({ data: { email: u.email ?? "" } });
-                          if (r.link) await navigator.clipboard.writeText(r.link).catch(() => undefined);
+                          const r = await enviarRecuperacaoSenha({
+                            data: { email: u.email ?? "" },
+                          });
+                          if (r.link)
+                            await navigator.clipboard.writeText(r.link).catch(() => undefined);
                         })
                       }
                     >

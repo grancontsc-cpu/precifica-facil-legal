@@ -71,7 +71,11 @@ async function registrarEvento(
 }
 
 /** Data de término efetiva conforme o status atual da licença. */
-function validadeAtual(licenca: { status: string; expires_at: string | null; trial_ends_at: string | null }) {
+function validadeAtual(licenca: {
+  status: string;
+  expires_at: string | null;
+  trial_ends_at: string | null;
+}) {
   return licenca.status === "trial" ? licenca.trial_ends_at : licenca.expires_at;
 }
 
@@ -217,11 +221,15 @@ export const atualizarLicenca = createServerFn({ method: "POST" })
     } else if (data.acao === "estender") {
       if (atual?.status === "trial") {
         const base =
-          atual.trial_ends_at && new Date(atual.trial_ends_at) > agora ? new Date(atual.trial_ends_at) : agora;
+          atual.trial_ends_at && new Date(atual.trial_ends_at) > agora
+            ? new Date(atual.trial_ends_at)
+            : agora;
         patch = { status: "trial", plan: "free_trial", trial_ends_at: emDias(base, dias) };
       } else {
         const base =
-          atual?.expires_at && new Date(atual.expires_at) > agora ? new Date(atual.expires_at) : agora;
+          atual?.expires_at && new Date(atual.expires_at) > agora
+            ? new Date(atual.expires_at)
+            : agora;
         patch = {
           status: "active",
           expires_at: emDias(base, dias),
@@ -245,24 +253,25 @@ export const atualizarLicenca = createServerFn({ method: "POST" })
       const validade = data.validade ?? atual?.expires_at ?? null;
       const validadeFutura = !validade || new Date(validade).getTime() > agora.getTime();
 
-      patch = testeValido && !data.validade
-        ? {
-            status: "trial",
-            plan: "free_trial",
-            suspended_at: null,
-            suspended_by: null,
-            suspension_reason: null,
-          }
-        : {
-            status: "active",
-            plan: atual?.plan === "free_trial" ? "licenciado" : (atual?.plan ?? "licenciado"),
-            activated_at: atual?.activated_at ?? agora.toISOString(),
-            activated_by: atual?.activated_by ?? context.userId,
-            expires_at: validadeFutura ? validade : emDias(agora, dias),
-            suspended_at: null,
-            suspended_by: null,
-            suspension_reason: null,
-          };
+      patch =
+        testeValido && !data.validade
+          ? {
+              status: "trial",
+              plan: "free_trial",
+              suspended_at: null,
+              suspended_by: null,
+              suspension_reason: null,
+            }
+          : {
+              status: "active",
+              plan: atual?.plan === "free_trial" ? "licenciado" : (atual?.plan ?? "licenciado"),
+              activated_at: atual?.activated_at ?? agora.toISOString(),
+              activated_by: atual?.activated_by ?? context.userId,
+              expires_at: validadeFutura ? validade : emDias(agora, dias),
+              suspended_at: null,
+              suspended_by: null,
+              suspension_reason: null,
+            };
       evento = "license_reactivated";
     } else if (data.acao === "cancelar") {
       patch = {

@@ -24,7 +24,12 @@ import { CardTributoVenda } from "@/components/pricing/CardTributoVenda";
 import { useApp } from "@/hooks/useApp";
 import { supabase } from "@/integrations/supabase/client";
 import { tributosCompraPadrao, tributosVendaPadrao } from "@/lib/pricing-defaults";
-import { aplicarPerfil, linhasDoEstado, type TaxProfileLineRow, type TaxProfileRow } from "@/lib/tax-profiles";
+import {
+  aplicarPerfil,
+  linhasDoEstado,
+  type TaxProfileLineRow,
+  type TaxProfileRow,
+} from "@/lib/tax-profiles";
 import { estadoInicial } from "@/lib/pricing-defaults";
 import type { PurchaseTax, SaleTax, ScenarioId } from "@/types/pricing";
 
@@ -115,7 +120,11 @@ function PerfisPage() {
       toast.error(error.message);
       return;
     }
-    const estado = aplicarPerfil(estadoInicial(), perfil, (data ?? []) as unknown as TaxProfileLineRow[]);
+    const estado = aplicarPerfil(
+      estadoInicial(),
+      perfil,
+      (data ?? []) as unknown as TaxProfileLineRow[],
+    );
     setRascunho({
       id: perfil.id,
       name: perfil.name,
@@ -135,11 +144,16 @@ function PerfisPage() {
   const salvar = useMutation({
     mutationFn: async (r: Rascunho) => {
       if (!r.name.trim()) throw new Error("Informe o nome do perfil tributário.");
-      if (r.valid_to && r.valid_to < r.valid_from) throw new Error("Vigência final anterior à inicial.");
+      if (r.valid_to && r.valid_to < r.valid_from)
+        throw new Error("Vigência final anterior à inicial.");
       const payload = {
         name: r.name.trim(),
         organization_id: r.organization_id,
-        scenario: (r.scenario === "transicao2026" ? "transicao" : r.scenario) as "atual" | "transicao" | "novo" | "personalizado",
+        scenario: (r.scenario === "transicao2026" ? "transicao" : r.scenario) as
+          | "atual"
+          | "transicao"
+          | "novo"
+          | "personalizado",
         valid_from: r.valid_from,
         valid_to: r.valid_to || null,
         notes: r.notes || null,
@@ -154,10 +168,17 @@ function PerfisPage() {
           .update({ ...payload, version: r.version + 1 })
           .eq("id", perfilId);
         if (error) throw error;
-        const { error: delErr } = await supabase.from("tax_profile_lines").delete().eq("tax_profile_id", perfilId);
+        const { error: delErr } = await supabase
+          .from("tax_profile_lines")
+          .delete()
+          .eq("tax_profile_id", perfilId);
         if (delErr) throw delErr;
       } else {
-        const { data, error } = await supabase.from("tax_profiles").insert(payload).select("id").single();
+        const { data, error } = await supabase
+          .from("tax_profiles")
+          .insert(payload)
+          .select("id")
+          .single();
         if (error) throw error;
         perfilId = data.id;
       }
@@ -184,7 +205,8 @@ function PerfisPage() {
       <main className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
         <h1 className="text-xl font-semibold tracking-tight text-foreground">Perfis tributários</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Estes são os perfis liberados pela Grancont para sua empresa. Apenas a Grancont pode alterá-los.
+          Estes são os perfis liberados pela Grancont para sua empresa. Apenas a Grancont pode
+          alterá-los.
         </p>
         <ul className="mt-6 space-y-2">
           {(perfis.data ?? []).map((p) => (
@@ -210,7 +232,9 @@ function PerfisPage() {
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
         <div className="flex flex-wrap items-center gap-3">
           <div className="min-w-0 flex-1">
-            <h1 className="text-xl font-semibold tracking-tight text-foreground">Perfis tributários</h1>
+            <h1 className="text-xl font-semibold tracking-tight text-foreground">
+              Perfis tributários
+            </h1>
             <p className="mt-1 text-sm text-muted-foreground">
               Cada alteração gera uma nova versão e fica registrada na auditoria.
             </p>
@@ -308,7 +332,9 @@ function PerfisPage() {
             </div>
 
             <div className="mt-4 rounded-lg border border-border bg-surface p-4">
-              <p className="text-sm font-semibold text-foreground">Campos bloqueados para a empresa</p>
+              <p className="text-sm font-semibold text-foreground">
+                Campos bloqueados para a empresa
+              </p>
               <p className="text-xs text-muted-foreground">
                 Os grupos marcados ficam somente leitura no simulador dos clientes.
               </p>
@@ -346,7 +372,9 @@ function PerfisPage() {
                     onChange={(patch) =>
                       setRascunho({
                         ...rascunho,
-                        compra: rascunho.compra.map((x) => (x.id === t.id ? { ...x, ...patch } : x)),
+                        compra: rascunho.compra.map((x) =>
+                          x.id === t.id ? { ...x, ...patch } : x,
+                        ),
                       })
                     }
                   />
@@ -382,7 +410,10 @@ function PerfisPage() {
 
         <section className="mt-6 space-y-2">
           {(perfis.data ?? []).map((p) => (
-            <div key={p.id} className="flex flex-wrap items-center gap-3 rounded-xl border border-border bg-card p-4">
+            <div
+              key={p.id}
+              className="flex flex-wrap items-center gap-3 rounded-xl border border-border bg-card p-4"
+            >
               <div className="min-w-0 flex-1">
                 <p className="font-medium text-foreground">{p.name}</p>
                 <p className="text-xs text-muted-foreground">
@@ -394,7 +425,9 @@ function PerfisPage() {
               </div>
               <Badge variant="outline">v{p.version}</Badge>
               <Badge variant="secondary">{p.scenario}</Badge>
-              <Badge variant={p.active ? "secondary" : "outline"}>{p.active ? "Ativo" : "Inativo"}</Badge>
+              <Badge variant={p.active ? "secondary" : "outline"}>
+                {p.active ? "Ativo" : "Inativo"}
+              </Badge>
               <Button variant="outline" size="sm" onClick={() => void abrir(p)}>
                 Editar
               </Button>

@@ -21,7 +21,9 @@ export function useAliquotas() {
       const [internas, interestaduais] = await Promise.all([
         supabase
           .from("icms_aliquotas_internas")
-          .select("uf, aliquota, fcp, vigencia_inicio, vigencia_fim, fonte, observacao, updated_at"),
+          .select(
+            "uf, aliquota, fcp, vigencia_inicio, vigencia_fim, fonte, observacao, updated_at",
+          ),
         supabase
           .from("icms_aliquotas_interestaduais")
           .select(

@@ -13,17 +13,22 @@ export const consultarConvite = createServerFn({ method: "POST" })
     const hash = await hashToken(data.token);
     const { data: convite } = await supabaseAdmin
       .from("invitations")
-      .select("id, email, intended_role, invitation_status, expires_at, full_name, organizations(name, active)")
+      .select(
+        "id, email, intended_role, invitation_status, expires_at, full_name, organizations(name, active)",
+      )
       .eq("token_hash", hash)
       .maybeSingle();
 
     if (!convite) return { valido: false as const, motivo: "Convite não encontrado." };
-    if (convite.invitation_status === "accepted") return { valido: false as const, motivo: "Este convite já foi utilizado." };
-    if (convite.invitation_status === "cancelled") return { valido: false as const, motivo: "Este convite foi cancelado." };
+    if (convite.invitation_status === "accepted")
+      return { valido: false as const, motivo: "Este convite já foi utilizado." };
+    if (convite.invitation_status === "cancelled")
+      return { valido: false as const, motivo: "Este convite foi cancelado." };
     if (new Date(convite.expires_at).getTime() < Date.now())
       return { valido: false as const, motivo: "Este convite expirou." };
     const empresa = convite.organizations as { name: string; active: boolean } | null;
-    if (!empresa?.active) return { valido: false as const, motivo: "A empresa deste convite está inativa." };
+    if (!empresa?.active)
+      return { valido: false as const, motivo: "A empresa deste convite está inativa." };
 
     return {
       valido: true as const,
@@ -52,14 +57,20 @@ export const aceitarConvite = createServerFn({ method: "POST" })
     const hash = await acesso.hashToken(data.token);
     const { data: convite } = await supabaseAdmin
       .from("invitations")
-      .select("id, email, organization_id, intended_role, invitation_status, expires_at, invited_by")
+      .select(
+        "id, email, organization_id, intended_role, invitation_status, expires_at, invited_by",
+      )
       .eq("token_hash", hash)
       .maybeSingle();
 
     if (!convite) throw new Error("Convite não encontrado.");
-    if (convite.invitation_status !== "pending") throw new Error("Este convite não está mais disponível.");
+    if (convite.invitation_status !== "pending")
+      throw new Error("Este convite não está mais disponível.");
     if (new Date(convite.expires_at).getTime() < Date.now()) {
-      await supabaseAdmin.from("invitations").update({ invitation_status: "expired" }).eq("id", convite.id);
+      await supabaseAdmin
+        .from("invitations")
+        .update({ invitation_status: "expired" })
+        .eq("id", convite.id);
       throw new Error("Este convite expirou.");
     }
 
@@ -87,7 +98,8 @@ export const aceitarConvite = createServerFn({ method: "POST" })
         email_confirm: true,
         user_metadata: { full_name: data.fullName },
       });
-      if (error || !criado.user) throw new Error("Não foi possível criar o acesso. Tente novamente.");
+      if (error || !criado.user)
+        throw new Error("Não foi possível criar o acesso. Tente novamente.");
       userId = criado.user.id;
     } else {
       await supabaseAdmin.auth.admin.updateUserById(userId, {
@@ -122,7 +134,11 @@ export const aceitarConvite = createServerFn({ method: "POST" })
 
     await supabaseAdmin
       .from("invitations")
-      .update({ invitation_status: "accepted", accepted_at: new Date().toISOString(), token_hash: null })
+      .update({
+        invitation_status: "accepted",
+        accepted_at: new Date().toISOString(),
+        token_hash: null,
+      })
       .eq("id", convite.id);
 
     await acesso.registrarAuditoria(supabaseAdmin, {

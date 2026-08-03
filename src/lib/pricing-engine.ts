@@ -16,7 +16,6 @@ import type {
   VendaConfig,
 } from "@/types/pricing";
 
-
 /**
  * Motor de precificação — funções puras, sem dependência de interface.
  *
@@ -344,13 +343,18 @@ export function tributosVendaEfetivos(state: SimulationState): SaleTax[] {
   if (apuraPeloSimples(op.regime)) {
     return lista.map((t) =>
       t.id === "dasVenda"
-        ? { ...t, enabled: true, rate: D(op.aliquotaSimples).toNumber(), treatment: "incluido" as const, baseMode: "padrao" as const }
+        ? {
+            ...t,
+            enabled: true,
+            rate: D(op.aliquotaSimples).toNumber(),
+            treatment: "incluido" as const,
+            baseMode: "padrao" as const,
+          }
         : { ...t, enabled: t.treatment === "informativo" ? t.enabled : false },
     );
   }
   return lista.map((t) => (t.id === "dasVenda" ? { ...t, enabled: false } : t));
 }
-
 
 /* ------------------------------------------------------------------ */
 /* Venda — núcleo único                                                */
@@ -457,7 +461,10 @@ function nucleoVenda(precoBase: Decimal, ctx: SaleContext): NucleoVenda {
 }
 
 /** Avalia um preço-base candidato e devolve a decomposição arredondada. */
-export function avaliarPreco(precoBase: number | string | Decimal, ctx: SaleContext): SaleEvaluation {
+export function avaliarPreco(
+  precoBase: number | string | Decimal,
+  ctx: SaleContext,
+): SaleEvaluation {
   const n = nucleoVenda(D(precoBase), ctx);
 
   const markupMult = n.custo.gt(0) ? n.precoFinal.div(n.custo) : ZERO;
@@ -620,7 +627,6 @@ export function validar(state: SimulationState): ValidationIssue[] {
       }
     }
   }
-
 
   if (!p.nome.trim()) {
     issues.push({ campo: "nome", mensagem: "Informe o nome do produto.", severidade: "erro" });

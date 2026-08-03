@@ -12,7 +12,9 @@ type DetalhesAutorizacao = {
 } | null;
 
 type OAuthApi = {
-  getAuthorizationDetails: (id: string) => Promise<{ data: DetalhesAutorizacao; error: Error | null }>;
+  getAuthorizationDetails: (
+    id: string,
+  ) => Promise<{ data: DetalhesAutorizacao; error: Error | null }>;
   approveAuthorization: (id: string) => Promise<{ data: DetalhesAutorizacao; error: Error | null }>;
   denyAuthorization: (id: string) => Promise<{ data: DetalhesAutorizacao; error: Error | null }>;
 };
@@ -43,10 +45,10 @@ export const Route = createFileRoute("/.lovable/oauth/consent")({
   component: Consentimento,
   errorComponent: ({ error }) => (
     <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center gap-3 px-6">
-      <h1 className="text-lg font-semibold text-foreground">Não foi possível carregar a autorização</h1>
-      <p className="text-sm text-muted-foreground">
-        {String((error as Error)?.message ?? error)}
-      </p>
+      <h1 className="text-lg font-semibold text-foreground">
+        Não foi possível carregar a autorização
+      </h1>
+      <p className="text-sm text-muted-foreground">{String((error as Error)?.message ?? error)}</p>
     </main>
   ),
 });
@@ -87,9 +89,9 @@ function Consentimento() {
           Conectar {nomeCliente} à sua conta
         </h1>
         <p className="text-sm leading-relaxed text-muted-foreground">
-          {nomeCliente} poderá usar as ferramentas do Precifica Grancont em seu nome: simular
-          preços e consultar produtos e simulações que você já tem permissão para ver. As mesmas
-          regras de acesso da sua empresa continuam valendo.
+          {nomeCliente} poderá usar as ferramentas do Precifica Grancont em seu nome: simular preços
+          e consultar produtos e simulações que você já tem permissão para ver. As mesmas regras de
+          acesso da sua empresa continuam valendo.
         </p>
       </div>
 

@@ -76,7 +76,10 @@ describe("ForcaSenha — indicadores verdes e vermelhos", () => {
 
   it("o grupo de critérios é alcançável pelo teclado", () => {
     render(<ForcaSenha senha="Abc" />);
-    expect(screen.getByRole("group", { name: /requisitos e força da senha/i })).toHaveAttribute("tabindex", "0");
+    expect(screen.getByRole("group", { name: /requisitos e força da senha/i })).toHaveAttribute(
+      "tabindex",
+      "0",
+    );
   });
 });
 
@@ -101,10 +104,11 @@ describe("CamposSenha — digitação real", () => {
     const campo = screen.getByLabelText("Senha");
 
     await user.type(campo, "abc");
-    expect(criterios().filter((i) => i.atendido).map((i) => i.texto.split(" —")[0])).toEqual([
-      "Uma letra minúscula (a-z)",
-      "Sem espaços em branco",
-    ]);
+    expect(
+      criterios()
+        .filter((i) => i.atendido)
+        .map((i) => i.texto.split(" —")[0]),
+    ).toEqual(["Uma letra minúscula (a-z)", "Sem espaços em branco"]);
 
     await user.clear(campo);
     await user.type(campo, "Abcd1234!");

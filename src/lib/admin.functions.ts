@@ -92,7 +92,11 @@ export const convidarUsuario = createServerFn({ method: "POST" })
       after_data: { email, role: data.role, expires_at: expira },
     });
 
-    return { id: convite.id, link: `${origemDaRequisicao()}/aceitar-convite?token=${token}`, email };
+    return {
+      id: convite.id,
+      link: `${origemDaRequisicao()}/aceitar-convite?token=${token}`,
+      email,
+    };
   });
 
 export const reenviarConvite = createServerFn({ method: "POST" })
@@ -111,7 +115,8 @@ export const reenviarConvite = createServerFn({ method: "POST" })
     if (!convite) throw new Error("Convite não encontrado.");
     acesso.exigirGestaoDe(ator, convite.organization_id);
     if (convite.intended_role === "manager") acesso.exigirSuperAdmin(ator);
-    if (convite.invitation_status !== "pending") throw new Error("Somente convites pendentes podem ser reenviados.");
+    if (convite.invitation_status !== "pending")
+      throw new Error("Somente convites pendentes podem ser reenviados.");
 
     const { token, hash } = await acesso.gerarToken();
     const expira = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
@@ -228,7 +233,9 @@ export const alterarStatusUsuario = createServerFn({ method: "POST" })
 export const alterarPapelMembro = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    z.object({ userId: uuid, organizationId: uuid, role: z.enum(["manager", "user"]) }).parse(input),
+    z
+      .object({ userId: uuid, organizationId: uuid, role: z.enum(["manager", "user"]) })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     const acesso = await import("./access.server");
@@ -266,7 +273,12 @@ export const moverUsuarioDeEmpresa = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
     z
-      .object({ userId: uuid, deOrganizationId: uuid, paraOrganizationId: uuid, role: z.enum(["manager", "user"]) })
+      .object({
+        userId: uuid,
+        deOrganizationId: uuid,
+        paraOrganizationId: uuid,
+        role: z.enum(["manager", "user"]),
+      })
       .parse(input),
   )
   .handler(async ({ data, context }) => {

@@ -28,9 +28,7 @@ const meta: RelatorioMeta = {
 function relatorio(comparacao = false) {
   const state = estadoExemplo();
   const resultado = simular(state);
-  const comp = comparacao
-    ? compararFornecedores(exemploComparacao(), state.produto.nome)
-    : null;
+  const comp = comparacao ? compararFornecedores(exemploComparacao(), state.produto.nome) : null;
   return { state, resultado, rel: montarRelatorio(state, resultado, meta, comp) };
 }
 

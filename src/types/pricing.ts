@@ -70,7 +70,6 @@ export interface OperacaoFiscal {
   aliquotaSimples: number;
 }
 
-
 export interface PurchaseTax {
   id: PurchaseTaxId;
   label: string;
@@ -155,7 +154,6 @@ export interface SimulationState {
   /** Contexto fiscal (regime + UFs). Opcional para simulações salvas antes desta versão. */
   operacao?: OperacaoFiscal;
 }
-
 
 /* ------------------------------------------------------------------ */
 /* Resultados                                                          */

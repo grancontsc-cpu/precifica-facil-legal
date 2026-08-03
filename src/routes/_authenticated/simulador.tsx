@@ -160,7 +160,6 @@ function Secao({
   );
 }
 
-
 function Simulador() {
   const {
     orgId,
@@ -198,7 +197,6 @@ function Simulador() {
   // referência para avisar sobre alterações não salvas ao sair da tela.
   const [snapshotSalvo, setSnapshotSalvo] = useState<string>(() => JSON.stringify(estadoInicial()));
 
-
   const perfisQuery = useQuery({
     queryKey: ["tax_profiles", "simulador", orgId],
     enabled: !!orgId,
@@ -230,8 +228,6 @@ function Simulador() {
 
   const perfilSelecionado = (perfisQuery.data ?? []).find((p) => p.id === perfilId) ?? null;
 
-
-
   const aplicarPerfilNoEstado = async (id: string) => {
     if (id === "manual") {
       setPerfilId(null);
@@ -240,7 +236,10 @@ function Simulador() {
     }
     const perfil = (perfisQuery.data ?? []).find((p) => p.id === id);
     if (!perfil) return;
-    const { data, error } = await supabase.from("tax_profile_lines").select("*").eq("tax_profile_id", id);
+    const { data, error } = await supabase
+      .from("tax_profile_lines")
+      .select("*")
+      .eq("tax_profile_id", id);
     if (error) {
       toast.error(error.message);
       return;
@@ -276,7 +275,9 @@ function Simulador() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("simulations")
-        .select("id, organization_id, created_by, titulo, tax_profile_id, product_id, input_snapshot")
+        .select(
+          "id, organization_id, created_by, titulo, tax_profile_id, product_id, input_snapshot",
+        )
         .eq("id", simulacaoId!)
         .maybeSingle();
       if (error) throw error;
@@ -306,7 +307,6 @@ function Simulador() {
       origem: "simulador",
     });
   }, [simulacaoId, userId, acessoSimulacao, simulacaoQuery.data?.organization_id]);
-
 
   useEffect(() => {
     const linha = simulacaoQuery.data;
@@ -338,7 +338,6 @@ function Simulador() {
     ? lockedFieldsOf(perfilSelecionado)
     : Object.keys(ROTULOS_BLOQUEIO);
   const bloqueado = (chave: string) => camposBloqueados.includes(chave) || !podeEditarAtual;
-
 
   const alterados = baseline ? camposAlterados(baseline, state) : [];
 
@@ -402,8 +401,6 @@ function Simulador() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [simulacaoId]);
 
-
-
   const setOperacao = (patch: Partial<OperacaoFiscal>) => {
     for (const [campo, valor] of Object.entries(patch)) {
       eventoParametroFiscal({ modo, campo, valor: valor as string | number | boolean });
@@ -445,12 +442,13 @@ function Simulador() {
     const regimeEmpresa = empresa?.regime as Regime | undefined;
     if (!regimeEmpresa || simulacaoId) return;
     setState((s) =>
-      s.operacao?.regime && s.operacao.regime !== "real" ? s : aplicarRegime(garantirOperacao(s), regimeEmpresa),
+      s.operacao?.regime && s.operacao.regime !== "real"
+        ? s
+        : aplicarRegime(garantirOperacao(s), regimeEmpresa),
     );
   }, [empresa?.regime, simulacaoId]);
 
-  const nomeEmpresa =
-    organizations?.find((o) => o.id === orgId)?.name ?? "Empresa não selecionada";
+  const nomeEmpresa = organizations?.find((o) => o.id === orgId)?.name ?? "Empresa não selecionada";
 
   const comparacaoParaRelatorio = useMemo(
     () => comparacaoSalva(state.produto.nome),
@@ -476,7 +474,6 @@ function Simulador() {
       tributosVenda: s.tributosVenda.map((t) => (t.id === id ? { ...t, ...patch } : t)),
     }));
   };
-
 
   const cenarioAtual = CENARIOS.find((c) => c.id === state.cenario);
 
@@ -515,9 +512,7 @@ function Simulador() {
     eventoRestaurarExemplo({
       modo,
       contexto: anterior?.tipo ?? "direto",
-      segundosDesdeAcao: anterior
-        ? Math.round((Date.now() - anterior.em) / 1000)
-        : undefined,
+      segundosDesdeAcao: anterior ? Math.round((Date.now() - anterior.em) / 1000) : undefined,
     });
     ultimaAcao.current = null;
     eventoSimulacaoIniciada({ modo, origem: "exemplo" });
@@ -550,7 +545,6 @@ function Simulador() {
       if (resultado.issues.some((v) => v.severidade === "erro")) {
         throw new Error("Corrija os erros de validação antes de salvar.");
       }
-
 
       let snapshotPerfil: unknown = {};
       if (perfilId) {
@@ -605,7 +599,11 @@ function Simulador() {
       setSnapshotSalvo(JSON.stringify(state));
       qc.invalidateQueries({ queryKey: ["simulations", orgId] });
       toast.success(vars.duplicar ? "Simulação duplicada." : "Simulação salva no histórico.");
-      void navigate({ to: "/simulador", search: { simulacao: id, produto: undefined }, replace: true });
+      void navigate({
+        to: "/simulador",
+        search: { simulacao: id, produto: undefined },
+        replace: true,
+      });
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -626,13 +624,15 @@ function Simulador() {
       <AvisoAcesso
         codigo={acessoSimulacao.codigo ?? "sem_permissao_leitura"}
         solicitacao={{ simulacaoId }}
-
         acoes={[
           {
             rotulo: "Nova simulação",
             variante: "outline",
             onClick: () =>
-              void navigate({ to: "/simulador", search: { simulacao: undefined, produto: undefined } }),
+              void navigate({
+                to: "/simulador",
+                search: { simulacao: undefined, produto: undefined },
+              }),
           },
           { rotulo: "Ver meu histórico", onClick: () => void navigate({ to: "/simulacoes" }) },
         ]}
@@ -640,9 +640,7 @@ function Simulador() {
     );
   }
 
-
   return (
-
     <TooltipProvider delayDuration={150}>
       <div className="min-h-screen bg-background pb-32 lg:pb-10">
         <header aria-label="Cabeçalho do simulador" className="border-b border-border bg-card">
@@ -663,7 +661,11 @@ function Simulador() {
                 ) : null}
               </div>
             </div>
-            <div role="group" aria-label="Ações rápidas" className="flex shrink-0 items-center gap-2">
+            <div
+              role="group"
+              aria-label="Ações rápidas"
+              className="flex shrink-0 items-center gap-2"
+            >
               <Button
                 variant="outline"
                 size="sm"
@@ -687,9 +689,10 @@ function Simulador() {
           </div>
         </header>
 
-
-        <main aria-label="Formulário e resultados da simulação" className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
-
+        <main
+          aria-label="Formulário e resultados da simulação"
+          className="mx-auto max-w-7xl px-4 py-6 sm:px-6"
+        >
           <div className="mb-6">
             <BarraSimulacao
               titulo={titulo}
@@ -750,7 +753,6 @@ function Simulador() {
                       rotulo="nível de detalhe da simulação"
                       texto="No modo completo você edita base de cálculo, redução de base, percentual de crédito, valores manuais e observações."
                     />
-
                   </div>
                   <div className="flex flex-wrap gap-2">
                     <Button variant="ghost" size="sm" className="h-10" onClick={carregarExemplo}>
@@ -828,321 +830,324 @@ function Simulador() {
                 </>
               ) : (
                 <>
-              <Secao
-
-                numero="Seção 1"
-                titulo="Produto e compra"
-                descricao="Informe o que foi comprado e quanto foi pago ao fornecedor."
-              >
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <CampoTexto
-                    label="Nome do produto"
-                    value={state.produto.nome}
-                    onChange={(v) => setProduto({ nome: v })}
-                    placeholder="Ex.: Café torrado e moído 500g"
-                    className="sm:col-span-2"
-                  />
-                  <CampoTexto
-                    label="Código ou SKU (opcional)"
-                    value={state.produto.sku}
-                    onChange={(v) => setProduto({ sku: v })}
-                  />
-                  <CampoTexto
-                    label="NCM (opcional)"
-                    value={state.produto.ncm}
-                    onChange={(v) => setProduto({ ncm: v })}
-                    ajuda="O preenchimento do NCM não altera automaticamente os tributos nesta versão."
-                  />
-                  <div className="space-y-1.5">
-                    <Label className="text-xs font-medium text-muted-foreground">Unidade</Label>
-                    <Select
-                      value={state.produto.unidade}
-                      onValueChange={(v) => setProduto({ unidade: v })}
-                    >
-                      <SelectTrigger className="h-11" aria-label="Unidade de compra">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {UNIDADES.map((u) => (
-                          <SelectItem key={u} value={u}>
-                            {u}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <CampoNumero
-                    label="Quantidade comprada"
-                    value={state.produto.quantidade}
-                    onChange={(v) => setProduto({ quantidade: v })}
-                    ajuda="Aceita até quatro casas decimais."
-                  />
-                  <CampoNumero
-                    label="Valor unitário de compra"
-                    prefixo="R$"
-                    value={state.produto.valorUnitario}
-                    onChange={(v) => setProduto({ valorUnitario: v })}
-                  />
-                  <CampoNumero
-                    label="Desconto incondicional total"
-                    prefixo="R$"
-                    value={state.produto.descontoTotal}
-                    onChange={(v) => setProduto({ descontoTotal: v })}
-                    ajuda="Desconto que já vem aplicado na nota, sem condição futura."
-                  />
-                  <CampoNumero
-                    label="Frete de compra total"
-                    prefixo="R$"
-                    value={state.produto.freteTotal}
-                    onChange={(v) => setProduto({ freteTotal: v })}
-                  />
-                  <CampoNumero
-                    label="Seguro total"
-                    prefixo="R$"
-                    value={state.produto.seguroTotal}
-                    onChange={(v) => setProduto({ seguroTotal: v })}
-                  />
-                  <CampoNumero
-                    label="Outras despesas de compra"
-                    prefixo="R$"
-                    value={state.produto.outrasDespesas}
-                    onChange={(v) => setProduto({ outrasDespesas: v })}
-                  />
-                  <CampoNumero
-                    label="Embalagem por unidade (opcional)"
-                    prefixo="R$"
-                    value={state.produto.embalagemPorUnidade}
-                    onChange={(v) => setProduto({ embalagemPorUnidade: v })}
-                  />
-                  <CampoNumero
-                    label="Rateio de outros custos por unidade (opcional)"
-                    prefixo="R$"
-                    value={state.produto.rateioPorUnidade}
-                    onChange={(v) => setProduto({ rateioPorUnidade: v })}
-                  />
-                </div>
-
-                <dl className="mt-5 grid gap-3 rounded-lg bg-surface p-4 sm:grid-cols-3">
-                  <div>
-                    <dt className="text-xs text-muted-foreground">Valor bruto dos produtos</dt>
-                    <dd className="text-base font-semibold tabular-nums text-foreground">
-                      {formatBRL(compra.valorBrutoProdutos)}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-xs text-muted-foreground">Compra antes dos créditos</dt>
-                    <dd className="text-base font-semibold tabular-nums text-foreground">
-                      {formatBRL(compra.desembolsoTotal)}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-xs text-muted-foreground">Valor médio por unidade</dt>
-                    <dd className="text-base font-semibold tabular-nums text-foreground">
-                      {formatBRL(compra.valorMedioUnitario)}
-                    </dd>
-                  </div>
-                </dl>
-              </Secao>
-
-              <Secao
-                numero="Seção 2"
-                titulo="Cenário tributário"
-                descricao="O cenário apenas ativa ou desativa tributos. Todas as alíquotas e tratamentos continuam editáveis."
-              >
-                <div
-                  role="group"
-                  aria-label="Escolha do cenário tributário"
-                  className="grid gap-3 sm:grid-cols-2"
-                >
-                  {CENARIOS.map((c) => {
-                    const ativo = state.cenario === c.id;
-                    return (
-                      <button
-                        key={c.id}
-                        type="button"
-                        onClick={() => setState((s) => aplicarCenario(s, c.id as ScenarioId))}
-                        aria-pressed={ativo}
-                        aria-label={`Cenário ${c.nome}`}
-                        aria-describedby={`cenario-${c.id}-descricao`}
-                        className={`rounded-lg border p-4 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-                          ativo
-                            ? "border-primary bg-brand-soft"
-                            : "border-border bg-card hover:bg-surface"
-                        }`}
-                      >
-                        <p className="text-sm font-semibold text-foreground">{c.nome}</p>
-                        <p
-                          id={`cenario-${c.id}-descricao`}
-                          className="mt-1 text-xs text-muted-foreground"
+                  <Secao
+                    numero="Seção 1"
+                    titulo="Produto e compra"
+                    descricao="Informe o que foi comprado e quanto foi pago ao fornecedor."
+                  >
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <CampoTexto
+                        label="Nome do produto"
+                        value={state.produto.nome}
+                        onChange={(v) => setProduto({ nome: v })}
+                        placeholder="Ex.: Café torrado e moído 500g"
+                        className="sm:col-span-2"
+                      />
+                      <CampoTexto
+                        label="Código ou SKU (opcional)"
+                        value={state.produto.sku}
+                        onChange={(v) => setProduto({ sku: v })}
+                      />
+                      <CampoTexto
+                        label="NCM (opcional)"
+                        value={state.produto.ncm}
+                        onChange={(v) => setProduto({ ncm: v })}
+                        ajuda="O preenchimento do NCM não altera automaticamente os tributos nesta versão."
+                      />
+                      <div className="space-y-1.5">
+                        <Label className="text-xs font-medium text-muted-foreground">Unidade</Label>
+                        <Select
+                          value={state.produto.unidade}
+                          onValueChange={(v) => setProduto({ unidade: v })}
                         >
-                          {c.descricao}
-                        </p>
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {state.cenario === "transicao2026" ? (
-                  <Alert className="mt-4">
-                    <Info className="h-4 w-4" aria-hidden />
-                    <AlertDescription className="text-sm">
-                      Perfil de referência. Confirme o tratamento aplicável com a contabilidade. O
-                      IBS (0,10%) e a CBS (0,90%) iniciam como informativos e não alteram custo nem
-                      preço até que você mude o tratamento.
-                    </AlertDescription>
-                  </Alert>
-                ) : null}
-              </Secao>
-
-              <Secao
-                numero="Seção 3"
-                titulo="Tributos da compra"
-                descricao="Alíquota e direito ao crédito são informações independentes. Configure cada tributo conforme a nota e a orientação da contabilidade."
-              >
-                <div className="space-y-3">
-                  {state.tributosCompra.map((t) => (
-                    <CardTributoCompra
-                      key={t.id}
-                      tributo={t}
-                      avancado={state.modoAvancado}
-                      resultado={compra.tributos.find((r) => r.id === t.id)}
-                      onChange={(patch) => setTributoCompra(t.id, patch)}
-                    />
-                  ))}
-                </div>
-              </Secao>
-
-              <Secao
-                numero="Seção 4"
-                titulo="Venda e margem"
-                descricao="Calcule o preço a partir da margem desejada ou analise a margem de um preço já praticado."
-              >
-                <Tabs
-                  value={state.venda.modo}
-                  onValueChange={(v) => setVenda({ modo: v as VendaConfig["modo"] })}
-                >
-                  <TabsList aria-label="Forma de cálculo da venda" className="w-full">
-                    <TabsTrigger value="margem" className="flex-1">
-                      Calcular preço pela margem
-                    </TabsTrigger>
-                    <TabsTrigger value="analise" className="flex-1">
-                      Analisar preço informado
-                    </TabsTrigger>
-                  </TabsList>
-                </Tabs>
-
-                <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                  {state.venda.modo === "margem" ? (
-                    <CampoNumero
-                      label="Margem desejada"
-                      sufixo="%"
-                      value={state.venda.margemDesejada}
-                      onChange={(v) => setVenda({ margemDesejada: v })}
-                      ajuda="Margem: percentual que sobra da venda depois do custo do produto, tributos e despesas variáveis."
-                    />
-                  ) : (
-                    <CampoNumero
-                      label="Preço de venda informado"
-                      prefixo="R$"
-                      value={state.venda.precoInformado}
-                      onChange={(v) => setVenda({ precoInformado: v })}
-                      ajuda="Preço final cobrado do cliente, incluindo tributos acrescentados por fora."
-                    />
-                  )}
-                  <CampoNumero
-                    label="Comissão"
-                    sufixo="%"
-                    value={state.venda.comissaoPercent}
-                    onChange={(v) => setVenda({ comissaoPercent: v })}
-                  />
-                  <CampoNumero
-                    label="Taxa de cartão"
-                    sufixo="%"
-                    value={state.venda.cartaoPercent}
-                    onChange={(v) => setVenda({ cartaoPercent: v })}
-                  />
-                  <CampoNumero
-                    label="Taxa de marketplace"
-                    sufixo="%"
-                    value={state.venda.marketplacePercent}
-                    onChange={(v) => setVenda({ marketplacePercent: v })}
-                  />
-                  <CampoNumero
-                    label="Perdas estimadas"
-                    sufixo="%"
-                    value={state.venda.perdasPercent}
-                    onChange={(v) => setVenda({ perdasPercent: v })}
-                  />
-                  <CampoNumero
-                    label="Outros percentuais sobre a venda"
-                    sufixo="%"
-                    value={state.venda.outrosPercent}
-                    onChange={(v) => setVenda({ outrosPercent: v })}
-                  />
-                  <CampoNumero
-                    label="Frete de venda por unidade"
-                    prefixo="R$"
-                    value={state.venda.freteVendaUnidade}
-                    onChange={(v) => setVenda({ freteVendaUnidade: v })}
-                  />
-                  <CampoNumero
-                    label="Embalagem de venda por unidade"
-                    prefixo="R$"
-                    value={state.venda.embalagemVendaUnidade}
-                    onChange={(v) => setVenda({ embalagemVendaUnidade: v })}
-                  />
-                  <CampoNumero
-                    label="Rateio de custo fixo por unidade (opcional)"
-                    prefixo="R$"
-                    value={state.venda.custoFixoUnidade}
-                    onChange={(v) => setVenda({ custoFixoUnidade: v })}
-                  />
-                  <CampoNumero
-                    label="Outras despesas fixas por unidade"
-                    prefixo="R$"
-                    value={state.venda.outrasDespesasFixasUnidade}
-                    onChange={(v) => setVenda({ outrasDespesasFixasUnidade: v })}
-                  />
-                </div>
-
-                {state.modoAvancado ? (
-                  <div className="mt-4 space-y-1.5 rounded-lg bg-surface p-4">
-                    <div className="flex items-center gap-1.5">
-                      <Label className="text-xs font-medium text-muted-foreground">
-                        Base da margem
-                      </Label>
-                      <Ajuda texto="Por padrão a margem é calculada sobre o preço final cobrado. Você pode usar o preço antes dos tributos acrescentados por fora." />
+                          <SelectTrigger className="h-11" aria-label="Unidade de compra">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {UNIDADES.map((u) => (
+                              <SelectItem key={u} value={u}>
+                                {u}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <CampoNumero
+                        label="Quantidade comprada"
+                        value={state.produto.quantidade}
+                        onChange={(v) => setProduto({ quantidade: v })}
+                        ajuda="Aceita até quatro casas decimais."
+                      />
+                      <CampoNumero
+                        label="Valor unitário de compra"
+                        prefixo="R$"
+                        value={state.produto.valorUnitario}
+                        onChange={(v) => setProduto({ valorUnitario: v })}
+                      />
+                      <CampoNumero
+                        label="Desconto incondicional total"
+                        prefixo="R$"
+                        value={state.produto.descontoTotal}
+                        onChange={(v) => setProduto({ descontoTotal: v })}
+                        ajuda="Desconto que já vem aplicado na nota, sem condição futura."
+                      />
+                      <CampoNumero
+                        label="Frete de compra total"
+                        prefixo="R$"
+                        value={state.produto.freteTotal}
+                        onChange={(v) => setProduto({ freteTotal: v })}
+                      />
+                      <CampoNumero
+                        label="Seguro total"
+                        prefixo="R$"
+                        value={state.produto.seguroTotal}
+                        onChange={(v) => setProduto({ seguroTotal: v })}
+                      />
+                      <CampoNumero
+                        label="Outras despesas de compra"
+                        prefixo="R$"
+                        value={state.produto.outrasDespesas}
+                        onChange={(v) => setProduto({ outrasDespesas: v })}
+                      />
+                      <CampoNumero
+                        label="Embalagem por unidade (opcional)"
+                        prefixo="R$"
+                        value={state.produto.embalagemPorUnidade}
+                        onChange={(v) => setProduto({ embalagemPorUnidade: v })}
+                      />
+                      <CampoNumero
+                        label="Rateio de outros custos por unidade (opcional)"
+                        prefixo="R$"
+                        value={state.produto.rateioPorUnidade}
+                        onChange={(v) => setProduto({ rateioPorUnidade: v })}
+                      />
                     </div>
-                    <Select
-                      value={state.venda.baseMargem}
-                      onValueChange={(v) => setVenda({ baseMargem: v as VendaConfig["baseMargem"] })}
-                    >
-                      <SelectTrigger className="h-11" aria-label="Base da margem">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="precoFinal">Preço final cobrado</SelectItem>
-                        <SelectItem value="precoBase">
-                          Preço antes dos tributos acrescentados por fora
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                ) : null}
 
-                <h3 className="mt-6 text-sm font-semibold text-foreground">Tributos da venda</h3>
-                <div className="mt-3 space-y-3">
-                  {state.tributosVenda.map((t) => (
-                    <CardTributoVenda
-                      key={t.id}
-                      tributo={t}
-                      avancado={state.modoAvancado}
-                      resultado={resultado.recomendado?.tributos.find((r) => r.id === t.id)}
-                      onChange={(patch) => setTributoVenda(t.id, patch)}
-                    />
-                  ))}
-                </div>
-              </Secao>
+                    <dl className="mt-5 grid gap-3 rounded-lg bg-surface p-4 sm:grid-cols-3">
+                      <div>
+                        <dt className="text-xs text-muted-foreground">Valor bruto dos produtos</dt>
+                        <dd className="text-base font-semibold tabular-nums text-foreground">
+                          {formatBRL(compra.valorBrutoProdutos)}
+                        </dd>
+                      </div>
+                      <div>
+                        <dt className="text-xs text-muted-foreground">Compra antes dos créditos</dt>
+                        <dd className="text-base font-semibold tabular-nums text-foreground">
+                          {formatBRL(compra.desembolsoTotal)}
+                        </dd>
+                      </div>
+                      <div>
+                        <dt className="text-xs text-muted-foreground">Valor médio por unidade</dt>
+                        <dd className="text-base font-semibold tabular-nums text-foreground">
+                          {formatBRL(compra.valorMedioUnitario)}
+                        </dd>
+                      </div>
+                    </dl>
+                  </Secao>
+
+                  <Secao
+                    numero="Seção 2"
+                    titulo="Cenário tributário"
+                    descricao="O cenário apenas ativa ou desativa tributos. Todas as alíquotas e tratamentos continuam editáveis."
+                  >
+                    <div
+                      role="group"
+                      aria-label="Escolha do cenário tributário"
+                      className="grid gap-3 sm:grid-cols-2"
+                    >
+                      {CENARIOS.map((c) => {
+                        const ativo = state.cenario === c.id;
+                        return (
+                          <button
+                            key={c.id}
+                            type="button"
+                            onClick={() => setState((s) => aplicarCenario(s, c.id as ScenarioId))}
+                            aria-pressed={ativo}
+                            aria-label={`Cenário ${c.nome}`}
+                            aria-describedby={`cenario-${c.id}-descricao`}
+                            className={`rounded-lg border p-4 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                              ativo
+                                ? "border-primary bg-brand-soft"
+                                : "border-border bg-card hover:bg-surface"
+                            }`}
+                          >
+                            <p className="text-sm font-semibold text-foreground">{c.nome}</p>
+                            <p
+                              id={`cenario-${c.id}-descricao`}
+                              className="mt-1 text-xs text-muted-foreground"
+                            >
+                              {c.descricao}
+                            </p>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {state.cenario === "transicao2026" ? (
+                      <Alert className="mt-4">
+                        <Info className="h-4 w-4" aria-hidden />
+                        <AlertDescription className="text-sm">
+                          Perfil de referência. Confirme o tratamento aplicável com a contabilidade.
+                          O IBS (0,10%) e a CBS (0,90%) iniciam como informativos e não alteram
+                          custo nem preço até que você mude o tratamento.
+                        </AlertDescription>
+                      </Alert>
+                    ) : null}
+                  </Secao>
+
+                  <Secao
+                    numero="Seção 3"
+                    titulo="Tributos da compra"
+                    descricao="Alíquota e direito ao crédito são informações independentes. Configure cada tributo conforme a nota e a orientação da contabilidade."
+                  >
+                    <div className="space-y-3">
+                      {state.tributosCompra.map((t) => (
+                        <CardTributoCompra
+                          key={t.id}
+                          tributo={t}
+                          avancado={state.modoAvancado}
+                          resultado={compra.tributos.find((r) => r.id === t.id)}
+                          onChange={(patch) => setTributoCompra(t.id, patch)}
+                        />
+                      ))}
+                    </div>
+                  </Secao>
+
+                  <Secao
+                    numero="Seção 4"
+                    titulo="Venda e margem"
+                    descricao="Calcule o preço a partir da margem desejada ou analise a margem de um preço já praticado."
+                  >
+                    <Tabs
+                      value={state.venda.modo}
+                      onValueChange={(v) => setVenda({ modo: v as VendaConfig["modo"] })}
+                    >
+                      <TabsList aria-label="Forma de cálculo da venda" className="w-full">
+                        <TabsTrigger value="margem" className="flex-1">
+                          Calcular preço pela margem
+                        </TabsTrigger>
+                        <TabsTrigger value="analise" className="flex-1">
+                          Analisar preço informado
+                        </TabsTrigger>
+                      </TabsList>
+                    </Tabs>
+
+                    <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                      {state.venda.modo === "margem" ? (
+                        <CampoNumero
+                          label="Margem desejada"
+                          sufixo="%"
+                          value={state.venda.margemDesejada}
+                          onChange={(v) => setVenda({ margemDesejada: v })}
+                          ajuda="Margem: percentual que sobra da venda depois do custo do produto, tributos e despesas variáveis."
+                        />
+                      ) : (
+                        <CampoNumero
+                          label="Preço de venda informado"
+                          prefixo="R$"
+                          value={state.venda.precoInformado}
+                          onChange={(v) => setVenda({ precoInformado: v })}
+                          ajuda="Preço final cobrado do cliente, incluindo tributos acrescentados por fora."
+                        />
+                      )}
+                      <CampoNumero
+                        label="Comissão"
+                        sufixo="%"
+                        value={state.venda.comissaoPercent}
+                        onChange={(v) => setVenda({ comissaoPercent: v })}
+                      />
+                      <CampoNumero
+                        label="Taxa de cartão"
+                        sufixo="%"
+                        value={state.venda.cartaoPercent}
+                        onChange={(v) => setVenda({ cartaoPercent: v })}
+                      />
+                      <CampoNumero
+                        label="Taxa de marketplace"
+                        sufixo="%"
+                        value={state.venda.marketplacePercent}
+                        onChange={(v) => setVenda({ marketplacePercent: v })}
+                      />
+                      <CampoNumero
+                        label="Perdas estimadas"
+                        sufixo="%"
+                        value={state.venda.perdasPercent}
+                        onChange={(v) => setVenda({ perdasPercent: v })}
+                      />
+                      <CampoNumero
+                        label="Outros percentuais sobre a venda"
+                        sufixo="%"
+                        value={state.venda.outrosPercent}
+                        onChange={(v) => setVenda({ outrosPercent: v })}
+                      />
+                      <CampoNumero
+                        label="Frete de venda por unidade"
+                        prefixo="R$"
+                        value={state.venda.freteVendaUnidade}
+                        onChange={(v) => setVenda({ freteVendaUnidade: v })}
+                      />
+                      <CampoNumero
+                        label="Embalagem de venda por unidade"
+                        prefixo="R$"
+                        value={state.venda.embalagemVendaUnidade}
+                        onChange={(v) => setVenda({ embalagemVendaUnidade: v })}
+                      />
+                      <CampoNumero
+                        label="Rateio de custo fixo por unidade (opcional)"
+                        prefixo="R$"
+                        value={state.venda.custoFixoUnidade}
+                        onChange={(v) => setVenda({ custoFixoUnidade: v })}
+                      />
+                      <CampoNumero
+                        label="Outras despesas fixas por unidade"
+                        prefixo="R$"
+                        value={state.venda.outrasDespesasFixasUnidade}
+                        onChange={(v) => setVenda({ outrasDespesasFixasUnidade: v })}
+                      />
+                    </div>
+
+                    {state.modoAvancado ? (
+                      <div className="mt-4 space-y-1.5 rounded-lg bg-surface p-4">
+                        <div className="flex items-center gap-1.5">
+                          <Label className="text-xs font-medium text-muted-foreground">
+                            Base da margem
+                          </Label>
+                          <Ajuda texto="Por padrão a margem é calculada sobre o preço final cobrado. Você pode usar o preço antes dos tributos acrescentados por fora." />
+                        </div>
+                        <Select
+                          value={state.venda.baseMargem}
+                          onValueChange={(v) =>
+                            setVenda({ baseMargem: v as VendaConfig["baseMargem"] })
+                          }
+                        >
+                          <SelectTrigger className="h-11" aria-label="Base da margem">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="precoFinal">Preço final cobrado</SelectItem>
+                            <SelectItem value="precoBase">
+                              Preço antes dos tributos acrescentados por fora
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    ) : null}
+
+                    <h3 className="mt-6 text-sm font-semibold text-foreground">
+                      Tributos da venda
+                    </h3>
+                    <div className="mt-3 space-y-3">
+                      {state.tributosVenda.map((t) => (
+                        <CardTributoVenda
+                          key={t.id}
+                          tributo={t}
+                          avancado={state.modoAvancado}
+                          resultado={resultado.recomendado?.tributos.find((r) => r.id === t.id)}
+                          onChange={(patch) => setTributoVenda(t.id, patch)}
+                        />
+                      ))}
+                    </div>
+                  </Secao>
                 </>
               )}
 
@@ -1154,7 +1159,6 @@ function Simulador() {
                 modo={state.modoAvancado ? "completo" : "simples"}
                 comComparacao={Boolean(comparacaoParaRelatorio)}
               />
-
 
               <footer className="rounded-xl border border-border bg-surface p-4 text-xs leading-relaxed text-muted-foreground">
                 {AVISO_RODAPE}
@@ -1175,7 +1179,6 @@ function Simulador() {
 
         <ResumoFlutuante resultado={resultado} />
         <VoltarAoTopo />
-
       </div>
     </TooltipProvider>
   );

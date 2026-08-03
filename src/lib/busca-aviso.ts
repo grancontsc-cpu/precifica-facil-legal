@@ -37,7 +37,14 @@ export function avaliarBusca(texto: string): AvaliacaoBusca {
         : "Não foi possível ler o texto da busca: há caracteres com codificação inválida. " +
           "Apague o termo e digite novamente.";
 
-    return { termo: "", excedeu: false, normalizado: false, bloqueado: true, motivo: validacao.motivo, aviso };
+    return {
+      termo: "",
+      excedeu: false,
+      normalizado: false,
+      bloqueado: true,
+      motivo: validacao.motivo,
+      aviso,
+    };
   }
 
   const termo = sanitizarBusca(original);
@@ -57,4 +64,3 @@ export function avaliarBusca(texto: string): AvaliacaoBusca {
 
   return { termo, excedeu, normalizado, bloqueado: false, motivo: null, aviso };
 }
-

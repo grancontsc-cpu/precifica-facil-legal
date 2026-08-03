@@ -13,18 +13,22 @@ Também vale ajustar o workflow: o projeto tem `bun.lock` e `package-lock.json` 
 ## O que fazer
 
 ### 1. Normalizar a formatação
+
 - Rodar o Prettier em todo o projeto (`prettier --write .`) e confirmar `eslint .` limpo.
 - Nenhuma mudança de comportamento: só formatação.
 
 ### 2. Corrigir os 13 erros de tipo do `/login`
+
 - Em cada link/redirecionamento para `/login`, passar `search: { next: undefined }` (ou o caminho de retorno correto, quando fizer sentido — por exemplo em `_authenticated/route.tsx` e `entrando.tsx`, onde faz sentido preservar a rota que o usuário tentou abrir).
 - Manter o comportamento atual de retorno seguro (`destinoSeguro`).
 
 ### 3. Deixar o CI estável
+
 - Alinhar o workflow ao gerenciador realmente usado: instalar com Bun (`oven-sh/setup-bun` + `bun install --frozen-lockfile`) e rodar `bun run lint`, `bun run typecheck`, `bun run test`.
 - Manter só um lockfile como fonte de verdade para evitar o erro clássico de `npm ci` com lock defasado.
 
 ### 4. Validar
+
 - Rodar localmente lint, typecheck e a suíte completa (267 testes) antes de subir, para o próximo push já sair verde.
 
 ## Detalhes técnicos

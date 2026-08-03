@@ -82,7 +82,12 @@ export function SolicitarAcesso({ simulacaoId, motivoCodigo }: SolicitarAcessoPr
         >
           <div className="space-y-1.5">
             <Label htmlFor="solicitacao-id">ID da simulação</Label>
-            <Input id="solicitacao-id" value={simulacaoId ?? "—"} readOnly className="font-mono text-xs" />
+            <Input
+              id="solicitacao-id"
+              value={simulacaoId ?? "—"}
+              readOnly
+              className="font-mono text-xs"
+            />
           </div>
 
           <div className="space-y-1.5">

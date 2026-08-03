@@ -89,9 +89,9 @@ export function PerguntasImpostos({
         <Alert>
           <Info className="size-4" aria-hidden />
           <AlertDescription>
-            No Simples Nacional (e no MEI) o ICMS, o PIS e a Cofins da venda estão dentro do
-            DAS — por isso essas perguntas não se aplicam. Informe apenas a alíquota efetiva
-            da sua apuração. O ICMS de fronteira continua sendo tratado como custo.
+            No Simples Nacional (e no MEI) o ICMS, o PIS e a Cofins da venda estão dentro do DAS —
+            por isso essas perguntas não se aplicam. Informe apenas a alíquota efetiva da sua
+            apuração. O ICMS de fronteira continua sendo tratado como custo.
           </AlertDescription>
         </Alert>
         <CampoNumero

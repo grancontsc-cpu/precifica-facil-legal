@@ -85,7 +85,10 @@ function EmpresasPage() {
     queryKey: ["profiles", "todos"],
     enabled: isGrancontAdmin,
     queryFn: async () => {
-      const { data, error } = await supabase.from("profiles").select("id, full_name, email").order("email");
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, full_name, email")
+        .order("email");
       if (error) throw error;
       return data;
     },
@@ -183,11 +186,21 @@ function EmpresasPage() {
         <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_1fr_auto]">
           <div className="space-y-1.5">
             <Label htmlFor="org-nome">Nome</Label>
-            <Input id="org-nome" value={nome} onChange={(e) => setNome(e.target.value)} maxLength={120} />
+            <Input
+              id="org-nome"
+              value={nome}
+              onChange={(e) => setNome(e.target.value)}
+              maxLength={120}
+            />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="org-cnpj">CNPJ</Label>
-            <Input id="org-cnpj" value={cnpj} onChange={(e) => setCnpj(e.target.value)} maxLength={20} />
+            <Input
+              id="org-cnpj"
+              value={cnpj}
+              onChange={(e) => setCnpj(e.target.value)}
+              maxLength={20}
+            />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="org-uf">Estado (UF)</Label>
@@ -233,11 +246,17 @@ function EmpresasPage() {
             <div className="flex flex-wrap items-center gap-3">
               <div className="min-w-0 flex-1">
                 <p className="font-medium text-foreground">{o.name}</p>
-                  <p className="text-xs text-muted-foreground">
-                  {(o.cnpj ?? "sem CNPJ") + " · " + (o.uf ?? "UF não informada") + " · " + nomeRegime(o.regime as Regime)}
+                <p className="text-xs text-muted-foreground">
+                  {(o.cnpj ?? "sem CNPJ") +
+                    " · " +
+                    (o.uf ?? "UF não informada") +
+                    " · " +
+                    nomeRegime(o.regime as Regime)}
                 </p>
               </div>
-              <Badge variant={o.active ? "secondary" : "outline"}>{o.active ? "Ativa" : "Inativa"}</Badge>
+              <Badge variant={o.active ? "secondary" : "outline"}>
+                {o.active ? "Ativa" : "Inativa"}
+              </Badge>
               <Select
                 value={o.default_tax_profile_id ?? "nenhum"}
                 onValueChange={(v) =>
@@ -282,7 +301,10 @@ function EmpresasPage() {
                       ))}
                     </SelectContent>
                   </Select>
-                  <Select value={novoPapel} onValueChange={(v) => setNovoPapel(v as "manager" | "user")}>
+                  <Select
+                    value={novoPapel}
+                    onValueChange={(v) => setNovoPapel(v as "manager" | "user")}
+                  >
                     <SelectTrigger className="h-9">
                       <SelectValue />
                     </SelectTrigger>
@@ -293,7 +315,10 @@ function EmpresasPage() {
                   </Select>
                   <Button
                     size="sm"
-                    onClick={() => novoUsuario && adicionarMembro.mutate({ user_id: novoUsuario, role: novoPapel })}
+                    onClick={() =>
+                      novoUsuario &&
+                      adicionarMembro.mutate({ user_id: novoUsuario, role: novoPapel })
+                    }
                   >
                     Vincular
                   </Button>
@@ -304,11 +329,17 @@ function EmpresasPage() {
                     const p = (usuarios.data ?? []).find((u) => u.id === m.user_id);
                     return (
                       <li key={m.id} className="flex items-center gap-3 text-sm">
-                        <span className="flex-1 truncate">{p?.email ?? p?.full_name ?? m.user_id}</span>
+                        <span className="flex-1 truncate">
+                          {p?.email ?? p?.full_name ?? m.user_id}
+                        </span>
                         <Badge variant="outline">
                           {m.role === "manager" ? "Gestor" : "Usuário"}
                         </Badge>
-                        <Button variant="ghost" size="sm" onClick={() => removerMembro.mutate(m.id)}>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removerMembro.mutate(m.id)}
+                        >
                           Remover
                         </Button>
                       </li>

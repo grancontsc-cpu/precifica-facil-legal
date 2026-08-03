@@ -28,7 +28,7 @@ export function LogoGrancont({
   const base = "block w-auto max-w-full shrink-0 select-none object-contain";
   const dimensoes = { width: 1268, height: 300 };
   const acessibilidade = decorativa
-    ? ({ alt: "", "aria-hidden": true as const, role: "presentation" as const })
+    ? { alt: "", "aria-hidden": true as const, role: "presentation" as const }
     : { alt };
 
   if (variante === "clara") {
@@ -43,7 +43,12 @@ export function LogoGrancont({
   }
   if (variante === "escura") {
     return (
-      <img src={logoRoxo.url} {...dimensoes} {...acessibilidade} className={`${base} ${className}`} />
+      <img
+        src={logoRoxo.url}
+        {...dimensoes}
+        {...acessibilidade}
+        className={`${base} ${className}`}
+      />
     );
   }
 
@@ -64,7 +69,5 @@ export function LogoGrancont({
         className={`${base} ${className} hidden dark:block`}
       />
     </>
-
-
   );
 }

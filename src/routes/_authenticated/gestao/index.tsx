@@ -8,7 +8,8 @@ import { useApp } from "@/hooks/useApp";
 import { supabase } from "@/integrations/supabase/client";
 
 const TITULO = "Gestão da empresa — Precifica Grancont";
-const DESCRICAO = "Painel do gestor: usuários da empresa, convites e simulações da equipe no Precifica Grancont.";
+const DESCRICAO =
+  "Painel do gestor: usuários da empresa, convites e simulações da equipe no Precifica Grancont.";
 
 export const Route = createFileRoute("/_authenticated/gestao/")({
   head: () => ({
@@ -44,7 +45,10 @@ function PainelGestao() {
           .select("id", { count: "exact", head: true })
           .eq("organization_id", orgId!)
           .eq("invitation_status", "pending"),
-        supabase.from("simulations").select("id", { count: "exact", head: true }).eq("organization_id", orgId!),
+        supabase
+          .from("simulations")
+          .select("id", { count: "exact", head: true })
+          .eq("organization_id", orgId!),
       ]);
       return {
         usuarios: usuarios.count ?? 0,
@@ -55,16 +59,33 @@ function PainelGestao() {
   });
 
   const cards = [
-    { rotulo: "Usuários da empresa", valor: resumo.data?.usuarios, icone: Users, para: "/gestao/usuarios" },
-    { rotulo: "Convites pendentes", valor: resumo.data?.convites, icone: MailPlus, para: "/gestao/convites" },
-    { rotulo: "Simulações da equipe", valor: resumo.data?.simulacoes, icone: ClipboardList, para: "/simulacoes" },
+    {
+      rotulo: "Usuários da empresa",
+      valor: resumo.data?.usuarios,
+      icone: Users,
+      para: "/gestao/usuarios",
+    },
+    {
+      rotulo: "Convites pendentes",
+      valor: resumo.data?.convites,
+      icone: MailPlus,
+      para: "/gestao/convites",
+    },
+    {
+      rotulo: "Simulações da equipe",
+      valor: resumo.data?.simulacoes,
+      icone: ClipboardList,
+      para: "/simulacoes",
+    },
   ] as const;
 
   return (
     <main className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6">
       <header>
         <h1 className="text-xl font-semibold tracking-tight text-foreground">Gestão da empresa</h1>
-        <p className="mt-1 text-sm text-muted-foreground">{empresa?.name ?? "Selecione uma empresa no topo."}</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          {empresa?.name ?? "Selecione uma empresa no topo."}
+        </p>
       </header>
 
       <div className="grid gap-3 sm:grid-cols-3">

@@ -14,7 +14,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { useApp } from "@/hooks/useApp";
 import { supabase } from "@/integrations/supabase/client";
 import { cancelarConvite, convidarUsuario, reenviarConvite } from "@/lib/admin.functions";
@@ -40,7 +47,9 @@ export function PainelConvites({ escopoOrgId }: { escopoOrgId: string | null }) 
     queryFn: async () => {
       let q = supabase
         .from("invitations")
-        .select("id, email, full_name, intended_role, invitation_status, expires_at, created_at, organizations(name)")
+        .select(
+          "id, email, full_name, intended_role, invitation_status, expires_at, created_at, organizations(name)",
+        )
         .order("created_at", { ascending: false })
         .limit(200);
       if (escopoOrgId) q = q.eq("organization_id", escopoOrgId);
@@ -70,7 +79,8 @@ export function PainelConvites({ escopoOrgId }: { escopoOrgId: string | null }) 
       toast.success("Convite criado. Link copiado para a área de transferência.");
       invalidar();
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Não foi possível criar o convite."),
+    onError: (e) =>
+      toast.error(e instanceof Error ? e.message : "Não foi possível criar o convite."),
   });
 
   const reenviar = useMutation({
@@ -105,7 +115,13 @@ export function PainelConvites({ escopoOrgId }: { escopoOrgId: string | null }) 
       >
         <div className="space-y-1.5">
           <Label htmlFor="c-email">E-mail</Label>
-          <Input id="c-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          <Input
+            id="c-email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="c-nome">Nome (opcional)</Label>
@@ -186,7 +202,9 @@ export function PainelConvites({ escopoOrgId }: { escopoOrgId: string | null }) 
                 <TableCell className="hidden md:table-cell text-sm">
                   {(c.organizations as { name: string } | null)?.name ?? "—"}
                 </TableCell>
-                <TableCell className="text-sm">{c.intended_role === "manager" ? "Gestor" : "Usuário"}</TableCell>
+                <TableCell className="text-sm">
+                  {c.intended_role === "manager" ? "Gestor" : "Usuário"}
+                </TableCell>
                 <TableCell>
                   <Badge variant={c.invitation_status === "pending" ? "secondary" : "outline"}>
                     {ROTULO[c.invitation_status] ?? c.invitation_status}

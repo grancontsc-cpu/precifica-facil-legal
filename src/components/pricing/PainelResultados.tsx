@@ -124,7 +124,11 @@ export function PainelResultados({ resultado }: { resultado: SimulationResult })
         </h3>
         {recomendado ? (
           <>
-            <div className="mt-3 rounded-lg bg-brand-soft px-4 py-3" role="status" aria-live="polite">
+            <div
+              className="mt-3 rounded-lg bg-brand-soft px-4 py-3"
+              role="status"
+              aria-live="polite"
+            >
               <p className="text-xs font-medium text-primary">Preço final cobrado</p>
               <p className="num-destaque mt-1 text-3xl text-primary">
                 {formatBRL(recomendado.precoFinal)}

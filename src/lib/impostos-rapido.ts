@@ -54,10 +54,7 @@ export function aliquotaIcmsCompra(state: SimulationState): number | null {
  * No Simples/MEI o ICMS e o PIS/Cofins não são apurados por fora do DAS:
  * a única alíquota relevante é a efetiva do Simples.
  */
-export function aplicarRespostas(
-  state: SimulationState,
-  r: RespostasImpostos,
-): SimulationState {
+export function aplicarRespostas(state: SimulationState, r: RespostasImpostos): SimulationState {
   const op = state.operacao;
   const regime = op?.regime ?? "real";
 

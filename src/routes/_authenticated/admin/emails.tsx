@@ -88,7 +88,9 @@ function PainelEmails() {
       setFiltro(r.email);
       queryClient.invalidateQueries({ queryKey: ["email-events"] });
       toast[r.aprovado ? "success" : "error"](
-        r.aprovado ? "Teste concluído sem falhas." : "O teste encontrou falhas. Veja os passos abaixo.",
+        r.aprovado
+          ? "Teste concluído sem falhas."
+          : "O teste encontrou falhas. Veja os passos abaixo.",
       );
     },
     onError: (e: Error) => toast.error(e.message || "Não foi possível executar o teste."),
@@ -99,8 +101,8 @@ function PainelEmails() {
       <header className="space-y-1">
         <h1 className="text-2xl font-semibold tracking-tight">Diagnóstico de e-mails</h1>
         <p className="text-sm text-muted-foreground">
-          Teste o ciclo completo (confirmação, recuperação, expiração dos links e cooldown de reenvio) com um endereço
-          controlado. Cada passo fica registrado no histórico abaixo.
+          Teste o ciclo completo (confirmação, recuperação, expiração dos links e cooldown de
+          reenvio) com um endereço controlado. Cada passo fica registrado no histórico abaixo.
         </p>
       </header>
 
@@ -110,8 +112,8 @@ function PainelEmails() {
             <Mail className="size-4" aria-hidden /> Teste de ponta a ponta
           </CardTitle>
           <CardDescription>
-            Use um endereço que você controla. Se a conta não existir, ela é criada apenas para o teste e removida ao
-            final.
+            Use um endereço que você controla. Se a conta não existir, ela é criada apenas para o
+            teste e removida ao final.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -185,7 +187,12 @@ function PainelEmails() {
               value={filtro}
               onChange={(e) => setFiltro(e.target.value.trim().toLowerCase())}
             />
-            <Button variant="outline" size="icon" onClick={() => eventos.refetch()} aria-label="Atualizar histórico">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => eventos.refetch()}
+              aria-label="Atualizar histórico"
+            >
               <RefreshCw className="size-4" aria-hidden />
             </Button>
           </div>
@@ -210,7 +217,9 @@ function PainelEmails() {
                 <tbody>
                   {eventos.data?.map((ev) => (
                     <tr key={ev.id} className="border-t align-top">
-                      <td className="py-2 pr-3 whitespace-nowrap text-muted-foreground">{dataBr(ev.criadoEm)}</td>
+                      <td className="py-2 pr-3 whitespace-nowrap text-muted-foreground">
+                        {dataBr(ev.criadoEm)}
+                      </td>
                       <td className="py-2 pr-3">{ROTULO_TIPO[ev.tipo] ?? ev.tipo}</td>
                       <td className="py-2 pr-3">{ev.email ?? "—"}</td>
                       <td className="py-2 pr-3">
@@ -219,7 +228,9 @@ function PainelEmails() {
                           {ev.status}
                         </span>
                       </td>
-                      <td className="py-2 text-muted-foreground">{ev.mensagemErro ?? ev.codigoErro ?? "—"}</td>
+                      <td className="py-2 text-muted-foreground">
+                        {ev.mensagemErro ?? ev.codigoErro ?? "—"}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

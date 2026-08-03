@@ -66,7 +66,9 @@ export const listarPedidosVinculo = createServerFn({ method: "POST" })
     const [{ data: perfis }, { data: orgs }] = await Promise.all([
       userIds.length
         ? supabaseAdmin.from("profiles").select("id, full_name, email").in("id", userIds)
-        : Promise.resolve({ data: [] as { id: string; full_name: string | null; email: string | null }[] }),
+        : Promise.resolve({
+            data: [] as { id: string; full_name: string | null; email: string | null }[],
+          }),
       orgIds.length
         ? supabaseAdmin.from("organizations").select("id, name").in("id", orgIds)
         : Promise.resolve({ data: [] as { id: string; name: string }[] }),

@@ -65,7 +65,11 @@ export function removerCookiesAnalytics() {
   if (typeof document === "undefined") return;
   const dominio = window.location.hostname;
   const partes = dominio.split(".");
-  const dominios = [undefined, dominio, ...(partes.length > 1 ? [`.${partes.slice(-2).join(".")}`] : [])];
+  const dominios = [
+    undefined,
+    dominio,
+    ...(partes.length > 1 ? [`.${partes.slice(-2).join(".")}`] : []),
+  ];
   for (const cookie of document.cookie.split(";")) {
     const nome = cookie.split("=")[0]?.trim();
     if (!nome) continue;

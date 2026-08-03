@@ -17,9 +17,19 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-import { AREAS_ADMIN, solicitarAcessoAdmin, type AreaAdmin } from "@/lib/solicitacao-admin.functions";
+import {
+  AREAS_ADMIN,
+  solicitarAcessoAdmin,
+  type AreaAdmin,
+} from "@/lib/solicitacao-admin.functions";
 
 /**
  * Formulário de solicitação de acesso administrativo. O pedido é registrado
@@ -38,7 +48,8 @@ export function SolicitarAcessoAdmin({ className }: { className?: string }) {
   const enviar = useServerFn(solicitarAcessoAdmin);
 
   const solicitacao = useMutation({
-    mutationFn: async () => enviar({ data: { area, mensagem: mensagem.trim(), contato: contato.trim() || undefined } }),
+    mutationFn: async () =>
+      enviar({ data: { area, mensagem: mensagem.trim(), contato: contato.trim() || undefined } }),
     onSuccess: (r) => {
       setAberto(false);
       setMensagem("");
@@ -65,7 +76,8 @@ export function SolicitarAcessoAdmin({ className }: { className?: string }) {
         <DialogHeader>
           <DialogTitle>Solicitar acesso ao painel</DialogTitle>
           <DialogDescription>
-            Seu pedido é encaminhado ao Administrador Geral com seu e-mail, o motivo e a data do envio.
+            Seu pedido é encaminhado ao Administrador Geral com seu e-mail, o motivo e a data do
+            envio.
           </DialogDescription>
         </DialogHeader>
 

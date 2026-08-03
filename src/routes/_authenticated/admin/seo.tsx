@@ -2,7 +2,14 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { metaPagina } from "@/lib/seo-head";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { AlertTriangle, CheckCircle2, ExternalLink, Loader2, RefreshCw, Search } from "lucide-react";
+import {
+  AlertTriangle,
+  CheckCircle2,
+  ExternalLink,
+  Loader2,
+  RefreshCw,
+  Search,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { ExigePapel } from "@/components/app/GuardaAcesso";
@@ -71,8 +78,9 @@ function PainelSeo() {
       <header className="space-y-1">
         <h1 className="text-2xl font-semibold tracking-tight">SEO e sitemap</h1>
         <p className="text-sm text-muted-foreground">
-          O sitemap é gerado automaticamente a partir das páginas públicas do sistema e reenviado ao Google todos os
-          dias. Use o botão abaixo se quiser avisar o Google agora mesmo, logo após publicar uma mudança.
+          O sitemap é gerado automaticamente a partir das páginas públicas do sistema e reenviado ao
+          Google todos os dias. Use o botão abaixo se quiser avisar o Google agora mesmo, logo após
+          publicar uma mudança.
         </p>
       </header>
 
@@ -150,7 +158,8 @@ function PainelSeo() {
           ) : null}
 
           <p className="text-xs leading-relaxed text-muted-foreground">
-            A indexação em si continua sendo decisão do Google e costuma levar alguns dias após o envio.
+            A indexação em si continua sendo decisão do Google e costuma levar alguns dias após o
+            envio.
           </p>
         </CardContent>
       </Card>

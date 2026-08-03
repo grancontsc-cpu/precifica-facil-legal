@@ -47,10 +47,11 @@ export default defineTool({
     if (internas.error) return erro(internas.error.message);
     if (interestaduais.error) return erro(interestaduais.error.message);
 
-    const tabela = montarTabela(
-      (internas.data ?? []) as unknown as LinhaInterna[],
-      (interestaduais.data ?? []) as unknown as LinhaInterestadual[],
-    ) ?? tabelaVazia();
+    const tabela =
+      montarTabela(
+        (internas.data ?? []) as unknown as LinhaInterna[],
+        (interestaduais.data ?? []) as unknown as LinhaInterestadual[],
+      ) ?? tabelaVazia();
 
     const regime = entrada.regime as Regime;
     const base = aplicarRegime(estadoInicial(), regime);

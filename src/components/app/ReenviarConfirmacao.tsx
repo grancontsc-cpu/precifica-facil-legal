@@ -84,7 +84,13 @@ export function ReenviarConfirmacao({ email, iniciarBloqueado = true, className 
 
   return (
     <div className={className}>
-      <Button type="button" variant="outline" className="w-full" onClick={() => void reenviar()} disabled={restante > 0 || enviando}>
+      <Button
+        type="button"
+        variant="outline"
+        className="w-full"
+        onClick={() => void reenviar()}
+        disabled={restante > 0 || enviando}
+      >
         {enviando ? (
           <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
         ) : restante > 0 ? (

@@ -17,7 +17,9 @@ export function novoId() {
   return `alt-${Date.now().toString(36)}-${contador}`;
 }
 
-export function alternativaVazia(overrides: Partial<SupplierAlternative> = {}): SupplierAlternative {
+export function alternativaVazia(
+  overrides: Partial<SupplierAlternative> = {},
+): SupplierAlternative {
   return {
     id: novoId(),
     nome: "",

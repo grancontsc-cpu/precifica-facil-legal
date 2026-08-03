@@ -7,7 +7,12 @@
  */
 import { formatBRL, formatData, formatNumero, formatPercent, formatQuantidade } from "@/lib/format";
 import { REGIMES } from "@/lib/comparison-defaults";
-import { apuraPeloSimples, calcularFronteira, creditaFronteiraPorRegime, nomeRegime as nomeRegimeFiscal } from "@/lib/pricing-engine";
+import {
+  apuraPeloSimples,
+  calcularFronteira,
+  creditaFronteiraPorRegime,
+  nomeRegime as nomeRegimeFiscal,
+} from "@/lib/pricing-engine";
 import type { SimulationResult, SimulationState } from "@/types/pricing";
 import type { SupplierComparison } from "@/types/comparison";
 
@@ -99,7 +104,10 @@ export function montarRelatorio(
     descricao: "Valores conforme informados na nota de aquisição.",
     linhas: [
       { rotulo: "Produto", valor: state.produto.nome || "—" },
-      { rotulo: "SKU / NCM", valor: [state.produto.sku, state.produto.ncm].filter(Boolean).join(" / ") || "—" },
+      {
+        rotulo: "SKU / NCM",
+        valor: [state.produto.sku, state.produto.ncm].filter(Boolean).join(" / ") || "—",
+      },
       { rotulo: "Quantidade", valor: `${formatQuantidade(q)} ${state.produto.unidade}` },
       { rotulo: "Valor unitário de compra", valor: formatBRL(state.produto.valorUnitario) },
       { rotulo: "Valor bruto dos produtos", valor: formatBRL(c.valorBrutoProdutos) },
@@ -186,7 +194,11 @@ export function montarRelatorio(
     titulo: "Preço sugerido e margem",
     linhas: venda
       ? [
-          { rotulo: "Preço sugerido ao cliente", valor: formatBRL(venda.precoFinal), destaque: true },
+          {
+            rotulo: "Preço sugerido ao cliente",
+            valor: formatBRL(venda.precoFinal),
+            destaque: true,
+          },
           { rotulo: "Margem efetiva", valor: formatPercent(venda.margemEfetiva), destaque: true },
           {
             rotulo: "Base da margem",
@@ -237,13 +249,19 @@ export function montarRelatorio(
           apuraPeloSimples(op.regime)
             ? `Venda tributada pelo DAS à alíquota efetiva de ${formatPercent(op.aliquotaSimples)}.`
             : `Alíquotas de ICMS usadas: interna do destino ${
-                op.aliquotaInternaDestino === null ? "não cadastrada" : formatPercent(op.aliquotaInternaDestino)
+                op.aliquotaInternaDestino === null
+                  ? "não cadastrada"
+                  : formatPercent(op.aliquotaInternaDestino)
               }, interestadual ${
-                op.aliquotaInterestadual === null ? "não aplicável" : formatPercent(op.aliquotaInterestadual)
+                op.aliquotaInterestadual === null
+                  ? "não aplicável"
+                  : formatPercent(op.aliquotaInterestadual)
               }.`,
           calcularFronteira(op).aplicavel
             ? `ICMS de fronteira (diferencial de alíquotas) aplicado e ${
-                creditaFronteiraPorRegime(op.regime) ? "recuperável como crédito" : "tratado como custo puro"
+                creditaFronteiraPorRegime(op.regime)
+                  ? "recuperável como crédito"
+                  : "tratado como custo puro"
               }.`
             : `Sem ICMS de fronteira nesta operação.`,
         ]
@@ -267,7 +285,9 @@ export function montarRelatorio(
     premissas.push(`Campos bloqueados pela Grancont: ${meta.camposBloqueados.join(", ")}.`);
   }
   if (meta.camposAlterados?.length) {
-    premissas.push(`Campos alterados manualmente em relação ao perfil: ${meta.camposAlterados.join(", ")}.`);
+    premissas.push(
+      `Campos alterados manualmente em relação ao perfil: ${meta.camposAlterados.join(", ")}.`,
+    );
   }
   for (const issue of resultado.issues) {
     premissas.push(`${issue.severidade === "erro" ? "Erro" : "Atenção"}: ${issue.mensagem}`);

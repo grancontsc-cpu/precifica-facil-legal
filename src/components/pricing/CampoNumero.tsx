@@ -43,7 +43,8 @@ export function CampoNumero({
     }
   }, [value, focado]);
 
-  const unidadeTexto = prefixo === "R$" ? "Valor em reais" : sufixo === "%" ? "Valor em porcentagem" : null;
+  const unidadeTexto =
+    prefixo === "R$" ? "Valor em reais" : sufixo === "%" ? "Valor em porcentagem" : null;
   const descritores = [unidadeTexto ? unidadeId : null, ajuda ? ajudaId : null]
     .filter(Boolean)
     .join(" ");
@@ -92,11 +93,7 @@ export function CampoNumero({
             setTexto(bruto);
             onChange(parseNumeroBR(bruto));
           }}
-          className={cn(
-            "h-11 text-base tabular-nums",
-            prefixo && "pl-10",
-            sufixo && "pr-10",
-          )}
+          className={cn("h-11 text-base tabular-nums", prefixo && "pl-10", sufixo && "pr-10")}
         />
         {sufixo ? (
           <span
@@ -110,7 +107,6 @@ export function CampoNumero({
     </div>
   );
 }
-
 
 interface CampoTextoProps {
   label: string;
@@ -171,7 +167,6 @@ export function Ajuda({ texto, rotulo }: { texto: string; rotulo?: string }) {
         </button>
       </TooltipTrigger>
       <TooltipContent className="max-w-xs text-xs leading-relaxed">{texto}</TooltipContent>
-
     </Tooltip>
   );
 }

@@ -38,7 +38,10 @@ function Pagina() {
         .select("status, plan, trial_started_at, trial_ends_at, activated_at, expires_at, notes")
         .eq("user_id", sessao.user.id)
         .maybeSingle();
-      navigate({ to: rotaBloqueio(avaliarLicenca((data as Licenca | null) ?? null)), replace: true });
+      navigate({
+        to: rotaBloqueio(avaliarLicenca((data as Licenca | null) ?? null)),
+        replace: true,
+      });
     })();
   }, [navigate]);
 

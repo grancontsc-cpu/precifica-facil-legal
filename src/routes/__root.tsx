@@ -19,9 +19,6 @@ import { analyticsPermitido } from "../lib/consentimento";
 import { ConsentimentoCookies } from "../components/app/ConsentimentoCookies";
 import { LogoGrancont } from "../components/app/LogoGrancont";
 
-
-
-
 const TITULO_PADRAO = "Precifica Grancont — precificação tributária para empresas";
 const DESCRICAO_PADRAO =
   "Simulador de precificação: custo líquido de aquisição, créditos tributários e preço de venda recomendado por regime e por estado.";
@@ -118,7 +115,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       // O Google Analytics NÃO é carregado aqui: a tag só é injetada após o
       // consentimento explícito do usuário (LGPD) — ver src/lib/consentimento.ts.
       {
-
         type: "application/ld+json",
 
         children: JSON.stringify({
@@ -192,8 +188,6 @@ function RootComponent() {
     });
   }, [router]);
 
-
-
   return (
     <QueryClientProvider client={queryClient}>
       <TemaProvider>
@@ -204,5 +198,4 @@ function RootComponent() {
       </TemaProvider>
     </QueryClientProvider>
   );
-
 }

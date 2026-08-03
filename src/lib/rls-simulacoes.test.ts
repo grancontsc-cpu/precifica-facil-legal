@@ -101,11 +101,15 @@ describe("RLS · tabela simulations", () => {
   });
 
   it("INSERT exige created_by igual ao usuário autenticado", () => {
-    expect(podeNaSimulacao(autor, { organizationId: ORG_A, createdBy: AUTOR }, "INSERT")).toBe(true);
+    expect(podeNaSimulacao(autor, { organizationId: ORG_A, createdBy: AUTOR }, "INSERT")).toBe(
+      true,
+    );
     expect(podeNaSimulacao(autor, { organizationId: ORG_A, createdBy: COLEGA }, "INSERT")).toBe(
       false,
     );
-    expect(podeNaSimulacao(autor, { organizationId: ORG_A, createdBy: null }, "INSERT")).toBe(false);
+    expect(podeNaSimulacao(autor, { organizationId: ORG_A, createdBy: null }, "INSERT")).toBe(
+      false,
+    );
   });
 
   it("INSERT bloqueia criação em empresa da qual o usuário não participa", () => {
@@ -152,7 +156,10 @@ describe("RLS · linhas de detalhe da simulação", () => {
 const urlBanco = process.env.SUPABASE_DB_URL;
 const TABELAS = ["simulations", ...TABELAS_DETALHE] as const;
 
-type Cliente = { query: (sql: string) => Promise<{ rows: Record<string, unknown>[] }>; end: () => Promise<void> };
+type Cliente = {
+  query: (sql: string) => Promise<{ rows: Record<string, unknown>[] }>;
+  end: () => Promise<void>;
+};
 let cliente: Cliente | null = null;
 
 async function conectar(): Promise<Cliente> {

@@ -30,11 +30,7 @@ import { SuposicoesFiscais } from "@/components/pricing/SuposicoesFiscais";
 import { ComparativoModos } from "@/components/pricing/ComparativoModos";
 import { ajustesVazios, aplicarAjustes, type AjustesRapido } from "@/lib/suposicoes-rapido";
 import { PerguntasImpostos } from "@/components/pricing/PerguntasImpostos";
-import {
-  aplicarRespostas,
-  respostasPadrao,
-  type RespostasImpostos,
-} from "@/lib/impostos-rapido";
+import { aplicarRespostas, respostasPadrao, type RespostasImpostos } from "@/lib/impostos-rapido";
 import { formatBRL } from "@/lib/format";
 import { useApp } from "@/hooks/useApp";
 import type { Regime, SimulationState } from "@/types/pricing";
@@ -96,8 +92,7 @@ function Trilha({
               />
               <span
                 className={
-                  "text-[11px] font-medium " +
-                  (atual ? "text-foreground" : "text-muted-foreground")
+                  "text-[11px] font-medium " + (atual ? "text-foreground" : "text-muted-foreground")
                 }
               >
                 {rotulo}
@@ -109,10 +104,6 @@ function Trilha({
     </ol>
   );
 }
-
-
-
-
 
 function ModoRapido() {
   const navigate = useNavigate();
@@ -202,8 +193,6 @@ function ModoRapido() {
     setAjustes(ajustesVazios());
   };
 
-
-
   return (
     <div className="mx-auto w-full max-w-xl space-y-6 px-4 py-8 sm:py-12">
       <header className="space-y-2 text-center">
@@ -270,7 +259,6 @@ function ModoRapido() {
                   : "Define como o ICMS de fronteira entra no custo."}
               </p>
             </div>
-
           </div>
         ) : null}
 
@@ -314,10 +302,13 @@ function ModoRapido() {
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <Label htmlFor="rapido-origem">Estado de origem</Label>
-                <Select value={ufOrigem || undefined} onValueChange={(v) => {
+                <Select
+                  value={ufOrigem || undefined}
+                  onValueChange={(v) => {
                     eventoParametroFiscal({ modo: "rapido", campo: "ufOrigem", valor: v });
                     setUfOrigem(v);
-                  }}>
+                  }}
+                >
                   <SelectTrigger id="rapido-origem">
                     <SelectValue placeholder="Selecione" />
                   </SelectTrigger>
@@ -332,10 +323,13 @@ function ModoRapido() {
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="rapido-destino">Estado de destino</Label>
-                <Select value={ufDestino || undefined} onValueChange={(v) => {
+                <Select
+                  value={ufDestino || undefined}
+                  onValueChange={(v) => {
                     eventoParametroFiscal({ modo: "rapido", campo: "ufDestino", valor: v });
                     setUfDestino(v);
-                  }}>
+                  }}
+                >
                   <SelectTrigger id="rapido-destino">
                     <SelectValue placeholder="Selecione" />
                   </SelectTrigger>
@@ -364,8 +358,8 @@ function ModoRapido() {
                 Como esse produto é tributado?
               </h2>
               <p className="text-sm text-muted-foreground">
-                Duas perguntas rápidas. Se não souber, marque “Não sei” — assumimos que é
-                tributado, o que é mais prudente para o seu preço.
+                Duas perguntas rápidas. Se não souber, marque “Não sei” — assumimos que é tributado,
+                o que é mais prudente para o seu preço.
               </p>
             </div>
             <PerguntasImpostos
@@ -386,7 +380,6 @@ function ModoRapido() {
         ) : null}
 
         {passo === 5 ? (
-
           <div className="space-y-5">
             <div className="text-center">
               <p className="text-sm text-muted-foreground">Preço de venda sugerido por unidade</p>
@@ -480,7 +473,6 @@ function ModoRapido() {
                 Nova estimativa
               </Button>
             </div>
-
           </div>
         ) : null}
       </div>
@@ -501,44 +493,44 @@ function ModoRapido() {
                 Voltar ao preço
               </Button>
             ) : null}
-          <Button
-            onClick={() => {
-              if (passo === 4) {
-                eventoSimular({
-                  modo: "rapido",
-                  regime,
-                  ufOrigem,
-                  ufDestino: ufDestino || ufOrigem,
-                  possuiResultado: !!recomendado,
-                });
-                if (recomendado) {
-                  eventoSimulacaoConcluida({
+            <Button
+              onClick={() => {
+                if (passo === 4) {
+                  eventoSimular({
                     modo: "rapido",
                     regime,
                     ufOrigem,
                     ufDestino: ufDestino || ufOrigem,
+                    possuiResultado: !!recomendado,
                   });
+                  if (recomendado) {
+                    eventoSimulacaoConcluida({
+                      modo: "rapido",
+                      regime,
+                      ufOrigem,
+                      ufDestino: ufDestino || ufOrigem,
+                    });
+                  }
                 }
-              }
-              irPara(passo + 1);
-            }}
-            disabled={!podeAvancar}
-          >
-            {passo === 4 ? "Ver preço sugerido" : "Continuar"}
-            <ArrowRight className="size-4" aria-hidden />
-          </Button>
+                irPara(passo + 1);
+              }}
+              disabled={!podeAvancar}
+            >
+              {passo === 4 ? "Ver preço sugerido" : "Continuar"}
+              <ArrowRight className="size-4" aria-hidden />
+            </Button>
           </div>
         ) : (
           <span />
         )}
-
       </div>
-
-
 
       <p className="text-center text-xs text-muted-foreground">
         Precisa de todos os tributos abertos?{" "}
-        <Link to="/simulador" className="font-medium text-primary underline-offset-4 hover:underline">
+        <Link
+          to="/simulador"
+          className="font-medium text-primary underline-offset-4 hover:underline"
+        >
           Abrir o simulador completo
         </Link>
       </p>

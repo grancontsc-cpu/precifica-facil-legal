@@ -140,7 +140,6 @@ export function ExportarSimulacao({ state, resultado, meta, comparacao }: Props)
           </div>
         ) : null}
 
-
         <div className="rel-nao-imprimir flex flex-wrap gap-2">
           <Button size="sm" onClick={() => imprimir("imprimir")}>
             <Printer className="h-4 w-4" aria-hidden />

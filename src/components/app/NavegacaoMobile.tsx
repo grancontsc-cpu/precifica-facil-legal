@@ -62,7 +62,6 @@ export function NavegacaoMobile({ ehGestor, isSuperAdmin }: Props) {
           );
         })}
 
-
         <Sheet open={aberto} onOpenChange={setAberto}>
           <SheetTrigger
             className="flex min-h-[56px] flex-col items-center justify-center gap-1 px-1 py-2 text-[11px] font-medium text-muted-foreground"

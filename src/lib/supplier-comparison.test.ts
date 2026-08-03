@@ -1,16 +1,13 @@
 import Decimal from "decimal.js";
 import { describe, expect, it } from "vitest";
 
-
 import { compararFornecedores, limiteFreteEquivalencia } from "@/lib/supplier-comparison";
 import { alternativaVazia, exemploComparacao } from "@/lib/comparison-defaults";
 import { tributosCompraPadrao } from "@/lib/pricing-defaults";
 import type { PurchaseTax, PurchaseTaxId } from "@/types/pricing";
 import type { SupplierAlternative } from "@/types/comparison";
 
-function comTributos(
-  patches: Partial<Record<PurchaseTaxId, Partial<PurchaseTax>>>,
-): PurchaseTax[] {
+function comTributos(patches: Partial<Record<PurchaseTaxId, Partial<PurchaseTax>>>): PurchaseTax[] {
   return tributosCompraPadrao().map((t) => (patches[t.id] ? { ...t, ...patches[t.id] } : t));
 }
 
@@ -79,7 +76,6 @@ describe("comparação de fornecedores — exemplo RJ x BA", () => {
     const b = linhas.find((l) => l.nome === "BA")!;
     expect(a.custoLiquidoUnitario).toBeCloseTo(b.custoLiquidoUnitario, 2);
   });
-
 
   it("com frete alto no RJ a BA passa a ser a melhor opção", () => {
     const { linhas, vencedorId } = compararFornecedores([rj({ freteTotal: 10 }), ba()]);
@@ -170,7 +166,13 @@ describe("comparação de fornecedores — regras gerais", () => {
       valorUnitario: 100,
       quantidade: 1,
       tributos: comTributos({
-        icms: { enabled: true, rate: 20, treatment: "incluido", creditMode: "parcial", creditPercent: 50 },
+        icms: {
+          enabled: true,
+          rate: 20,
+          treatment: "incluido",
+          creditMode: "parcial",
+          creditPercent: 50,
+        },
       }),
     });
     const manual = alternativaVazia({
@@ -178,7 +180,13 @@ describe("comparação de fornecedores — regras gerais", () => {
       valorUnitario: 100,
       quantidade: 1,
       tributos: comTributos({
-        icms: { enabled: true, rate: 20, treatment: "incluido", creditMode: "manual", creditManual: 15 },
+        icms: {
+          enabled: true,
+          rate: 20,
+          treatment: "incluido",
+          creditMode: "manual",
+          creditManual: 15,
+        },
       }),
     });
     const { linhas } = compararFornecedores([parcial, manual]);

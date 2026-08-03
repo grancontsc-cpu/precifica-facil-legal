@@ -28,7 +28,33 @@ export const Route = createFileRoute("/onboarding")({
 });
 
 const UFS = [
-  "AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO",
+  "AC",
+  "AL",
+  "AP",
+  "AM",
+  "BA",
+  "CE",
+  "DF",
+  "ES",
+  "GO",
+  "MA",
+  "MT",
+  "MS",
+  "MG",
+  "PA",
+  "PB",
+  "PR",
+  "PE",
+  "PI",
+  "RJ",
+  "RN",
+  "RS",
+  "RO",
+  "RR",
+  "SC",
+  "SP",
+  "SE",
+  "TO",
 ];
 
 function OnboardingPage() {
@@ -94,15 +120,24 @@ function OnboardingPage() {
     <main className="flex min-h-screen items-center justify-center bg-background px-4 py-10">
       <div className="w-full max-w-lg rounded-xl border border-border bg-card p-6 shadow-[var(--shadow-card)] sm:p-8">
         <LogoGrancont className="h-9 w-auto" />
-        <h1 className="mt-5 text-xl font-semibold tracking-tight text-foreground">Vamos concluir seu cadastro</h1>
+        <h1 className="mt-5 text-xl font-semibold tracking-tight text-foreground">
+          Vamos concluir seu cadastro
+        </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Precisamos de poucos dados para preparar sua empresa e liberar os 30 dias de teste gratuito.
+          Precisamos de poucos dados para preparar sua empresa e liberar os 30 dias de teste
+          gratuito.
         </p>
 
         <form className="mt-6 space-y-4" onSubmit={enviar}>
           <div className="space-y-1.5">
             <Label htmlFor="nome">Seu nome completo</Label>
-            <Input id="nome" value={nome} onChange={(e) => setNome(e.target.value)} required maxLength={150} />
+            <Input
+              id="nome"
+              value={nome}
+              onChange={(e) => setNome(e.target.value)}
+              required
+              maxLength={150}
+            />
           </div>
 
           <div className="space-y-1.5">
@@ -150,7 +185,12 @@ function OnboardingPage() {
 
           <div className="space-y-1.5">
             <Label htmlFor="cidade">Cidade (opcional)</Label>
-            <Input id="cidade" value={cidade} onChange={(e) => setCidade(e.target.value)} maxLength={120} />
+            <Input
+              id="cidade"
+              value={cidade}
+              onChange={(e) => setCidade(e.target.value)}
+              maxLength={120}
+            />
           </div>
 
           <label className="flex items-start gap-2 text-sm text-muted-foreground">
@@ -160,7 +200,9 @@ function OnboardingPage() {
               onChange={(e) => setAceite(e.target.checked)}
               className="mt-0.5 h-4 w-4 rounded border-input"
             />
-            <span>Li e aceito os termos de uso e a política de privacidade do Precifica Grancont.</span>
+            <span>
+              Li e aceito os termos de uso e a política de privacidade do Precifica Grancont.
+            </span>
           </label>
 
           <Button type="submit" className="w-full" disabled={carregando}>
@@ -171,10 +213,12 @@ function OnboardingPage() {
 
         <div className="mt-6 grid gap-2 text-xs text-muted-foreground">
           <p className="flex items-center gap-2">
-            <ShieldCheck className="h-4 w-4 text-primary" aria-hidden /> Seus dados ficam isolados por empresa.
+            <ShieldCheck className="h-4 w-4 text-primary" aria-hidden /> Seus dados ficam isolados
+            por empresa.
           </p>
           <p className="flex items-center gap-2">
-            <Building2 className="h-4 w-4 text-primary" aria-hidden /> Você pode convidar sua equipe depois.
+            <Building2 className="h-4 w-4 text-primary" aria-hidden /> Você pode convidar sua equipe
+            depois.
           </p>
         </div>
       </div>

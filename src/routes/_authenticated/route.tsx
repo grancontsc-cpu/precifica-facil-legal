@@ -10,8 +10,7 @@ export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async ({ location }) => {
     const { data, error } = await supabase.auth.getUser();
     // Preserva a rota pretendida para voltar a ela depois do login.
-    if (error || !data.user)
-      throw redirect({ to: "/login", search: { next: location.href } });
+    if (error || !data.user) throw redirect({ to: "/login", search: { next: location.href } });
     return { user: data.user };
   },
   component: () => (

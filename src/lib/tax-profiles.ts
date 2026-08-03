@@ -53,7 +53,9 @@ const num = (v: unknown) => {
   return Number.isFinite(n) ? n : 0;
 };
 
-export function lockedFieldsOf(profile: Pick<TaxProfileRow, "locked_fields"> | null | undefined): string[] {
+export function lockedFieldsOf(
+  profile: Pick<TaxProfileRow, "locked_fields"> | null | undefined,
+): string[] {
   const raw = profile?.locked_fields;
   if (Array.isArray(raw)) return raw.filter((v): v is string => typeof v === "string");
   return [];
@@ -162,7 +164,8 @@ export function camposAlterados(padrao: SimulationState, atual: SimulationState)
   const alterados: string[] = [];
   const comparar = (prefixo: string, a: Record<string, unknown>, b: Record<string, unknown>) => {
     for (const chave of Object.keys(b)) {
-      if (JSON.stringify(a?.[chave]) !== JSON.stringify(b[chave])) alterados.push(`${prefixo}.${chave}`);
+      if (JSON.stringify(a?.[chave]) !== JSON.stringify(b[chave]))
+        alterados.push(`${prefixo}.${chave}`);
     }
   };
   comparar("produto", padrao.produto as never, atual.produto as never);
