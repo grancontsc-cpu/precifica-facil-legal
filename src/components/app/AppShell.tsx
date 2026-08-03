@@ -31,6 +31,8 @@ import {
 } from "@/components/ui/select";
 import { useApp } from "@/hooks/useApp";
 import { cn } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+
 
 function LinkTopo({ item, ativo }: { item: ItemNav; ativo: boolean }) {
   const Icon = item.icon;
