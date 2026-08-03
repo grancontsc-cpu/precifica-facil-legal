@@ -39,6 +39,7 @@ import {
   eventoSimulacaoConcluida,
   type ContextoExemplo,
 } from "@/lib/analytics-eventos";
+import { useAlteracoesPendentes } from "@/hooks/useAlteracoesPendentes";
 import { useAliquotas } from "@/hooks/useAliquotas";
 import { sincronizarOperacao } from "@/lib/aliquotas";
 import { ResumoFlutuante } from "@/components/pricing/ResumoFlutuante";
@@ -343,6 +344,14 @@ function Simulador() {
     }
     setCarregado(true);
   }, [simulacaoId]);
+
+  // Sinaliza ao cabeçalho que existem edições não salvas.
+  const { registrarPendencia } = useAlteracoesPendentes();
+  const temPendencia = JSON.stringify(state) !== snapshotSalvo;
+  useEffect(() => {
+    registrarPendencia(temPendencia);
+    return () => registrarPendencia(false);
+  }, [temPendencia, registrarPendencia]);
 
   const { tabela } = useAliquotas();
   const resultado = useMemo(() => simular(state), [state]);
