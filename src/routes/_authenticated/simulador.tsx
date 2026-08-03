@@ -178,6 +178,9 @@ function Simulador() {
   const [produtoId, setProdutoId] = useState<string | null>(produtoQuery ?? null);
   const [baseline, setBaseline] = useState<SimulationState | null>(null);
   const [simulacaoAtual, setSimulacaoAtual] = useState<string | null>(simulacaoId ?? null);
+  // Snapshot do último estado persistido (rascunho, banco ou reset): serve de
+  // referência para avisar sobre alterações não salvas ao sair da tela.
+  const [snapshotSalvo, setSnapshotSalvo] = useState<string>(() => JSON.stringify(estadoInicial()));
 
 
   const perfisQuery = useQuery({
@@ -327,6 +330,7 @@ function Simulador() {
         const dados = JSON.parse(bruto) as { state: SimulationState; salvoEm?: string };
         if (dados?.state?.produto) {
           setState(dados.state);
+          setSnapshotSalvo(JSON.stringify(dados.state));
           if (dados.salvoEm) setSalvoEm(new Date(dados.salvoEm));
         }
       }
@@ -452,6 +456,7 @@ function Simulador() {
     const agora = new Date();
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ state, salvoEm: agora.toISOString() }));
     setSalvoEm(agora);
+    setSnapshotSalvo(JSON.stringify(state));
     toast.success("Rascunho salvo neste navegador.");
   };
 
@@ -464,6 +469,7 @@ function Simulador() {
     ultimaAcao.current = { tipo: "apos_nova_simulacao", em: Date.now() };
     eventoSimulacaoIniciada({ modo, origem: "nova" });
     setState(estadoInicial());
+    setSnapshotSalvo(JSON.stringify(estadoInicial()));
     toast.info("Nova simulação iniciada.");
   };
 
@@ -471,6 +477,7 @@ function Simulador() {
     ultimaAcao.current = { tipo: "apos_limpar", em: Date.now() };
     localStorage.removeItem(STORAGE_KEY);
     setState(estadoInicial());
+    setSnapshotSalvo(JSON.stringify(estadoInicial()));
     setSalvoEm(null);
     toast.info("Simulação limpa.");
   };
@@ -487,6 +494,7 @@ function Simulador() {
     ultimaAcao.current = null;
     eventoSimulacaoIniciada({ modo, origem: "exemplo" });
     setState(estadoExemplo());
+    setSnapshotSalvo(JSON.stringify(estadoExemplo()));
     toast.info("Valores de exemplo restaurados.");
   };
 
@@ -566,6 +574,7 @@ function Simulador() {
     },
     onSuccess: (id, vars) => {
       setSimulacaoAtual(id);
+      setSnapshotSalvo(JSON.stringify(state));
       qc.invalidateQueries({ queryKey: ["simulations", orgId] });
       toast.success(vars.duplicar ? "Simulação duplicada." : "Simulação salva no histórico.");
       void navigate({ to: "/simulador", search: { simulacao: id, produto: undefined }, replace: true });
