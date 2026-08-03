@@ -130,7 +130,8 @@
           "properties": {
             "busca": {
               "description": "Texto no título ou no nome do produto.",
-              "type": "string"
+              "type": "string",
+              "maxLength": 100
             },
             "status": {
               "description": "Filtra pelo status da simulação.",
