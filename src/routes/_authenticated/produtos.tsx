@@ -137,7 +137,7 @@ function ProdutosPage() {
             </tr>
           </thead>
           <tbody>
-            {(produtos.data ?? []).map((p) => (
+            {lista.map((p) => (
               <tr key={p.id} className="border-t border-border">
                 <td className="px-4 py-3 font-medium text-foreground">{p.nome}</td>
                 <td className="px-4 py-3 text-muted-foreground">{p.sku ?? "—"}</td>
