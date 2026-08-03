@@ -125,7 +125,7 @@ describe("MenuSuspenso — clique fora", () => {
   }
 
   it("devolve o foco ao gatilho e atualiza aria-expanded", async () => {
-    const usuario = userEvent.setup();
+    const usuario = userEvent.setup({ pointerEventsCheck: 0 });
     const { gatilho, fora } = montarComFora();
 
     expect(gatilho).toHaveAttribute("aria-expanded", "false");
@@ -140,7 +140,7 @@ describe("MenuSuspenso — clique fora", () => {
   });
 
   it("permite reabrir pelo teclado logo após o clique fora", async () => {
-    const usuario = userEvent.setup();
+    const usuario = userEvent.setup({ pointerEventsCheck: 0 });
     const { gatilho, fora } = montarComFora();
 
     await usuario.click(gatilho);
