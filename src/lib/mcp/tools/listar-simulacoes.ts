@@ -1,4 +1,4 @@
-import { filtroIlike } from "./filtro-busca";
+import { MAX_BUSCA, filtroIlike } from "./filtro-busca";
 import { defineTool } from "@lovable.dev/mcp-js";
 import { z } from "zod";
 import { erro, ok, supabaseForUser } from "../supabase";
@@ -9,7 +9,13 @@ export default defineTool({
   description:
     "Lista as simulações de precificação visíveis para o usuário conectado, com filtro por texto e status.",
   inputSchema: {
-    busca: z.string().trim().optional().describe("Texto no título ou no nome do produto."),
+    busca: z
+      .string()
+      .trim()
+      .max(MAX_BUSCA, `A busca deve ter no máximo ${MAX_BUSCA} caracteres.`)
+      .optional()
+      .describe("Texto no título ou no nome do produto."),
+
     status: z
       .enum(["rascunho", "final", "arquivada"])
       .optional()
