@@ -117,12 +117,19 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <div className="mx-auto flex max-w-7xl items-center gap-2 px-3 py-2.5 sm:gap-3 sm:px-6">
           <Link
             to="/simulador"
-            className="flex shrink-0 items-center rounded-md transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            className={cn(
+              "flex shrink-0 items-center rounded-md px-1.5 py-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+              itemAtivo(pathname, "/simulador")
+                ? "bg-primary/10 ring-1 ring-primary/30"
+                : "hover:opacity-80",
+            )}
             aria-label="Precifica Grancont — ir para o simulador"
-            title="Ir para o simulador"
+            aria-current={itemAtivo(pathname, "/simulador") ? "page" : undefined}
+            title={itemAtivo(pathname, "/simulador") ? "Você está no simulador" : "Ir para o simulador"}
           >
             <LogoGrancont className="h-6 sm:h-7" decorativa />
           </Link>
+
 
 
           <nav aria-label="Navegação principal" className="ml-4 hidden items-center gap-1 lg:flex">
