@@ -12,17 +12,20 @@ export function LogoGrancont({
 }) {
   const alt = "Grancont — soluções contábeis";
 
+  const base = "block w-auto max-w-full select-none object-contain";
+
   if (variante === "clara") {
-    return <img src={logoBranca.url} alt={alt} className={className} />;
+    return <img src={logoBranca.url} alt={alt} className={`${base} ${className}`} />;
   }
   if (variante === "escura") {
-    return <img src={logoRoxo.url} alt={alt} className={className} />;
+    return <img src={logoRoxo.url} alt={alt} className={`${base} ${className}`} />;
   }
 
   return (
     <>
-      <img src={logoRoxo.url} alt={alt} className={`${className} dark:hidden`} />
-      <img src={logoBranca.url} alt={alt} className={`${className} hidden dark:block`} />
+      <img src={logoRoxo.url} alt={alt} className={`${base} ${className} dark:hidden`} />
+      <img src={logoBranca.url} alt={alt} className={`${base} ${className} hidden dark:block`} />
     </>
   );
+
 }

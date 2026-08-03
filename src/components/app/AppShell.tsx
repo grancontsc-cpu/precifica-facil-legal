@@ -114,14 +114,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-background pb-16 lg:pb-0">
       <header className="sticky top-0 z-30 border-b border-border bg-card/95 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2.5 sm:px-6">
+        <div className="mx-auto flex max-w-7xl items-center gap-2 px-3 py-2.5 sm:gap-3 sm:px-6">
           <Link
             to="/simulador"
-            className="shrink-0 rounded-md transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            className="flex shrink-0 items-center rounded-md transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             aria-label="Precifica Grancont — ir para o simulador"
             title="Ir para o simulador"
           >
-            <LogoGrancont className="h-7 w-auto" />
+            <LogoGrancont className="h-6 sm:h-7" />
           </Link>
 
 
@@ -137,14 +137,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             ) : null}
           </nav>
 
-          <div className="ml-auto flex items-center gap-2">
+          <div className="ml-auto flex min-w-0 items-center gap-2">
+
             <div className="hidden lg:block">
               <Glossario />
             </div>
             {organizations.length > 1 ? (
               <Select value={orgId ?? undefined} onValueChange={setOrgId}>
                 <SelectTrigger
-                  className="h-10 w-[150px] sm:w-[210px]"
+                  className="h-10 w-[120px] min-w-0 shrink sm:w-[210px]"
                   aria-label="Empresa selecionada"
                 >
                   <SelectValue placeholder="Escolher empresa" />
