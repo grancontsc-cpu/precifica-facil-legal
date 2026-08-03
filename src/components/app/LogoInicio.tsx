@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
   AlertDialog,
@@ -24,6 +24,15 @@ export function LogoInicio({ naRotaInicial }: { naRotaInicial: boolean }) {
   const navigate = useNavigate();
   const { pendente } = useAlteracoesPendentes();
   const [confirmando, setConfirmando] = useState(false);
+  const [tooltipAberto, setTooltipAberto] = useState(false);
+  const dicaId = useId();
+
+  // Texto lido pelo leitor de tela como descrição (aria-describedby) do link.
+  const dica = pendente
+    ? "Há alterações não salvas — pediremos confirmação antes de voltar ao simulador"
+    : naRotaInicial
+      ? "Você já está no simulador"
+      : "Ir para o simulador de precificação";
 
   const irParaSimulador = () =>
     void navigate({ to: "/simulador", search: { simulacao: undefined, produto: undefined } });
@@ -31,7 +40,7 @@ export function LogoInicio({ naRotaInicial }: { naRotaInicial: boolean }) {
   return (
     <>
       <TooltipProvider delayDuration={200}>
-        <Tooltip>
+        <Tooltip open={tooltipAberto} onOpenChange={setTooltipAberto}>
           <TooltipTrigger asChild>
             <Link
               to="/simulador"
@@ -42,7 +51,8 @@ export function LogoInicio({ naRotaInicial }: { naRotaInicial: boolean }) {
                 naRotaInicial ? "bg-primary/10 ring-1 ring-primary/30" : "hover:opacity-80",
               )}
 
-              aria-label="Precifica Grancont — ir para o simulador"
+              aria-label="Precifica Grancont"
+              aria-describedby={tooltipAberto ? dicaId : undefined}
               aria-current={naRotaInicial ? "page" : undefined}
               onClick={(e) => {
                 if (!pendente) return;
@@ -53,12 +63,8 @@ export function LogoInicio({ naRotaInicial }: { naRotaInicial: boolean }) {
               <LogoGrancont className="h-6 sm:h-7" decorativa />
             </Link>
           </TooltipTrigger>
-          <TooltipContent side="bottom" align="start">
-            {pendente
-              ? "Há alterações não salvas — pediremos confirmação antes de voltar ao simulador"
-              : naRotaInicial
-                ? "Você já está no simulador"
-                : "Ir para o simulador de precificação"}
+          <TooltipContent id={dicaId} side="bottom" align="start">
+            {dica}
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
