@@ -117,8 +117,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <ProvedorAlteracoesPendentes>
     <div className="min-h-screen bg-background pb-16 lg:pb-0">
+      {/* Atalho de teclado: visível apenas ao receber foco (primeiro Tab). */}
+      <a
+        href="#conteudo-principal"
+        className="sr-only z-50 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-lg focus:not-sr-only focus:absolute focus:left-3 focus:top-3 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+      >
+        Pular para o simulador
+      </a>
       <header className="sticky top-0 z-30 border-b border-border bg-card/95 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center gap-2 px-3 py-2.5 sm:gap-3 sm:px-6">
+
           <LogoInicio naRotaInicial={itemAtivo(pathname, "/simulador")} />
 
 
