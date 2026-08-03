@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { MAX_BUSCA, filtroIlike, sanitizarBusca } from "./filtro-busca";
+import { MAX_BUSCA, MAX_BYTES_BUSCA, bytesBusca, filtroIlike, sanitizarBusca, validarBusca } from "./filtro-busca";
 
 describe("sanitizarBusca", () => {
   it("faz trim e colapsa espaços duplicados", () => {
@@ -74,5 +74,46 @@ describe("filtroIlike", () => {
 
   it("retorna null quando não sobra texto útil", () => {
     expect(filtroIlike(["nome"], "  ()  ")).toBeNull();
+  });
+});
+
+describe("validarBusca", () => {
+  it("aceita texto normal", () => {
+    expect(validarBusca("café com leite")).toEqual({ valida: true, texto: "café com leite" });
+  });
+
+  it("rejeita valores que não são string", () => {
+    expect(validarBusca(undefined)).toEqual({ valida: false, motivo: "tipo" });
+    expect(validarBusca(123)).toEqual({ valida: false, motivo: "tipo" });
+  });
+
+  it("rejeita texto acima do limite de bytes mesmo com poucos caracteres", () => {
+    const emojis = "🧾".repeat(120); // 4 bytes cada
+    expect(emojis.length).toBeLessThan(MAX_BYTES_BUSCA);
+    expect(bytesBusca(emojis)).toBeGreaterThan(MAX_BYTES_BUSCA);
+    expect(validarBusca(emojis)).toEqual({ valida: false, motivo: "bytes" });
+    expect(sanitizarBusca(emojis)).toBe("");
+    expect(filtroIlike(["nome"], emojis)).toBeNull();
+  });
+
+  it("aceita texto acentuado no limite de bytes", () => {
+    const texto = "á".repeat(MAX_BYTES_BUSCA / 2);
+    expect(bytesBusca(texto)).toBe(MAX_BYTES_BUSCA);
+    expect(validarBusca(texto).valida).toBe(true);
+  });
+
+  it("rejeita surrogates soltos (encoding inválido)", () => {
+    expect(validarBusca("produto\ud800")).toEqual({ valida: false, motivo: "encoding" });
+    expect(validarBusca("\udc00produto")).toEqual({ valida: false, motivo: "encoding" });
+    expect(sanitizarBusca("pro\ud800duto")).toBe("");
+  });
+
+  it("aceita pares de surrogates válidos (emoji)", () => {
+    expect(validarBusca("café 🧾").valida).toBe(true);
+    expect(sanitizarBusca("café 🧾")).toBe("café 🧾");
+  });
+
+  it("rejeita o caractere de substituição U+FFFD", () => {
+    expect(validarBusca("produto\ufffd")).toEqual({ valida: false, motivo: "encoding" });
   });
 });
