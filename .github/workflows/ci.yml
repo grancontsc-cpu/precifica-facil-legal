@@ -16,19 +16,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      # O projeto usa Bun (bun.lock é a fonte de verdade das dependências).
+      - uses: oven-sh/setup-bun@v2
         with:
-          node-version: "20"
-          cache: "npm"
+          bun-version: latest
 
       - name: Instalar dependências
-        run: npm ci --no-audit --no-fund
+        run: bun install --frozen-lockfile
 
       - name: Lint
-        run: npm run lint
+        run: bun run lint
 
       - name: Verificação de tipos
-        run: npm run typecheck
+        run: bun run typecheck
 
       - name: Testes
-        run: npm run test
+        run: bun run test
