@@ -59,9 +59,9 @@ export function LogoInicio({ naRotaInicial }: { naRotaInicial: boolean }) {
               to="/simulador"
               search={{ simulacao: undefined, produto: undefined }}
               className={cn(
-                "flex shrink-0 basis-auto items-center whitespace-nowrap rounded-md px-1.5 py-1 transition-all",
-                "max-w-[45vw] sm:max-w-none",
-                naRotaInicial ? "bg-primary/10 ring-1 ring-primary/30" : "hover:opacity-80",
+                "flex min-h-11 shrink-0 basis-auto items-center whitespace-nowrap rounded-md px-2 py-1.5 transition-all",
+                "max-w-[60vw] sm:max-w-none",
+                naRotaInicial ? "bg-primary/15 ring-1 ring-primary/50" : "hover:opacity-80",
               )}
               aria-label="Precifica Grancont — ir para o simulador"
               aria-current={naRotaInicial ? "page" : undefined}
