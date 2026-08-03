@@ -131,13 +131,25 @@ function Secao({
   children: React.ReactNode;
   acao?: React.ReactNode;
 }) {
+  const id = useId();
+  const tituloId = `${id}-titulo`;
+  const descricaoId = `${id}-descricao`;
   return (
-    <section className="rounded-xl border border-border bg-card p-5 shadow-[var(--shadow-card)]">
+    <section
+      aria-labelledby={tituloId}
+      aria-describedby={descricaoId}
+      className="rounded-xl border border-border bg-card p-5 shadow-[var(--shadow-card)]"
+    >
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
         <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-wide text-primary">{numero}</p>
-          <h2 className="mt-0.5 text-lg font-semibold text-foreground">{titulo}</h2>
-          <p className="mt-1 text-sm text-muted-foreground">{descricao}</p>
+          <h2 id={tituloId} className="mt-0.5 text-lg font-semibold text-foreground">
+            <span className="sr-only">{numero} — </span>
+            {titulo}
+          </h2>
+          <p id={descricaoId} className="mt-1 text-sm text-muted-foreground">
+            {descricao}
+          </p>
         </div>
         {acao ? <div className="shrink-0">{acao}</div> : null}
       </div>
@@ -145,6 +157,7 @@ function Secao({
     </section>
   );
 }
+
 
 function Simulador() {
   const {
