@@ -643,7 +643,7 @@ function Simulador() {
 
     <TooltipProvider delayDuration={150}>
       <div className="min-h-screen bg-background pb-32 lg:pb-10">
-        <header className="border-b border-border bg-card">
+        <header aria-label="Cabeçalho do simulador" className="border-b border-border bg-card">
           <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 sm:px-6">
             <div className="min-w-0">
               <h1 className="truncate text-lg font-semibold tracking-tight text-foreground sm:text-xl">
@@ -651,17 +651,33 @@ function Simulador() {
               </h1>
               <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                 <Badge variant="outline" className="border-primary/30 text-primary">
+                  <span className="sr-only">Cenário tributário: </span>
                   {cenarioAtual?.nome ?? "Personalizado"}
                 </Badge>
-                {salvoEm ? <span>Rascunho salvo em {formatData(salvoEm)}</span> : null}
+                {salvoEm ? (
+                  <span role="status" aria-live="polite">
+                    Rascunho salvo em {formatData(salvoEm)}
+                  </span>
+                ) : null}
               </div>
             </div>
-            <div className="flex shrink-0 items-center gap-2">
-              <Button variant="outline" size="sm" className="h-10" onClick={novaSimulacao}>
+            <div role="group" aria-label="Ações rápidas" className="flex shrink-0 items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-10"
+                onClick={novaSimulacao}
+                aria-label="Iniciar nova simulação"
+              >
                 <RotateCcw className="h-4 w-4" aria-hidden />
                 <span className="hidden sm:inline">Nova simulação</span>
               </Button>
-              <Button size="sm" className="h-10" onClick={salvarRascunho}>
+              <Button
+                size="sm"
+                className="h-10"
+                onClick={salvarRascunho}
+                aria-label="Salvar rascunho da simulação"
+              >
                 <Save className="h-4 w-4" aria-hidden />
                 <span className="hidden sm:inline">Salvar rascunho</span>
               </Button>
@@ -670,7 +686,8 @@ function Simulador() {
         </header>
 
 
-        <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
+        <main aria-label="Formulário e resultados da simulação" className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
+
           <div className="mb-6">
             <BarraSimulacao
               titulo={titulo}
