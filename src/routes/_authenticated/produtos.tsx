@@ -1,8 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { metaPagina } from "@/lib/seo-head";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useDebounce } from "@/hooks/useDebounce";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
+
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,6 +31,10 @@ function ProdutosPage() {
   const { orgId, canEdit, userId } = useApp();
   const qc = useQueryClient();
   const [form, setForm] = useState({ nome: "", sku: "", ncm: "", unidade: "unidade", valor: "0" });
+  const [busca, setBusca] = useState("");
+  // Campo responde na hora; o filtro recalcula quando o usuário pausa a digitação.
+  const buscaDebounce = useDebounce(busca, 300);
+
 
   const produtos = useQuery({
     queryKey: ["products", orgId],
@@ -43,6 +49,16 @@ function ProdutosPage() {
       return data;
     },
   });
+
+  const lista = useMemo(() => {
+    const termo = buscaDebounce.trim().toLowerCase();
+    const todos = produtos.data ?? [];
+    if (!termo) return todos;
+    return todos.filter((p) =>
+      `${p.nome} ${p.sku ?? ""} ${p.ncm ?? ""}`.toLowerCase().includes(termo),
+    );
+  }, [produtos.data, buscaDebounce]);
+
 
   const criar = useMutation({
     mutationFn: async () => {
@@ -118,6 +134,23 @@ function ProdutosPage() {
         </p>
       )}
 
+      <div className="mt-6 flex flex-wrap items-center gap-3">
+        <Input
+          placeholder="Pesquisar por nome, SKU ou NCM"
+          value={busca}
+          onChange={(e) => setBusca(e.target.value)}
+          className="max-w-sm"
+          aria-label="Pesquisar produtos"
+        />
+        <p className="text-sm text-muted-foreground" role="status" aria-live="polite">
+          {produtos.isLoading
+            ? "Carregando produtos…"
+            : `${lista.length} ${lista.length === 1 ? "produto encontrado" : "produtos encontrados"}`}
+          {busca !== buscaDebounce ? " · atualizando…" : ""}
+        </p>
+      </div>
+
+
       <section className="mt-6 overflow-x-auto rounded-xl border border-border bg-card">
         <table className="w-full text-sm">
           <thead className="bg-surface text-left text-xs uppercase tracking-wide text-muted-foreground">
@@ -131,7 +164,7 @@ function ProdutosPage() {
             </tr>
           </thead>
           <tbody>
-            {(produtos.data ?? []).map((p) => (
+            {lista.map((p) => (
               <tr key={p.id} className="border-t border-border">
                 <td className="px-4 py-3 font-medium text-foreground">{p.nome}</td>
                 <td className="px-4 py-3 text-muted-foreground">{p.sku ?? "—"}</td>
@@ -154,12 +187,15 @@ function ProdutosPage() {
                 </td>
               </tr>
             ))}
-            {!produtos.isLoading && (produtos.data ?? []).length === 0 ? (
+            {!produtos.isLoading && lista.length === 0 ? (
               <tr>
                 <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
-                  Nenhum produto cadastrado ainda.
+                  {buscaDebounce.trim()
+                    ? "Nenhum produto encontrado para esta busca."
+                    : "Nenhum produto cadastrado ainda."}
                 </td>
               </tr>
+
             ) : null}
           </tbody>
         </table>
