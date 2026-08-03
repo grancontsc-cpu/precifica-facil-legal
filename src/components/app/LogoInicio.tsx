@@ -26,6 +26,8 @@ export function LogoInicio({ naRotaInicial }: { naRotaInicial: boolean }) {
   const [confirmando, setConfirmando] = useState(false);
   const [tooltipAberto, setTooltipAberto] = useState(false);
   const linkRef = useRef<HTMLAnchorElement | null>(null);
+  // Evita devolver o foco ao link quando o fechamento acontece por navegação.
+  const navegando = useRef(false);
 
   // Texto lido pelo leitor de tela como descrição (aria-describedby) do link.
   const dica = pendente
@@ -104,7 +106,8 @@ export function LogoInicio({ naRotaInicial }: { naRotaInicial: boolean }) {
         onOpenChange={(aberto) => {
           setConfirmando(aberto);
           // Ao fechar a confirmação por Esc ou clique fora, o foco volta ao link.
-          if (!aberto) fecharTooltip();
+          if (!aberto && !navegando.current) fecharTooltip();
+          if (aberto) navegando.current = false;
         }}
       >
         <AlertDialogContent>
@@ -119,9 +122,10 @@ export function LogoInicio({ naRotaInicial }: { naRotaInicial: boolean }) {
             <AlertDialogCancel>Continuar editando</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
-                setConfirmando(false);
                 // Navegação intencional: não devolve o foco ao link, a nova
                 // rota assume a ordem de tab.
+                navegando.current = true;
+                setConfirmando(false);
                 setTooltipAberto(false);
                 irParaSimulador();
               }}
