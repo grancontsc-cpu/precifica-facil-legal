@@ -32,6 +32,8 @@ export function CampoNumero({
   placeholder,
 }: CampoNumeroProps) {
   const id = useId();
+  const ajudaId = `${id}-ajuda`;
+  const unidadeId = `${id}-unidade`;
   const [texto, setTexto] = useState(() => (value === 0 ? "" : String(value).replace(".", ",")));
   const [focado, setFocado] = useState(false);
 
@@ -41,17 +43,35 @@ export function CampoNumero({
     }
   }, [value, focado]);
 
+  const unidadeTexto = prefixo === "R$" ? "Valor em reais" : sufixo === "%" ? "Valor em porcentagem" : null;
+  const descritores = [unidadeTexto ? unidadeId : null, ajuda ? ajudaId : null]
+    .filter(Boolean)
+    .join(" ");
+
   return (
     <div className={cn("space-y-1.5", className)}>
       <div className="flex items-center gap-1.5">
         <Label htmlFor={id} className="text-xs font-medium text-muted-foreground">
           {label}
         </Label>
-        {ajuda ? <Ajuda texto={ajuda} /> : null}
+        {ajuda ? <Ajuda texto={ajuda} rotulo={label} /> : null}
       </div>
+      {unidadeTexto ? (
+        <span id={unidadeId} className="sr-only">
+          {unidadeTexto}
+        </span>
+      ) : null}
+      {ajuda ? (
+        <span id={ajudaId} className="sr-only">
+          {ajuda}
+        </span>
+      ) : null}
       <div className="relative">
         {prefixo ? (
-          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+          <span
+            aria-hidden
+            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground"
+          >
             {prefixo}
           </span>
         ) : null}
@@ -59,6 +79,7 @@ export function CampoNumero({
           id={id}
           inputMode="decimal"
           autoComplete="off"
+          aria-describedby={descritores || undefined}
           placeholder={placeholder ?? "0,00"}
           value={texto}
           onFocus={() => setFocado(true)}
@@ -78,7 +99,10 @@ export function CampoNumero({
           )}
         />
         {sufixo ? (
-          <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+          <span
+            aria-hidden
+            className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground"
+          >
             {sufixo}
           </span>
         ) : null}
@@ -86,6 +110,7 @@ export function CampoNumero({
     </div>
   );
 }
+
 
 interface CampoTextoProps {
   label: string;
