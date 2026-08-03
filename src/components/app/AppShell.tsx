@@ -129,13 +129,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <ProvedorAlteracoesPendentes>
     <div className="min-h-screen bg-background pb-16 lg:pb-0">
-      {/* Atalho de teclado: visível apenas ao receber foco (primeiro Tab). */}
+      {/* Atalho de teclado: visível apenas ao receber foco (primeiro Tab).
+          Em telas pequenas ocupa a largura disponível e mantém alvo de toque
+          de 44px com contraste alto sobre o fundo. */}
       <a
         href="#conteudo-principal"
-        className="sr-only z-50 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-lg focus-visible:not-sr-only focus-visible:absolute focus-visible:left-3 focus-visible:top-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring focus:not-sr-only focus:absolute focus:left-3 focus:top-3"
+        className="sr-only z-50 inline-flex min-h-11 items-center rounded-md bg-primary px-4 py-2.5 text-sm font-semibold leading-snug text-primary-foreground shadow-lg ring-1 ring-primary-foreground/30 focus-visible:not-sr-only focus-visible:absolute focus-visible:left-3 focus-visible:right-3 focus-visible:top-3 focus-visible:w-auto focus-visible:max-w-[calc(100vw-1.5rem)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring sm:focus-visible:right-auto sm:text-base focus:not-sr-only focus:absolute focus:left-3 focus:top-3"
       >
         Pular para o simulador
       </a>
+
       <header
         role="banner"
         aria-label="Cabeçalho do Precifica Grancont"
