@@ -19,8 +19,11 @@ import { cn } from "@/lib/utils";
  *
  * Teclado: o gatilho abre com Enter, Espaço ou seta para baixo; as setas
  * percorrem os itens em ciclo (`loop`); Enter seleciona; Esc fecha e devolve o
- * foco ao gatilho. Quando o usuário escolhe um item e a navegação acontece, o
- * foco não é puxado de volta ao gatilho para não competir com a nova página.
+ * foco ao gatilho. Fechando com clique fora o foco também volta ao gatilho
+ * (o Radix, por padrão, deixaria o foco no ponto clicado), mantendo
+ * `aria-expanded="false"` no elemento que recebe o foco. Quando o usuário
+ * escolhe um item e a navegação acontece, o foco não é puxado de volta ao
+ * gatilho para não competir com a nova página.
  */
 export function MenuSuspenso({
   rotulo,
@@ -33,11 +36,13 @@ export function MenuSuspenso({
 }) {
   const algumAtivo = itens.some((i) => itemAtivo(pathname, i.to));
   const navegando = useRef(false);
+  const gatilhoRef = useRef<HTMLButtonElement>(null);
 
   return (
     <DropdownMenu onOpenChange={(aberto) => (aberto ? (navegando.current = false) : undefined)}>
       <DropdownMenuTrigger asChild>
         <Button
+          ref={gatilhoRef}
           variant="ghost"
           size="sm"
           className={cn(
@@ -59,9 +64,16 @@ export function MenuSuspenso({
         loop
         onCloseAutoFocus={(evento) => {
           // Após escolher um item a página muda: deixamos o foco com a nova
-          // rota. Fechando por Esc ou clique fora, o Radix devolve o foco ao
-          // gatilho (comportamento padrão preservado).
-          if (navegando.current) evento.preventDefault();
+          // rota.
+          if (navegando.current) {
+            evento.preventDefault();
+            return;
+          }
+          // Esc, clique fora ou perda de foco: assumimos o controle e
+          // devolvemos o foco ao gatilho sempre (o Radix não faz isso quando
+          // o fechamento veio de uma interação com ponteiro fora do menu).
+          evento.preventDefault();
+          gatilhoRef.current?.focus();
         }}
       >
         {/* O menu já recebe o nome do gatilho; o rótulo visível fica oculto

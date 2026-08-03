@@ -109,3 +109,48 @@ describe("MenuSuspenso — teclado", () => {
     await waitFor(() => expect(screen.queryByRole("menuitem")).not.toBeInTheDocument());
   });
 });
+
+describe("MenuSuspenso — clique fora", () => {
+  function montarComFora() {
+    render(
+      <div>
+        <MenuSuspenso rotulo="Gestão" itens={ITENS} pathname="/simulador" />
+        <p data-testid="fora">Área fora do menu</p>
+      </div>,
+    );
+    return {
+      gatilho: screen.getByRole("button", { name: /gestão/i }),
+      fora: screen.getByTestId("fora"),
+    };
+  }
+
+  it("devolve o foco ao gatilho e atualiza aria-expanded", async () => {
+    const usuario = userEvent.setup({ pointerEventsCheck: 0 });
+    const { gatilho, fora } = montarComFora();
+
+    expect(gatilho).toHaveAttribute("aria-expanded", "false");
+    await usuario.click(gatilho);
+    await itensDoMenu();
+    expect(gatilho).toHaveAttribute("aria-expanded", "true");
+
+    await usuario.click(fora);
+    await waitFor(() => expect(screen.queryByRole("menuitem")).not.toBeInTheDocument());
+    await waitFor(() => expect(gatilho).toHaveAttribute("aria-expanded", "false"));
+    await waitFor(() => expect(gatilho).toHaveFocus());
+  });
+
+  it("permite reabrir pelo teclado logo após o clique fora", async () => {
+    const usuario = userEvent.setup({ pointerEventsCheck: 0 });
+    const { gatilho, fora } = montarComFora();
+
+    await usuario.click(gatilho);
+    await itensDoMenu();
+    await usuario.click(fora);
+    await waitFor(() => expect(gatilho).toHaveFocus());
+
+    await usuario.keyboard("{ArrowDown}");
+    const itens = await itensDoMenu();
+    expect(gatilho).toHaveAttribute("aria-expanded", "true");
+    await waitFor(() => expect(itens[0]).toHaveFocus());
+  });
+});
