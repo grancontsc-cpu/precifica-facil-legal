@@ -1,10 +1,49 @@
 /** Tamanho máximo aceito para o texto de busca já normalizado. */
 export const MAX_BUSCA = 100;
 
+/** Tamanho máximo aceito, em bytes UTF-8, para o texto bruto da busca. */
+export const MAX_BYTES_BUSCA = 400;
+
+/** Motivo pelo qual um texto de busca foi bloqueado antes de virar filtro. */
+export type MotivoBloqueioBusca = "tipo" | "bytes" | "encoding";
+
+export type ValidacaoBusca =
+  | { valida: true; texto: string }
+  | { valida: false; motivo: MotivoBloqueioBusca };
+
+const CODIFICADOR = new TextEncoder();
+
+/** Conta os bytes UTF-8 do texto (caracteres inválidos viram 3 bytes de U+FFFD). */
+export function bytesBusca(texto: string): number {
+  return CODIFICADOR.encode(texto).length;
+}
+
+/**
+ * Rejeita entradas antes de qualquer normalização:
+ * - tipo diferente de string;
+ * - byte-length excessivo (evita payloads gigantes em UTF-8 multibyte);
+ * - encoding inválido (surrogates soltos ou caractere de substituição U+FFFD).
+ */
+export function validarBusca(texto: unknown): ValidacaoBusca {
+  if (typeof texto !== "string") return { valida: false, motivo: "tipo" };
+
+  // Surrogate solto (par UTF-16 quebrado) ou marcador de decodificação inválida.
+  if (/\ufffd/.test(texto) || /[\ud800-\udbff](?![\udc00-\udfff])|(?<![\ud800-\udbff])[\udc00-\udfff]/.test(texto)) {
+    return { valida: false, motivo: "encoding" };
+  }
+
+  if (bytesBusca(texto) > MAX_BYTES_BUSCA) {
+    return { valida: false, motivo: "bytes" };
+  }
+
+  return { valida: true, texto };
+}
+
 /**
  * Normaliza e sanitiza texto de busca antes de montar filtros PostgREST (.or()).
  *
  * Etapas, nesta ordem:
+ * 0. Validação prévia (tipo, byte-length e encoding) — entradas inválidas viram "".
  * 1. Normalização Unicode (NFKC) para evitar variantes visuais do mesmo caractere.
  * 2. Remoção de caracteres invisíveis (zero-width, hífen suave, BOM, word joiner).
  * 3. Remoção de caracteres de controle (inclui quebras de linha e tabulações).
@@ -14,9 +53,10 @@ export const MAX_BUSCA = 100;
  * 6. Corte em MAX_BUSCA caracteres, com novo trim para não deixar espaço final.
  */
 export function sanitizarBusca(texto: unknown): string {
-  if (typeof texto !== "string") return "";
+  const validacao = validarBusca(texto);
+  if (!validacao.valida) return "";
 
-  return texto
+  return validacao.texto
     .normalize("NFKC")
     .replace(/[\u00ad\u200b-\u200f\u2028\u2029\u2060\ufeff]/g, "")
     // eslint-disable-next-line no-control-regex
