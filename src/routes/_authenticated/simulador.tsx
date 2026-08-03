@@ -1015,7 +1015,7 @@ function Simulador() {
                   value={state.venda.modo}
                   onValueChange={(v) => setVenda({ modo: v as VendaConfig["modo"] })}
                 >
-                  <TabsList className="w-full">
+                  <TabsList aria-label="Forma de cálculo da venda" className="w-full">
                     <TabsTrigger value="margem" className="flex-1">
                       Calcular preço pela margem
                     </TabsTrigger>
