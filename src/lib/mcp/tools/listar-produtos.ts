@@ -8,7 +8,13 @@ export default defineTool({
   title: "Listar produtos",
   description: "Lista os produtos cadastrados nas empresas visíveis para o usuário conectado.",
   inputSchema: {
-    busca: z.string().trim().optional().describe("Texto no nome, SKU ou NCM."),
+    busca: z
+      .string()
+      .trim()
+      .max(MAX_BUSCA, `A busca deve ter no máximo ${MAX_BUSCA} caracteres.`)
+      .optional()
+      .describe("Texto no nome, SKU ou NCM."),
+
     limite: z.number().int().min(1).max(50).default(20).describe("Quantidade máxima de registros."),
   },
   annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
