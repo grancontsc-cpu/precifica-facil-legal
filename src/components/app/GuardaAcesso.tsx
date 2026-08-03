@@ -27,9 +27,7 @@ export function Carregando({
       </p>
     </div>
   );
-
 }
-
 
 /** Bloqueia a renderização até resolver sessão, situação da conta e papel. */
 export function GuardaStatus({ children }: { children: ReactNode }) {
@@ -55,15 +53,23 @@ export function GuardaStatus({ children }: { children: ReactNode }) {
   }, [loading, accountStatus, navigate, isSuperAdmin, situacaoLicenca]);
 
   if (loading || !accountStatus || accountStatus !== "active") return <Carregando />;
-  if (!isSuperAdmin && !situacaoLicenca.liberado) return <Carregando texto="Verificando sua licença…" />;
+  if (!isSuperAdmin && !situacaoLicenca.liberado)
+    return <Carregando texto="Verificando sua licença…" />;
   return <>{children}</>;
 }
 
 /** Restringe uma rota a um papel mínimo. */
-export function ExigePapel({ papel, children }: { papel: "manager" | "super_admin"; children: ReactNode }) {
+export function ExigePapel({
+  papel,
+  children,
+}: {
+  papel: "manager" | "super_admin";
+  children: ReactNode;
+}) {
   const { loading, isSuperAdmin, memberships } = useApp();
   const navigate = useNavigate();
-  const permitido = isSuperAdmin || (papel === "manager" && memberships.some((m) => m.role === "manager"));
+  const permitido =
+    isSuperAdmin || (papel === "manager" && memberships.some((m) => m.role === "manager"));
 
   useEffect(() => {
     if (loading) return;

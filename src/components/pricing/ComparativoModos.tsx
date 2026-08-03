@@ -14,11 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { formatBRL } from "@/lib/format";
-import {
-  enviarParaCompleto,
-  montarComparativo,
-  type StatusParcela,
-} from "@/lib/comparativo-modos";
+import { enviarParaCompleto, montarComparativo, type StatusParcela } from "@/lib/comparativo-modos";
 import type { SimulationResult, SimulationState } from "@/types/pricing";
 
 const ESTILO: Record<StatusParcela, string> = {
@@ -73,10 +69,7 @@ export function ComparativoModos({ state, resultado }: Props) {
                 </h3>
                 <ul className="space-y-2">
                   {g.linhas.map((l) => (
-                    <li
-                      key={l.id}
-                      className="rounded-lg border border-border bg-background p-3"
-                    >
+                    <li key={l.id} className="rounded-lg border border-border bg-background p-3">
                       <div className="flex flex-wrap items-baseline justify-between gap-2">
                         <span className="text-sm font-medium text-foreground">{l.rotulo}</span>
                         <span className="num-destaque text-sm font-semibold">

@@ -6,7 +6,8 @@ import { ExigePapel } from "@/components/app/GuardaAcesso";
 import { useApp } from "@/hooks/useApp";
 
 const TITULO = "Usuários da empresa — Precifica Grancont";
-const DESCRICAO = "Gestor: acompanhe a equipe da empresa, suspenda acessos e redefina senhas no Precifica Grancont.";
+const DESCRICAO =
+  "Gestor: acompanhe a equipe da empresa, suspenda acessos e redefina senhas no Precifica Grancont.";
 
 export const Route = createFileRoute("/_authenticated/gestao/usuarios")({
   head: () => ({
@@ -25,8 +26,12 @@ function Pagina() {
     <ExigePapel papel="manager">
       <main className="mx-auto max-w-7xl space-y-5 px-4 py-6 sm:px-6">
         <header>
-          <h1 className="text-xl font-semibold tracking-tight text-foreground">Usuários da empresa</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Somente usuários vinculados à empresa selecionada.</p>
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">
+            Usuários da empresa
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Somente usuários vinculados à empresa selecionada.
+          </p>
         </header>
         <PainelUsuarios escopoOrgId={orgId} />
       </main>

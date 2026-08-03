@@ -16,7 +16,8 @@ import {
 } from "@/lib/solicitacao-admin.functions";
 
 const TITULO = "Solicitações de acesso — Administração Precifica Grancont";
-const DESCRICAO = "Analise os pedidos de acesso administrativo enviados pelos usuários do Precifica Grancont.";
+const DESCRICAO =
+  "Analise os pedidos de acesso administrativo enviados pelos usuários do Precifica Grancont.";
 
 export const Route = createFileRoute("/_authenticated/admin/solicitacoes")({
   head: () => ({
@@ -76,10 +77,12 @@ function PainelSolicitacoes() {
   return (
     <main className="mx-auto max-w-5xl space-y-5 px-4 py-6 sm:px-6">
       <header>
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">Solicitações de acesso</h1>
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">
+          Solicitações de acesso
+        </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Pedidos de acesso administrativo enviados pelos usuários. Aprovar aqui registra a decisão; a concessão do
-          papel continua sendo feita em Usuários ou Convites.
+          Pedidos de acesso administrativo enviados pelos usuários. Aprovar aqui registra a decisão;
+          a concessão do papel continua sendo feita em Usuários ou Convites.
         </p>
       </header>
 
@@ -123,10 +126,14 @@ function CartaoSolicitacao({
     <li className="rounded-lg border border-border bg-card p-4">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="min-w-0">
-          <p className="truncate text-sm font-medium text-foreground">{pedido.solicitanteNome ?? "Usuário"}</p>
+          <p className="truncate text-sm font-medium text-foreground">
+            {pedido.solicitanteNome ?? "Usuário"}
+          </p>
           <p className="truncate text-xs text-muted-foreground">{pedido.solicitanteEmail ?? "—"}</p>
         </div>
-        <Badge variant={pendente ? "default" : "secondary"}>{ROTULO_STATUS[pedido.status] ?? pedido.status}</Badge>
+        <Badge variant={pendente ? "default" : "secondary"}>
+          {ROTULO_STATUS[pedido.status] ?? pedido.status}
+        </Badge>
       </div>
 
       <dl className="mt-3 grid gap-2 text-xs sm:grid-cols-2">
@@ -155,7 +162,9 @@ function CartaoSolicitacao({
         ) : null}
       </dl>
 
-      <p className="mt-3 whitespace-pre-wrap rounded-md bg-muted/50 p-3 text-xs text-foreground">{pedido.motivo}</p>
+      <p className="mt-3 whitespace-pre-wrap rounded-md bg-muted/50 p-3 text-xs text-foreground">
+        {pedido.motivo}
+      </p>
 
       {pendente ? (
         <div className="mt-3 flex flex-wrap gap-2">
@@ -163,7 +172,12 @@ function CartaoSolicitacao({
             <Check className="h-4 w-4" aria-hidden />
             Aprovar
           </Button>
-          <Button size="sm" variant="outline" disabled={ocupado} onClick={() => onDecidir("rejected")}>
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={ocupado}
+            onClick={() => onDecidir("rejected")}
+          >
             <X className="h-4 w-4" aria-hidden />
             Recusar
           </Button>

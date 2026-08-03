@@ -58,9 +58,9 @@ export function ConsentimentoCookies() {
           <div className="space-y-1">
             <p className="text-sm font-semibold text-foreground">Cookies e privacidade</p>
             <p className="text-sm leading-relaxed text-muted-foreground">
-              Usamos cookies de análise (Google Analytics) apenas para entender o uso da ferramenta e
-              melhorá-la. Conforme a LGPD, eles só são ativados com o seu consentimento. Os cookies
-              essenciais de login e preferências continuam funcionando.
+              Usamos cookies de análise (Google Analytics) apenas para entender o uso da ferramenta
+              e melhorá-la. Conforme a LGPD, eles só são ativados com o seu consentimento. Os
+              cookies essenciais de login e preferências continuam funcionando.
             </p>
           </div>
         </div>

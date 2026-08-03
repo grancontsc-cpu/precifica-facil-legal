@@ -11,7 +11,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { registrarEventoEmail } from "@/lib/email-eventos.functions";
 
 const TITULO = "Recuperar senha — Precifica Grancont";
-const DESCRICAO = "Solicite um link seguro para redefinir a senha do seu acesso ao Precifica Grancont.";
+const DESCRICAO =
+  "Solicite um link seguro para redefinir a senha do seu acesso ao Precifica Grancont.";
 
 export const Route = createFileRoute("/recuperar-senha")({
   head: () => ({
@@ -71,14 +72,22 @@ function Pagina() {
 
         {enviado ? (
           <p className="mt-6 rounded-md border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
-            Se houver uma conta associada a <span className="font-medium text-foreground">{email}</span>, o link de nova
-            senha chegará em instantes. Verifique a caixa de entrada e também o spam — o link vale por tempo limitado.
+            Se houver uma conta associada a{" "}
+            <span className="font-medium text-foreground">{email}</span>, o link de nova senha
+            chegará em instantes. Verifique a caixa de entrada e também o spam — o link vale por
+            tempo limitado.
           </p>
         ) : (
           <form className="mt-6 space-y-4" onSubmit={enviar}>
             <div className="space-y-1.5">
               <Label htmlFor="email">E-mail</Label>
-              <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
             </div>
             <Button type="submit" className="w-full" disabled={carregando}>
               {carregando ? "Enviando…" : "Enviar instruções"}
@@ -86,7 +95,11 @@ function Pagina() {
           </form>
         )}
 
-        <Link to="/login" className="mt-4 inline-block text-xs text-primary hover:underline">
+        <Link
+          to="/login"
+          search={{ next: undefined }}
+          className="mt-4 inline-block text-xs text-primary hover:underline"
+        >
           Voltar para o login
         </Link>
       </div>

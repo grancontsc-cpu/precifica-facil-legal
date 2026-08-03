@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { MAX_BUSCA, MAX_BYTES_BUSCA, bytesBusca, filtroIlike, sanitizarBusca, validarBusca } from "./filtro-busca";
+import {
+  MAX_BUSCA,
+  MAX_BYTES_BUSCA,
+  bytesBusca,
+  filtroIlike,
+  sanitizarBusca,
+  validarBusca,
+} from "./filtro-busca";
 
 describe("sanitizarBusca", () => {
   it("faz trim e colapsa espaços duplicados", () => {

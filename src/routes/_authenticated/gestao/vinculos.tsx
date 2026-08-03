@@ -34,7 +34,9 @@ function Pagina() {
     <ExigePapel papel="manager">
       <main className="mx-auto max-w-5xl space-y-5 px-4 py-6 sm:px-6">
         <header>
-          <h1 className="text-xl font-semibold tracking-tight text-foreground">Pedidos de vínculo</h1>
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">
+            Pedidos de vínculo
+          </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Pessoas que se cadastraram com o CNPJ da empresa e aguardam liberação de acesso.
           </p>
@@ -53,13 +55,17 @@ function Lista() {
   });
 
   const responder = useMutation({
-    mutationFn: (entrada: { pedidoId: string; decisao: "aprovar" | "recusar"; papel?: "user" | "manager" }) =>
-      responderPedidoVinculo({ data: { ...entrada, papel: entrada.papel ?? "user" } }),
+    mutationFn: (entrada: {
+      pedidoId: string;
+      decisao: "aprovar" | "recusar";
+      papel?: "user" | "manager";
+    }) => responderPedidoVinculo({ data: { ...entrada, papel: entrada.papel ?? "user" } }),
     onSuccess: (_r, entrada) => {
       toast.success(entrada.decisao === "aprovar" ? "Acesso liberado." : "Pedido recusado.");
       void queryClient.invalidateQueries({ queryKey: ["pedidos-vinculo"] });
     },
-    onError: (erro) => toast.error(erro instanceof Error ? erro.message : "Não foi possível registrar a decisão."),
+    onError: (erro) =>
+      toast.error(erro instanceof Error ? erro.message : "Não foi possível registrar a decisão."),
   });
 
   if (isLoading) return <Carregando texto="Carregando pedidos…" />;
@@ -82,7 +88,10 @@ function Lista() {
   return (
     <ul className="space-y-3">
       {pedidos.map((p) => (
-        <li key={p.id} className="rounded-lg border border-border bg-card p-4 shadow-[var(--shadow-card)]">
+        <li
+          key={p.id}
+          className="rounded-lg border border-border bg-card p-4 shadow-[var(--shadow-card)]"
+        >
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold text-foreground">

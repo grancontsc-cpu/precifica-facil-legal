@@ -51,7 +51,8 @@ function Pagina() {
         <MailCheck className="mx-auto h-8 w-8 text-primary" aria-hidden />
         <h1 className="mt-3 text-lg font-semibold text-foreground">Confirme seu e-mail</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Enviamos um link de confirmação para o seu e-mail. Após confirmar, entre novamente para acessar o sistema.
+          Enviamos um link de confirmação para o seu e-mail. Após confirmar, entre novamente para
+          acessar o sistema.
         </p>
         <div className="mt-6 grid gap-2">
           <Button variant="outline" onClick={() => void reenviar()}>
@@ -67,7 +68,11 @@ function Pagina() {
             Sair
           </Button>
         </div>
-        <Link to="/login" className="mt-3 inline-block text-xs text-primary hover:underline">
+        <Link
+          to="/login"
+          search={{ next: undefined }}
+          className="mt-3 inline-block text-xs text-primary hover:underline"
+        >
           Voltar para o login
         </Link>
       </div>

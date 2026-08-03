@@ -1,11 +1,7 @@
 import { Info, ShieldCheck, TriangleAlert } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { formatBRL, formatPercent } from "@/lib/format";
-import {
-  calcularFronteira,
-  creditaFronteiraPorRegime,
-  nomeRegime,
-} from "@/lib/pricing-engine";
+import { calcularFronteira, creditaFronteiraPorRegime, nomeRegime } from "@/lib/pricing-engine";
 import type { SimulationResult, SimulationState } from "@/types/pricing";
 import { cn } from "@/lib/utils";
 
@@ -104,9 +100,7 @@ export function PainelFronteira({
         </dl>
       ) : null}
 
-      <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
-        {fronteira.explicacao}
-      </p>
+      <p className="mt-3 text-xs leading-relaxed text-muted-foreground">{fronteira.explicacao}</p>
 
       <div className="mt-4 rounded-lg border border-dashed border-border p-3">
         <p className="flex items-start gap-2 text-xs leading-relaxed text-muted-foreground">

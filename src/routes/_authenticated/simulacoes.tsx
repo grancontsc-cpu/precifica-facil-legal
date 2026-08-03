@@ -48,7 +48,8 @@ export const Route = createFileRoute("/_authenticated/simulacoes")({
 type Situacao = "ativas" | "arquivadas" | "todas";
 
 function SimulacoesPage() {
-  const { orgId, canEdit, userId, organizations, memberships, isSuperAdmin, accountStatus } = useApp();
+  const { orgId, canEdit, userId, organizations, memberships, isSuperAdmin, accountStatus } =
+    useApp();
   const nomeEmpresa = organizations?.find((o) => o.id === orgId)?.name ?? "Empresa";
   const qc = useQueryClient();
   const navigate = useNavigate();
@@ -95,10 +96,11 @@ function SimulacoesPage() {
       if (situacao === "ativas" && s.status === "arquivada") return false;
       if (situacao === "arquivadas" && s.status !== "arquivada") return false;
       if (!termo) return true;
-      return `${s.titulo} ${s.produto_nome ?? ""} ${s.tax_profile_name ?? ""}`.toLowerCase().includes(termo);
+      return `${s.titulo} ${s.produto_nome ?? ""} ${s.tax_profile_name ?? ""}`
+        .toLowerCase()
+        .includes(termo);
     });
   }, [simulacoes.data, avaliacao.termo, situacao, ctxAcesso]);
-
 
   const podeAlterar = (s: { organization_id: string; created_by: string | null }) =>
     avaliarAcessoSimulacao(ctxAcesso, {
@@ -190,10 +192,11 @@ function SimulacoesPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-
   return (
     <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
-      <h1 className="text-xl font-semibold tracking-tight text-foreground">Histórico de simulações</h1>
+      <h1 className="text-xl font-semibold tracking-tight text-foreground">
+        Histórico de simulações
+      </h1>
       <p className="mt-1 text-sm text-muted-foreground">
         Cada simulação guarda uma cópia imutável do perfil tributário usado no momento do cálculo.
       </p>
@@ -234,9 +237,6 @@ function SimulacoesPage() {
         </p>
       ) : null}
 
-
-
-
       <section className="mt-5 overflow-x-auto rounded-xl border border-border bg-card">
         <table className="w-full text-sm">
           <thead className="bg-surface text-left text-xs uppercase tracking-wide text-muted-foreground">
@@ -255,7 +255,8 @@ function SimulacoesPage() {
                 <td className="px-4 py-3">
                   <p className="font-medium text-foreground">{s.titulo}</p>
                   <p className="text-xs text-muted-foreground">
-                    {s.produto_nome ?? "sem produto"} · {new Date(s.updated_at).toLocaleString("pt-BR")}
+                    {s.produto_nome ?? "sem produto"} ·{" "}
+                    {new Date(s.updated_at).toLocaleString("pt-BR")}
                     {s.status === "arquivada" ? " · arquivada" : ""}
                   </p>
                 </td>
@@ -265,9 +266,15 @@ function SimulacoesPage() {
                     {s.tax_profile_version ? ` v${s.tax_profile_version}` : ""}
                   </Badge>
                 </td>
-                <td className="px-4 py-3 text-right">{formatBRL(Number(s.custo_liquido_unitario ?? 0))}</td>
-                <td className="px-4 py-3 text-right font-medium">{formatBRL(Number(s.preco_final ?? 0))}</td>
-                <td className="px-4 py-3 text-right">{formatPercent(Number(s.margem_efetiva ?? 0))}</td>
+                <td className="px-4 py-3 text-right">
+                  {formatBRL(Number(s.custo_liquido_unitario ?? 0))}
+                </td>
+                <td className="px-4 py-3 text-right font-medium">
+                  {formatBRL(Number(s.preco_final ?? 0))}
+                </td>
+                <td className="px-4 py-3 text-right">
+                  {formatPercent(Number(s.margem_efetiva ?? 0))}
+                </td>
                 <td className="px-4 py-3">
                   <div className="flex justify-end gap-1">
                     <Button

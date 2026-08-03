@@ -5,11 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
   Select,
   SelectContent,
@@ -137,15 +133,9 @@ export function SuposicoesFiscais({ state, ajustes, onChange }: Props) {
                 </Label>
                 <Select
                   value={
-                    ajustes.creditarDifal === null
-                      ? "auto"
-                      : ajustes.creditarDifal
-                        ? "sim"
-                        : "nao"
+                    ajustes.creditarDifal === null ? "auto" : ajustes.creditarDifal ? "sim" : "nao"
                   }
-                  onValueChange={(v) =>
-                    set({ creditarDifal: v === "auto" ? null : v === "sim" })
-                  }
+                  onValueChange={(v) => set({ creditarDifal: v === "auto" ? null : v === "sim" })}
                 >
                   <SelectTrigger>
                     <SelectValue />

@@ -23,7 +23,11 @@ const r2 = (d: Decimal) => Number(d.toDecimalPlaces(2, Decimal.ROUND_HALF_UP));
 const r4 = (d: Decimal) => Number(d.toDecimalPlaces(4, Decimal.ROUND_HALF_UP));
 
 /** Custo líquido unitário em precisão plena, direto do motor. */
-function custoUnitarioExato(alt: SupplierAlternative, nomeProduto: string, freteExtra = 0): Decimal {
+function custoUnitarioExato(
+  alt: SupplierAlternative,
+  nomeProduto: string,
+  freteExtra = 0,
+): Decimal {
   const compra = calcularCompra(alternativaParaProduto(alt, nomeProduto, freteExtra), alt.tributos);
   return D(compra.custoLiquidoUnitarioExato);
 }
@@ -198,7 +202,9 @@ export function explicar(
       .filter((t) => t.enabled && t.treatment === "porFora" && t.credito === 0)
       .map((t) => t.label);
     if (custoNaoCreditavel.length > 0) {
-      out.push(`Tributos cobrados por fora sem crédito viram custo: ${custoNaoCreditavel.join(", ")}.`);
+      out.push(
+        `Tributos cobrados por fora sem crédito viram custo: ${custoNaoCreditavel.join(", ")}.`,
+      );
     }
 
     if (ref) {

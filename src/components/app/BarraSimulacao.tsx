@@ -112,7 +112,12 @@ export function BarraSimulacao({
         <div role="group" aria-label="Ações da simulação" className="flex flex-wrap gap-2">
           {acoes}
           {simulacaoSalva && podeEditar ? (
-            <Button variant="outline" size="sm" onClick={onDuplicar} aria-label="Duplicar simulação">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onDuplicar}
+              aria-label="Duplicar simulação"
+            >
               <Copy className="h-4 w-4" aria-hidden />
               <span className="hidden sm:inline">Duplicar</span>
             </Button>
@@ -124,11 +129,12 @@ export function BarraSimulacao({
             aria-label={simulacaoSalva ? "Salvar alterações da simulação" : "Salvar simulação"}
           >
             <Save className="h-4 w-4" aria-hidden />
-            <span className="hidden sm:inline">{simulacaoSalva ? "Salvar alterações" : "Salvar simulação"}</span>
+            <span className="hidden sm:inline">
+              {simulacaoSalva ? "Salvar alterações" : "Salvar simulação"}
+            </span>
           </Button>
         </div>
       </div>
-
 
       {camposBloqueados.length > 0 || camposAlterados.length > 0 ? (
         <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-border pt-3 text-xs">
@@ -147,7 +153,11 @@ export function BarraSimulacao({
             <>
               <span className="ml-2 text-muted-foreground">Alterado manualmente:</span>
               {camposAlterados.map((c) => (
-                <Badge key={c} className="bg-warning/15 text-warning-foreground" variant="secondary">
+                <Badge
+                  key={c}
+                  className="bg-warning/15 text-warning-foreground"
+                  variant="secondary"
+                >
                   {c}
                 </Badge>
               ))}

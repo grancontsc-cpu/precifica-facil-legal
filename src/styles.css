@@ -245,7 +245,6 @@
     outline-color: var(--ring);
   }
 
-
   /* Números fiscais nunca "dançam" ao atualizar o cálculo. */
   input[inputmode="decimal"],
   input[type="number"],

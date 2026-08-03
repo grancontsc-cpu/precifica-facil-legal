@@ -68,15 +68,26 @@ export function ForcaSenha({
           aria-valuemin={0}
           aria-valuemax={total}
           aria-valuenow={atendidos}
-          aria-valuetext={senha ? `${nivel.texto}: ${atendidos} de ${total} critérios atendidos` : "Senha vazia"}
+          aria-valuetext={
+            senha ? `${nivel.texto}: ${atendidos} de ${total} critérios atendidos` : "Senha vazia"
+          }
           className="h-1.5 w-full overflow-hidden rounded-full bg-surface-strong"
         >
           <div
-            className={cn("h-full rounded-full transition-all duration-300", senha ? nivel.barra : "bg-transparent")}
+            className={cn(
+              "h-full rounded-full transition-all duration-300",
+              senha ? nivel.barra : "bg-transparent",
+            )}
             style={{ width: `${Math.round(proporcao * 100)}%` }}
           />
         </div>
-        <span aria-hidden className={cn("shrink-0 text-xs font-semibold", senha ? nivel.cor : "text-muted-foreground")}>
+        <span
+          aria-hidden
+          className={cn(
+            "shrink-0 text-xs font-semibold",
+            senha ? nivel.cor : "text-muted-foreground",
+          )}
+        >
           {senha ? nivel.texto : "—"}
         </span>
       </div>

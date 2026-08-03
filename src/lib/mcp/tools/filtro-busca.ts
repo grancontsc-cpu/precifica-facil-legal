@@ -28,7 +28,10 @@ export function validarBusca(texto: unknown): ValidacaoBusca {
   if (typeof texto !== "string") return { valida: false, motivo: "tipo" };
 
   // Surrogate solto (par UTF-16 quebrado) ou marcador de decodificação inválida.
-  if (/\ufffd/.test(texto) || /[\ud800-\udbff](?![\udc00-\udfff])|(?<![\ud800-\udbff])[\udc00-\udfff]/.test(texto)) {
+  if (
+    /\ufffd/.test(texto) ||
+    /[\ud800-\udbff](?![\udc00-\udfff])|(?<![\ud800-\udbff])[\udc00-\udfff]/.test(texto)
+  ) {
     return { valida: false, motivo: "encoding" };
   }
 
@@ -56,16 +59,18 @@ export function sanitizarBusca(texto: unknown): string {
   const validacao = validarBusca(texto);
   if (!validacao.valida) return "";
 
-  return validacao.texto
-    .normalize("NFKC")
-    .replace(/[\u00ad\u200b-\u200f\u2028\u2029\u2060\ufeff]/g, "")
-    // eslint-disable-next-line no-control-regex
-    .replace(/[\u0000-\u001f\u007f]/g, " ")
-    .replace(/[,.()"'\\%_*]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim()
-    .slice(0, MAX_BUSCA)
-    .trim();
+  return (
+    validacao.texto
+      .normalize("NFKC")
+      .replace(/[\u00ad\u200b-\u200f\u2028\u2029\u2060\ufeff]/g, "")
+      // eslint-disable-next-line no-control-regex
+      .replace(/[\u0000-\u001f\u007f]/g, " ")
+      .replace(/[,.()"'\\%_*]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim()
+      .slice(0, MAX_BUSCA)
+      .trim()
+  );
 }
 
 /** Monta uma expressão .or() com ilike em várias colunas, já sanitizada. */

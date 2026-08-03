@@ -10,7 +10,6 @@ import { CamposSenha } from "@/components/app/CamposSenha";
 import { registrarEventoEmail } from "@/lib/email-eventos.functions";
 import { traduzirErroSenha, validarParDeSenhas } from "@/lib/senha";
 
-
 const TITULO = "Redefinir senha — Precifica Grancont";
 const DESCRICAO = "Crie uma nova senha para o seu acesso ao Precifica Grancont.";
 
@@ -80,7 +79,8 @@ function Pagina() {
         <h1 className="text-lg font-semibold text-foreground">Criar nova senha</h1>
         {!pronto ? (
           <p className="mt-4 text-sm text-muted-foreground">
-            Abra esta página pelo link enviado no e-mail de recuperação. O link é válido por tempo limitado.
+            Abra esta página pelo link enviado no e-mail de recuperação. O link é válido por tempo
+            limitado.
           </p>
         ) : (
           <form className="mt-6 space-y-4" onSubmit={salvar}>

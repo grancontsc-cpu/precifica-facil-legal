@@ -27,7 +27,10 @@ export function segundosDeEspera(mensagem: string | undefined): number | null {
   return m ? Number(m[1]) : null;
 }
 
-export async function executarTeste(email: string, executorId: string): Promise<ResultadoTesteEmail> {
+export async function executarTeste(
+  email: string,
+  executorId: string,
+): Promise<ResultadoTesteEmail> {
   const referencia = `teste-email:${crypto.randomUUID()}`;
   const iniciadoEm = new Date().toISOString();
   const passos: PassoTeste[] = [];
@@ -41,7 +44,13 @@ export async function executarTeste(email: string, executorId: string): Promise<
     inicio: number,
     erro?: { code?: string; message?: string },
   ) => {
-    const passo: PassoTeste = { chave: tipo, titulo, status, detalhe, duracaoMs: Date.now() - inicio };
+    const passo: PassoTeste = {
+      chave: tipo,
+      titulo,
+      status,
+      detalhe,
+      duracaoMs: Date.now() - inicio,
+    };
     passos.push(passo);
     await supabaseAdmin.from("email_events").insert({
       event_type: tipo,
@@ -68,7 +77,13 @@ export async function executarTeste(email: string, executorId: string): Promise<
 
     if (perfil?.id) {
       usuarioId = perfil.id;
-      await registrar("teste_conta_preparada", "Conta controlada", "ok", "Conta já existente reutilizada no teste.", t);
+      await registrar(
+        "teste_conta_preparada",
+        "Conta controlada",
+        "ok",
+        "Conta já existente reutilizada no teste.",
+        t,
+      );
     } else {
       const { data: novo, error } = await supabaseAdmin.auth.admin.createUser({
         email,
@@ -76,15 +91,28 @@ export async function executarTeste(email: string, executorId: string): Promise<
         email_confirm: false,
       });
       if (error || !novo?.user) {
-        await registrar("teste_conta_preparada", "Conta controlada", "erro", "Não foi possível criar a conta de teste.", t, {
-          code: error?.code,
-          message: error?.message,
-        });
+        await registrar(
+          "teste_conta_preparada",
+          "Conta controlada",
+          "erro",
+          "Não foi possível criar a conta de teste.",
+          t,
+          {
+            code: error?.code,
+            message: error?.message,
+          },
+        );
         return { referencia, email, iniciadoEm, passos, aprovado: false };
       }
       usuarioId = novo.user.id;
       criadoAgora = true;
-      await registrar("teste_conta_preparada", "Conta controlada", "ok", "Conta de teste criada sem confirmação.", t);
+      await registrar(
+        "teste_conta_preparada",
+        "Conta controlada",
+        "ok",
+        "Conta de teste criada sem confirmação.",
+        t,
+      );
     }
   }
 
@@ -104,7 +132,9 @@ export async function executarTeste(email: string, executorId: string): Promise<
       "teste_confirmacao_enviada",
       "Link de confirmação gerado",
       error || !tokenConfirmacao ? "erro" : "ok",
-      error || !tokenConfirmacao ? "Falha ao gerar o link." : `Link de ${tipoConfirmacao} gerado com sucesso.`,
+      error || !tokenConfirmacao
+        ? "Falha ao gerar o link."
+        : `Link de ${tipoConfirmacao} gerado com sucesso.`,
       t,
       { code: error?.code, message: error?.message },
     );
@@ -149,13 +179,18 @@ export async function executarTeste(email: string, executorId: string): Promise<
   let tokenRecuperacao: string | null = null;
   {
     const t = Date.now();
-    const { data: link, error } = await supabaseAdmin.auth.admin.generateLink({ type: "recovery", email });
+    const { data: link, error } = await supabaseAdmin.auth.admin.generateLink({
+      type: "recovery",
+      email,
+    });
     tokenRecuperacao = link?.properties?.hashed_token ?? null;
     await registrar(
       "teste_recuperacao_enviada",
       "Link de recuperação gerado",
       error || !tokenRecuperacao ? "erro" : "ok",
-      error || !tokenRecuperacao ? "Falha ao gerar o link de recuperação." : "Link de recuperação gerado com sucesso.",
+      error || !tokenRecuperacao
+        ? "Falha ao gerar o link de recuperação."
+        : "Link de recuperação gerado com sucesso.",
       t,
       { code: error?.code, message: error?.message },
     );
@@ -169,13 +204,18 @@ export async function executarTeste(email: string, executorId: string): Promise<
       "teste_recuperacao_validada",
       "Link de recuperação validado",
       error ? "erro" : "ok",
-      error ? "O link de recuperação válido foi recusado." : "O link permitiu abrir a redefinição de senha.",
+      error
+        ? "O link de recuperação válido foi recusado."
+        : "O link permitiu abrir a redefinição de senha.",
       t,
       { code: error?.code, message: error?.message },
     );
 
     const t2 = Date.now();
-    const { error: erroReuso } = await anon.auth.verifyOtp({ token_hash: tokenRecuperacao, type: "recovery" });
+    const { error: erroReuso } = await anon.auth.verifyOtp({
+      token_hash: tokenRecuperacao,
+      type: "recovery",
+    });
     await registrar(
       "teste_recuperacao_expirada",
       "Link de recuperação expira após o uso",
@@ -225,7 +265,9 @@ export async function executarTeste(email: string, executorId: string): Promise<
       "teste_conta_removida",
       "Conta de teste removida",
       error ? "erro" : "ok",
-      error ? "Não foi possível remover a conta de teste." : "Conta de teste excluída após o ensaio.",
+      error
+        ? "Não foi possível remover a conta de teste."
+        : "Conta de teste excluída após o ensaio.",
       t,
       { code: error?.code, message: error?.message },
     );

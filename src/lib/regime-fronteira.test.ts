@@ -162,8 +162,16 @@ describe("Validações do contexto fiscal", () => {
   });
 
   it("trajeto pela metade é erro", () => {
-    expect(simular(base("real", { ufOrigem: "" })).issues.some((i) => i.campo === "ufOrigem" && i.severidade === "erro")).toBe(true);
-    expect(simular(base("real", { ufDestino: "" })).issues.some((i) => i.campo === "ufDestino" && i.severidade === "erro")).toBe(true);
+    expect(
+      simular(base("real", { ufOrigem: "" })).issues.some(
+        (i) => i.campo === "ufOrigem" && i.severidade === "erro",
+      ),
+    ).toBe(true);
+    expect(
+      simular(base("real", { ufDestino: "" })).issues.some(
+        (i) => i.campo === "ufDestino" && i.severidade === "erro",
+      ),
+    ).toBe(true);
   });
 
   it("avisa quando falta alíquota cadastrada para o trajeto", () => {

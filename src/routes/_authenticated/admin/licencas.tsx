@@ -80,7 +80,9 @@ function PainelLicencas() {
     const todas = licencas.data ?? [];
     if (!termo) return todas;
     return todas.filter(
-      (l) => (l.email ?? "").toLowerCase().includes(termo) || (l.full_name ?? "").toLowerCase().includes(termo),
+      (l) =>
+        (l.email ?? "").toLowerCase().includes(termo) ||
+        (l.full_name ?? "").toLowerCase().includes(termo),
     );
   }, [licencas.data, buscaDebounce]);
 
@@ -99,7 +101,8 @@ function PainelLicencas() {
           <KeyRound className="h-5 w-5 text-primary" aria-hidden /> Gestão de licenças
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Cada conta nova recebe 30 dias de teste gratuito. Depois disso, o acesso fica suspenso até a liberação aqui.
+          Cada conta nova recebe 30 dias de teste gratuito. Depois disso, o acesso fica suspenso até
+          a liberação aqui.
         </p>
       </header>
 
@@ -112,7 +115,10 @@ function PainelLicencas() {
       </div>
 
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
+        <Search
+          className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+          aria-hidden
+        />
         <Input
           className="pl-9"
           placeholder="Buscar por nome ou e-mail"
@@ -130,10 +136,15 @@ function PainelLicencas() {
           {lista.map((l) => {
             const situacao = avaliarLicenca(l as unknown as Licenca);
             return (
-              <li key={l.user_id} className="rounded-lg border border-border bg-card p-4 shadow-[var(--shadow-card)]">
+              <li
+                key={l.user_id}
+                className="rounded-lg border border-border bg-card p-4 shadow-[var(--shadow-card)]"
+              >
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div>
-                    <p className="text-sm font-medium text-foreground">{l.full_name ?? "Sem nome"}</p>
+                    <p className="text-sm font-medium text-foreground">
+                      {l.full_name ?? "Sem nome"}
+                    </p>
                     <p className="text-xs text-muted-foreground">{l.email ?? "—"}</p>
                   </div>
                   <Badge variant="outline" className={CORES[situacao.status]}>
@@ -152,7 +163,9 @@ function PainelLicencas() {
                   </div>
                   <div>
                     <dt>Validade</dt>
-                    <dd className="text-foreground">{l.expires_at ? dataBr(l.expires_at) : "Sem prazo"}</dd>
+                    <dd className="text-foreground">
+                      {l.expires_at ? dataBr(l.expires_at) : "Sem prazo"}
+                    </dd>
                   </div>
                   <div>
                     <dt>Último acesso</dt>
@@ -203,7 +216,6 @@ function PainelLicencas() {
                     Cancelar
                   </Button>
                 </div>
-
               </li>
             );
           })}

@@ -29,7 +29,9 @@ export interface EventoEmail {
   criadoEm: string;
 }
 
-async function exigirSuperAdmin(supabase: { rpc: (fn: "is_super_admin") => PromiseLike<{ data: unknown }> }) {
+async function exigirSuperAdmin(supabase: {
+  rpc: (fn: "is_super_admin") => PromiseLike<{ data: unknown }>;
+}) {
   const { data } = await supabase.rpc("is_super_admin");
   if (data !== true) throw new Error("Acesso restrito ao Administrador Geral.");
 }

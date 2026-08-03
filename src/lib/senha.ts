@@ -33,7 +33,11 @@ export function avaliarSenha(senha: string): {
   valida: boolean;
 } {
   const criterios: CriterioSenha[] = [
-    { id: "tamanho", rotulo: `Pelo menos ${REGRA_SENHA_TAMANHO_MINIMO} caracteres`, ok: senha.length >= REGRA_SENHA_TAMANHO_MINIMO },
+    {
+      id: "tamanho",
+      rotulo: `Pelo menos ${REGRA_SENHA_TAMANHO_MINIMO} caracteres`,
+      ok: senha.length >= REGRA_SENHA_TAMANHO_MINIMO,
+    },
     { id: "maiuscula", rotulo: "Uma letra maiúscula (A-Z)", ok: /[A-ZÀ-Þ]/.test(senha) },
     { id: "minuscula", rotulo: "Uma letra minúscula (a-z)", ok: /[a-zà-þ]/.test(senha) },
     { id: "numero", rotulo: "Um número (0-9)", ok: /[0-9]/.test(senha) },
@@ -64,7 +68,10 @@ export function traduzirErroSenha(mensagem?: string | null): string | null {
   if (m.includes("should be at least") || m.includes("at least 8")) {
     return "A senha precisa ter pelo menos 8 caracteres.";
   }
-  if (m.includes("password") && (m.includes("weak") || m.includes("requirements") || m.includes("characters"))) {
+  if (
+    m.includes("password") &&
+    (m.includes("weak") || m.includes("requirements") || m.includes("characters"))
+  ) {
     return "Senha fraca: use maiúscula, minúscula, número e símbolo, sem espaços.";
   }
   if (m.includes("pwned") || m.includes("compromised") || m.includes("leaked")) {

@@ -25,7 +25,8 @@ export const Route = createFileRoute("/aguardando-aprovacao")({
         <Hourglass className="mx-auto h-8 w-8 text-primary" aria-hidden />
         <h1 className="mt-3 text-lg font-semibold text-foreground">Aguardando aprovação</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Sua conta foi criada e está em análise. Você receberá um aviso por e-mail assim que o acesso for liberado.
+          Sua conta foi criada e está em análise. Você receberá um aviso por e-mail assim que o
+          acesso for liberado.
         </p>
         <Button
           variant="outline"
@@ -37,7 +38,11 @@ export const Route = createFileRoute("/aguardando-aprovacao")({
         >
           Sair
         </Button>
-        <Link to="/login" className="mt-3 inline-block text-xs text-primary hover:underline">
+        <Link
+          to="/login"
+          search={{ next: undefined }}
+          className="mt-3 inline-block text-xs text-primary hover:underline"
+        >
           Voltar para o login
         </Link>
       </div>

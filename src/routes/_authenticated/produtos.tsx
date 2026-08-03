@@ -7,7 +7,6 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -37,7 +36,6 @@ function ProdutosPage() {
   // Campo responde na hora; o filtro recalcula quando o usuário pausa a digitação.
   const buscaDebounce = useDebounce(busca, 300);
 
-
   const produtos = useQuery({
     queryKey: ["products", orgId],
     enabled: !!orgId,
@@ -62,8 +60,6 @@ function ProdutosPage() {
       `${p.nome} ${p.sku ?? ""} ${p.ncm ?? ""}`.toLowerCase().includes(termo),
     );
   }, [produtos.data, avaliacao.termo]);
-
-
 
   const criar = useMutation({
     mutationFn: async () => {
@@ -112,19 +108,38 @@ function ProdutosPage() {
           <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
             <div className="space-y-1.5 lg:col-span-2">
               <Label htmlFor="p-nome">Nome</Label>
-              <Input id="p-nome" value={form.nome} maxLength={140} onChange={(e) => setForm({ ...form, nome: e.target.value })} />
+              <Input
+                id="p-nome"
+                value={form.nome}
+                maxLength={140}
+                onChange={(e) => setForm({ ...form, nome: e.target.value })}
+              />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="p-sku">SKU</Label>
-              <Input id="p-sku" value={form.sku} maxLength={60} onChange={(e) => setForm({ ...form, sku: e.target.value })} />
+              <Input
+                id="p-sku"
+                value={form.sku}
+                maxLength={60}
+                onChange={(e) => setForm({ ...form, sku: e.target.value })}
+              />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="p-ncm">NCM</Label>
-              <Input id="p-ncm" value={form.ncm} maxLength={20} onChange={(e) => setForm({ ...form, ncm: e.target.value })} />
+              <Input
+                id="p-ncm"
+                value={form.ncm}
+                maxLength={20}
+                onChange={(e) => setForm({ ...form, ncm: e.target.value })}
+              />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="p-valor">Valor unitário</Label>
-              <Input id="p-valor" value={form.valor} onChange={(e) => setForm({ ...form, valor: e.target.value })} />
+              <Input
+                id="p-valor"
+                value={form.valor}
+                onChange={(e) => setForm({ ...form, valor: e.target.value })}
+              />
             </div>
           </div>
           <div className="mt-4">
@@ -135,7 +150,8 @@ function ProdutosPage() {
         </section>
       ) : (
         <p className="mt-6 rounded-lg border border-border bg-surface px-4 py-3 text-sm text-muted-foreground">
-          Seu perfil é apenas de consulta. O cadastro de produtos é feito pelo administrador da empresa.
+          Seu perfil é apenas de consulta. O cadastro de produtos é feito pelo administrador da
+          empresa.
         </p>
       )}
 
@@ -164,8 +180,6 @@ function ProdutosPage() {
           {avaliacao.aviso}
         </p>
       ) : null}
-
-
 
       <section className="mt-6 overflow-x-auto rounded-xl border border-border bg-card">
         <table className="w-full text-sm">
@@ -211,7 +225,6 @@ function ProdutosPage() {
                     : "Nenhum produto cadastrado ainda."}
                 </td>
               </tr>
-
             ) : null}
           </tbody>
         </table>

@@ -51,10 +51,8 @@ export function aplicarAjustes(state: SimulationState, a: AjustesRapido): Simula
   const operacao = state.operacao
     ? {
         ...state.operacao,
-        aliquotaInternaDestino:
-          a.aliquotaInternaDestino ?? state.operacao.aliquotaInternaDestino,
-        aliquotaInterestadual:
-          a.aliquotaInterestadual ?? state.operacao.aliquotaInterestadual,
+        aliquotaInternaDestino: a.aliquotaInternaDestino ?? state.operacao.aliquotaInternaDestino,
+        aliquotaInterestadual: a.aliquotaInterestadual ?? state.operacao.aliquotaInterestadual,
         difalManual: a.difalManual ?? state.operacao.difalManual,
         creditarDifal: a.creditarDifal ?? state.operacao.creditarDifal,
         aliquotaSimples: a.aliquotaSimples ?? state.operacao.aliquotaSimples,

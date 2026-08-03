@@ -19,9 +19,11 @@ export const provisionarConta = createServerFn({ method: "POST" })
     if (!authUser) throw new Error("Sessão inválida.");
 
     const emailConfirmado = !!authUser.email_confirmed_at;
-    const nome = (authUser.user_metadata?.full_name as string | undefined) ?? authUser.email ?? "Usuário";
+    const nome =
+      (authUser.user_metadata?.full_name as string | undefined) ?? authUser.email ?? "Usuário";
     const nomeEmpresa =
-      ((authUser.user_metadata?.company_name as string | undefined) ?? "").trim() || `Empresa de ${nome}`;
+      ((authUser.user_metadata?.company_name as string | undefined) ?? "").trim() ||
+      `Empresa de ${nome}`;
 
     // 1) Perfil
     const { data: perfil } = await supabaseAdmin
@@ -38,7 +40,10 @@ export const provisionarConta = createServerFn({ method: "POST" })
         account_status: emailConfirmado ? "active" : "pending_email_verification",
         email_verified_at: authUser.email_confirmed_at ?? null,
       });
-    } else if (emailConfirmado && ["pending_email_verification", "invited"].includes(perfil.account_status)) {
+    } else if (
+      emailConfirmado &&
+      ["pending_email_verification", "invited"].includes(perfil.account_status)
+    ) {
       await supabaseAdmin
         .from("profiles")
         .update({ account_status: "active", email_verified_at: authUser.email_confirmed_at })

@@ -72,7 +72,9 @@ export const solicitarAcessoAdmin = createServerFn({ method: "POST" })
     return { registrado: true as const, duplicado: false as const };
   });
 
-async function exigirSuperAdmin(supabase: { rpc: (fn: "is_super_admin") => Promise<{ data: unknown }> }) {
+async function exigirSuperAdmin(supabase: {
+  rpc: (fn: "is_super_admin") => Promise<{ data: unknown }>;
+}) {
   const { data } = await supabase.rpc("is_super_admin");
   if (data !== true) throw new Error("Acesso restrito ao Administrador Geral.");
 }
@@ -99,14 +101,18 @@ export const listarSolicitacoesAdmin = createServerFn({ method: "POST" })
 
     const { data: pedidos, error } = await supabaseAdmin
       .from("access_requests")
-      .select("id, created_at, status, requested_area, message, contact, requester_id, handled_at, handled_by")
+      .select(
+        "id, created_at, status, requested_area, message, contact, requester_id, handled_at, handled_by",
+      )
       .is("simulation_id", null)
       .order("created_at", { ascending: false })
       .limit(200);
     if (error) throw new Error("Não foi possível carregar as solicitações.");
 
     const ids = Array.from(
-      new Set((pedidos ?? []).flatMap((p) => [p.requester_id, p.handled_by].filter(Boolean) as string[])),
+      new Set(
+        (pedidos ?? []).flatMap((p) => [p.requester_id, p.handled_by].filter(Boolean) as string[]),
+      ),
     );
     const { data: perfis } = ids.length
       ? await supabaseAdmin.from("profiles").select("id, full_name, email").in("id", ids)
@@ -150,7 +156,11 @@ export const tratarSolicitacaoAdmin = createServerFn({ method: "POST" })
 
     const { error } = await supabaseAdmin
       .from("access_requests")
-      .update({ status: data.decisao, handled_at: new Date().toISOString(), handled_by: context.userId })
+      .update({
+        status: data.decisao,
+        handled_at: new Date().toISOString(),
+        handled_by: context.userId,
+      })
       .eq("id", data.id);
     if (error) throw new Error("Não foi possível atualizar a solicitação.");
 

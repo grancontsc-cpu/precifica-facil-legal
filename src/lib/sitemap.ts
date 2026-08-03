@@ -48,11 +48,13 @@ export function caminhoDaRota(arquivo: string): string | null {
 
   // Rotas de layout/privadas, raiz, catch-all, parâmetros dinâmicos e endpoints.
   if (semExtensao.startsWith("__")) return null;
-  if (semExtensao.startsWith("_") || semExtensao.includes("/_") || semExtensao.includes("._")) return null;
+  if (semExtensao.startsWith("_") || semExtensao.includes("/_") || semExtensao.includes("._"))
+    return null;
   if (semExtensao.includes("$")) return null;
   if (semExtensao.includes("[")) return null;
   if (semExtensao.startsWith("api/") || semExtensao.startsWith("api.")) return null;
-  if (semExtensao === "route" || semExtensao.endsWith("/route") || semExtensao.endsWith(".route")) return null;
+  if (semExtensao === "route" || semExtensao.endsWith("/route") || semExtensao.endsWith(".route"))
+    return null;
 
   const segmentos = semExtensao.split(/[./]/).filter(Boolean);
   if (segmentos[segmentos.length - 1] === "index") segmentos.pop();

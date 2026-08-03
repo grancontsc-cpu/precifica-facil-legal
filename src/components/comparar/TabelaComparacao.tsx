@@ -25,18 +25,38 @@ export function TabelaComparacao({ comparacao }: { comparacao: SupplierCompariso
   return (
     <div className="overflow-x-auto rounded-xl border border-border bg-card shadow-[var(--shadow-card)]">
       <table className="w-full min-w-[900px] text-sm">
-        <caption className="sr-only">Comparação de alternativas de compra por custo líquido</caption>
+        <caption className="sr-only">
+          Comparação de alternativas de compra por custo líquido
+        </caption>
         <thead>
           <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted-foreground">
-            <th scope="col" className="px-4 py-3">Fornecedor</th>
-            <th scope="col" className="px-4 py-3 text-right">Desembolso total</th>
-            <th scope="col" className="px-4 py-3 text-right">Créditos</th>
-            <th scope="col" className="px-4 py-3 text-right">Custo líquido total</th>
-            <th scope="col" className="px-4 py-3 text-right">Custo líq. unitário</th>
-            <th scope="col" className="px-4 py-3 text-right">Diferença R$/un</th>
-            <th scope="col" className="px-4 py-3 text-right">Diferença %</th>
-            <th scope="col" className="px-4 py-3 text-right">Economia no pedido</th>
-            <th scope="col" className="px-4 py-3 text-right">Limite de frete</th>
+            <th scope="col" className="px-4 py-3">
+              Fornecedor
+            </th>
+            <th scope="col" className="px-4 py-3 text-right">
+              Desembolso total
+            </th>
+            <th scope="col" className="px-4 py-3 text-right">
+              Créditos
+            </th>
+            <th scope="col" className="px-4 py-3 text-right">
+              Custo líquido total
+            </th>
+            <th scope="col" className="px-4 py-3 text-right">
+              Custo líq. unitário
+            </th>
+            <th scope="col" className="px-4 py-3 text-right">
+              Diferença R$/un
+            </th>
+            <th scope="col" className="px-4 py-3 text-right">
+              Diferença %
+            </th>
+            <th scope="col" className="px-4 py-3 text-right">
+              Economia no pedido
+            </th>
+            <th scope="col" className="px-4 py-3 text-right">
+              Limite de frete
+            </th>
           </tr>
         </thead>
         <tbody className="tabular-nums">

@@ -6,7 +6,7 @@ import simularPreco from "./tools/simular-preco";
 
 // O emissor OAuth precisa ser o host direto do backend; o ref do projeto é o
 // único valor que sobrevive à publicação sem reescrita.
-const projectRef = import.meta.env['VITE_SUPABASE_PROJECT_ID'] ?? "project-ref-unset";
+const projectRef = import.meta.env["VITE_SUPABASE_PROJECT_ID"] ?? "project-ref-unset";
 
 export default defineMcp({
   name: "precifica-facil",

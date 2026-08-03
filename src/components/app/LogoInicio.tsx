@@ -114,8 +114,8 @@ export function LogoInicio({ naRotaInicial }: { naRotaInicial: boolean }) {
           <AlertDialogHeader>
             <AlertDialogTitle>Descartar alterações não salvas?</AlertDialogTitle>
             <AlertDialogDescription>
-              Existem alterações no formulário que ainda não foram salvas. Se voltar ao
-              simulador agora, elas serão perdidas.
+              Existem alterações no formulário que ainda não foram salvas. Se voltar ao simulador
+              agora, elas serão perdidas.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

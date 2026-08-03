@@ -43,7 +43,8 @@ export function AvisoLicenca({ variante, titulo, descricao }: Props) {
         <h1 className="mt-3 text-lg font-semibold text-foreground">{titulo}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{motivo ?? descricao}</p>
         <p className="mt-2 text-sm text-muted-foreground">
-          Para continuar utilizando o simulador, solicite a liberação da licença ao Administrador Grancont.
+          Para continuar utilizando o simulador, solicite a liberação da licença ao Administrador
+          Grancont.
         </p>
 
         <div className="mt-6 space-y-2">
@@ -60,7 +61,11 @@ export function AvisoLicenca({ variante, titulo, descricao }: Props) {
           </Button>
         </div>
 
-        <Link to="/login" className="mt-3 inline-block text-xs text-primary hover:underline">
+        <Link
+          to="/login"
+          search={{ next: undefined }}
+          className="mt-3 inline-block text-xs text-primary hover:underline"
+        >
           Voltar para o login
         </Link>
       </div>

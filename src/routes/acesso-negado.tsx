@@ -26,8 +26,8 @@ export const Route = createFileRoute("/acesso-negado")({
         <Lock className="mx-auto h-8 w-8 text-muted-foreground" aria-hidden />
         <h1 className="mt-3 text-lg font-semibold text-foreground">Acesso negado</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Sua conta não possui permissão para esta área ou ainda não está vinculada a uma empresa. Solicite liberação
-          ao administrador.
+          Sua conta não possui permissão para esta área ou ainda não está vinculada a uma empresa.
+          Solicite liberação ao administrador.
         </p>
         <div className="mt-6 grid gap-2">
           <SolicitarAcessoAdmin className="w-full" />
@@ -44,7 +44,11 @@ export const Route = createFileRoute("/acesso-negado")({
             Sair
           </Button>
         </div>
-        <Link to="/login" className="mt-3 inline-block text-xs text-primary hover:underline">
+        <Link
+          to="/login"
+          search={{ next: undefined }}
+          className="mt-3 inline-block text-xs text-primary hover:underline"
+        >
           Ir para o login
         </Link>
       </div>

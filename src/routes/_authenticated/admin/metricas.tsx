@@ -166,7 +166,10 @@ function PainelMetricas() {
             onClick={() => void consulta.refetch()}
             aria-label="Atualizar métricas"
           >
-            <RefreshCw className={consulta.isFetching ? "size-4 animate-spin" : "size-4"} aria-hidden />
+            <RefreshCw
+              className={consulta.isFetching ? "size-4 animate-spin" : "size-4"}
+              aria-hidden
+            />
           </Button>
         </div>
       </header>
@@ -255,9 +258,24 @@ function PainelMetricas() {
               <YAxis allowDecimals={false} fontSize={12} />
               <Tooltip labelFormatter={(v) => diaBr(String(v))} />
               <Legend />
-              <Bar dataKey="iniciadas" name="Iniciadas" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="concluidas" name="Concluídas" fill="hsl(var(--chart-2, var(--primary)))" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="exportacoes" name="Exportações" fill="hsl(var(--muted-foreground))" radius={[4, 4, 0, 0]} />
+              <Bar
+                dataKey="iniciadas"
+                name="Iniciadas"
+                fill="hsl(var(--primary))"
+                radius={[4, 4, 0, 0]}
+              />
+              <Bar
+                dataKey="concluidas"
+                name="Concluídas"
+                fill="hsl(var(--chart-2, var(--primary)))"
+                radius={[4, 4, 0, 0]}
+              />
+              <Bar
+                dataKey="exportacoes"
+                name="Exportações"
+                fill="hsl(var(--muted-foreground))"
+                radius={[4, 4, 0, 0]}
+              />
             </BarChart>
           </ResponsiveContainer>
         </CardContent>
@@ -297,7 +315,10 @@ function PainelMetricas() {
                 ))}
                 {!consulta.isLoading && (m?.por_evento.length ?? 0) === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={4} className="py-6 text-center text-sm text-muted-foreground">
+                    <TableCell
+                      colSpan={4}
+                      className="py-6 text-center text-sm text-muted-foreground"
+                    >
                       Ainda não há eventos registrados neste período.
                     </TableCell>
                   </TableRow>
@@ -332,7 +353,10 @@ function PainelMetricas() {
                 ))}
                 {!consulta.isLoading && (m?.por_modo.length ?? 0) === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={2} className="py-6 text-center text-sm text-muted-foreground">
+                    <TableCell
+                      colSpan={2}
+                      className="py-6 text-center text-sm text-muted-foreground"
+                    >
                       Sem dados no período.
                     </TableCell>
                   </TableRow>

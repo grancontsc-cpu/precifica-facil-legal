@@ -83,7 +83,9 @@ describe("1. tributos incluídos no preço não são somados duas vezes", () => 
   it("CASO 2 — ICMS 20,5% incluído com crédito integral", () => {
     const r = calcularCompra(
       compraSimples({ quantidade: 1, valorUnitario: 62 }),
-      tributos({ icms: { enabled: true, rate: 20.5, treatment: "incluido", creditMode: "integral" } }),
+      tributos({
+        icms: { enabled: true, rate: 20.5, treatment: "incluido", creditMode: "integral" },
+      }),
     );
     expect(round2(r.desembolsoTotal)).toBe(62);
     expect(round2(r.tributos.find((t) => t.id === "icms")!.credito)).toBe(12.71);
@@ -105,7 +107,10 @@ describe("2. tributos por fora", () => {
   });
 
   it("CASO 5 — CBS de 10% acrescentada por fora na venda", () => {
-    const ev = avaliarPreco(100, ctxVenda(50, [tv({ id: "cbsVenda", rate: 10, treatment: "porFora" })]));
+    const ev = avaliarPreco(
+      100,
+      ctxVenda(50, [tv({ id: "cbsVenda", rate: 10, treatment: "porFora" })]),
+    );
     expect(round2(ev.tributosPorFora)).toBe(10);
     expect(round2(ev.precoFinal)).toBe(110);
   });
@@ -127,7 +132,9 @@ describe("3. tributos informativos", () => {
   it("compra: informativo não muda desembolso nem custo", () => {
     const r = calcularCompra(
       compraSimples({ quantidade: 1, valorUnitario: 100 }),
-      tributos({ ibs: { enabled: true, rate: 0.1, treatment: "informativo", creditMode: "integral" } }),
+      tributos({
+        ibs: { enabled: true, rate: 0.1, treatment: "informativo", creditMode: "integral" },
+      }),
     );
     expect(round2(r.desembolsoTotal)).toBe(100);
     expect(round2(r.custoLiquidoTotal)).toBe(100);
@@ -218,7 +225,9 @@ describe("6. quantidade > 1", () => {
   it("escala valores totais e mantém o unitário coerente", () => {
     const r = calcularCompra(
       compraSimples({ quantidade: 120, valorUnitario: 18.9 }),
-      tributos({ icms: { enabled: true, rate: 18, treatment: "incluido", creditMode: "integral" } }),
+      tributos({
+        icms: { enabled: true, rate: 18, treatment: "incluido", creditMode: "integral" },
+      }),
     );
     expect(round2(r.valorBrutoProdutos)).toBe(2268);
     expect(round2(r.creditosTotais)).toBe(408.24);
@@ -251,7 +260,9 @@ describe("7. descontos e fretes totais", () => {
   it("desconto reduz a base do tributo; frete não entra na base padrão", () => {
     const r = calcularCompra(
       compraSimples({ quantidade: 10, valorUnitario: 100, descontoTotal: 200, freteTotal: 100 }),
-      tributos({ icms: { enabled: true, rate: 10, treatment: "incluido", creditMode: "integral" } }),
+      tributos({
+        icms: { enabled: true, rate: 10, treatment: "incluido", creditMode: "integral" },
+      }),
     );
     expect(round2(r.tributos.find((t) => t.id === "icms")!.base)).toBe(800);
     expect(round2(r.creditosTotais)).toBe(80);
@@ -274,7 +285,12 @@ describe("7. descontos e fretes totais", () => {
 
   it("desconto maior que o valor bruto é bloqueado", () => {
     const state = estadoInicial();
-    state.produto = compraSimples({ nome: "X", quantidade: 1, valorUnitario: 10, descontoTotal: 50 });
+    state.produto = compraSimples({
+      nome: "X",
+      quantidade: 1,
+      valorUnitario: 10,
+      descontoTotal: 50,
+    });
     expect(validar(state).some((i) => i.campo === "descontoTotal")).toBe(true);
   });
 });
@@ -296,7 +312,10 @@ describe("8. totais x unitários", () => {
     expect(Number(r.custoLiquidoUnitarioExato)).toBeCloseTo(100, 10);
 
     // 33,333333 × 3 = 99,999999 — o unitário exato reconstrói o total sem erro.
-    const r2 = calcularCompra(compraSimples({ quantidade: 3, valorUnitario: 33.333333 }), tributos({}));
+    const r2 = calcularCompra(
+      compraSimples({ quantidade: 3, valorUnitario: 33.333333 }),
+      tributos({}),
+    );
     expect(Number(r2.custoLiquidoUnitarioExato) * 3).toBeCloseTo(99.999999, 9);
     // O total exposto é o mesmo número, arredondado só para exibição (4 casas).
     expect(r2.custoLiquidoTotal).toBe(100);
@@ -320,10 +339,11 @@ describe("9. preço reverso pela margem", () => {
   });
 
   it("o preço encontrado devolve exatamente a margem pedida", () => {
-    const ctx = ctxVenda(87.34, [
-      tv({ id: "icmsVenda", rate: 18 }),
-      tv({ id: "cbsVenda", rate: 8.8, treatment: "porFora" }),
-    ], { comissaoPercent: 4, cartaoPercent: 2.5, freteVendaUnidade: 3, custoFixoUnidade: 1.2 });
+    const ctx = ctxVenda(
+      87.34,
+      [tv({ id: "icmsVenda", rate: 18 }), tv({ id: "cbsVenda", rate: 8.8, treatment: "porFora" })],
+      { comissaoPercent: 4, cartaoPercent: 2.5, freteVendaUnidade: 3, custoFixoUnidade: 1.2 },
+    );
     for (const alvo of [0, 5, 12.5, 33.33, 60]) {
       const ev = resolverPrecoPorMargem(alvo, ctx)!;
       expect(ev.margemEfetiva).toBeCloseTo(alvo, 3);
@@ -356,7 +376,9 @@ describe("10. arredondamento apenas na saída", () => {
   it("mantém 4 casas no motor (não arredonda para 2)", () => {
     const r = calcularCompra(
       compraSimples({ quantidade: 1, valorUnitario: 10 }),
-      tributos({ icms: { enabled: true, rate: 3.3333, treatment: "incluido", creditMode: "integral" } }),
+      tributos({
+        icms: { enabled: true, rate: 3.3333, treatment: "incluido", creditMode: "integral" },
+      }),
     );
     expect(r.creditosTotais).toBeCloseTo(0.3333, 4);
   });
@@ -411,7 +433,9 @@ describe("11. entradas inválidas", () => {
       icms: { enabled: true, rate: 0, creditMode: "manual", creditManual: 500 },
     });
     const res = simular(state);
-    expect(res.issues.some((i) => i.campo === "custoLiquido" && i.severidade === "aviso")).toBe(true);
+    expect(res.issues.some((i) => i.campo === "custoLiquido" && i.severidade === "aviso")).toBe(
+      true,
+    );
   });
 
   it("markup não explode quando o custo é zero", () => {
@@ -426,7 +450,9 @@ describe("11. entradas inválidas", () => {
 /* ================================================================== */
 describe("12. percentuais somando perto de 100%", () => {
   it("CASO 6 — 60% de tributo com margem de 40% é impossível", () => {
-    expect(resolverPrecoPorMargem(40, ctxVenda(100, [tv({ id: "icmsVenda", rate: 60 })]))).toBeNull();
+    expect(
+      resolverPrecoPorMargem(40, ctxVenda(100, [tv({ id: "icmsVenda", rate: 60 })])),
+    ).toBeNull();
 
     const state = estadoInicial();
     state.produto = compraSimples({ nome: "Teste", quantidade: 1, valorUnitario: 100 });

@@ -87,7 +87,11 @@ export async function registrarAuditoria(
 /** Impede que um gestor altere um Administrador Geral. */
 export async function garantirAlvoPermitido(admin: SupabaseClient, ator: Ator, alvoUserId: string) {
   if (ator.isSuperAdmin) return;
-  const { data } = await admin.from("global_user_roles").select("user_id").eq("user_id", alvoUserId).maybeSingle();
+  const { data } = await admin
+    .from("global_user_roles")
+    .select("user_id")
+    .eq("user_id", alvoUserId)
+    .maybeSingle();
   if (data) throw new Error("Você não pode alterar um Administrador Geral.");
 }
 

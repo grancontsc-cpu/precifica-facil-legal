@@ -20,10 +20,7 @@ export function AvisoAcesso({ codigo, acoes = [], solicitacao }: AvisoAcessoProp
 
   return (
     <main className="mx-auto w-full max-w-2xl px-4 py-10 sm:py-16">
-      <div
-        role="alert"
-        className="rounded-xl border border-border bg-card p-5 text-center sm:p-8"
-      >
+      <div role="alert" className="rounded-xl border border-border bg-card p-5 text-center sm:p-8">
         <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-muted">
           <ShieldAlert className="h-5 w-5 text-muted-foreground" aria-hidden />
         </div>
@@ -46,7 +43,6 @@ export function AvisoAcesso({ codigo, acoes = [], solicitacao }: AvisoAcessoProp
               <SolicitarAcesso simulacaoId={solicitacao.simulacaoId} motivoCodigo={codigo} />
             )}
           </div>
-
         )}
       </div>
     </main>

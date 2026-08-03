@@ -35,7 +35,8 @@ export interface Empresa {
   default_tax_profile_id: string | null;
 }
 
-const CAMPOS_ORG = "id, name, cnpj, uf, regime, icms_contribuinte, defaults, default_tax_profile_id";
+const CAMPOS_ORG =
+  "id, name, cnpj, uf, regime, icms_contribuinte, defaults, default_tax_profile_id";
 
 export interface Membership {
   organization_id: string;
@@ -66,7 +67,6 @@ interface AppContextValue {
   signOut: () => Promise<void>;
 }
 
-
 const AppContext = createContext<AppContextValue | null>(null);
 
 const ORG_PREF_KEY = "precifica:org-selecionada";
@@ -90,7 +90,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
     enabled: !!userId,
     queryFn: async () => {
       const [{ data: perfil }, { data: globais }] = await Promise.all([
-        supabase.from("profiles").select("id, full_name, email, account_status").eq("id", userId!).maybeSingle(),
+        supabase
+          .from("profiles")
+          .select("id, full_name, email, account_status")
+          .eq("id", userId!)
+          .maybeSingle(),
         supabase.from("global_user_roles").select("role").eq("user_id", userId!),
       ]);
       return {
@@ -134,10 +138,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     queryKey: ["organizations", "all", isSuperAdmin],
     enabled: !!userId && isSuperAdmin,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("organizations")
-        .select(CAMPOS_ORG)
-        .order("name");
+      const { data, error } = await supabase.from("organizations").select(CAMPOS_ORG).order("name");
       if (error) throw error;
       return (data ?? []) as unknown as Empresa[];
     },
@@ -189,7 +190,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       /* ignora */
     }
     await supabase.auth.signOut();
-    navigate({ to: "/login", replace: true });
+    navigate({ to: "/login", search: { next: undefined }, replace: true });
   };
 
   const value: AppContextValue = {
@@ -209,7 +210,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
     canEdit,
     licenca: licencaQuery.data ?? null,
     situacaoLicenca: isSuperAdmin
-      ? { liberado: true, status: "active", emTeste: false, diasRestantes: null, motivo: "Licença interna." }
+      ? {
+          liberado: true,
+          status: "active",
+          emTeste: false,
+          diasRestantes: null,
+          motivo: "Licença interna.",
+        }
       : avaliarLicenca(licencaQuery.data ?? null),
     loading: perfilQuery.isLoading || membershipsQuery.isLoading || licencaQuery.isLoading,
     signOut,
@@ -225,7 +232,11 @@ export function useApp() {
 }
 
 /** Destino inicial conforme papel e situação da conta. */
-export function destinoInicial(papel: PapelEfetivo, status: StatusConta | null, temVinculo: boolean) {
+export function destinoInicial(
+  papel: PapelEfetivo,
+  status: StatusConta | null,
+  temVinculo: boolean,
+) {
   if (status === "suspended") return "/licenca-suspensa";
   if (status === "pending_approval") return "/aguardando-aprovacao";
   if (status === "pending_email_verification" || status === "invited") return "/confirmar-email";

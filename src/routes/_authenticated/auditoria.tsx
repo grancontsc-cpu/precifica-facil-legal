@@ -49,7 +49,6 @@ function grupoDaEntidade(entidade: string) {
   return "outros";
 }
 
-
 export const Route = createFileRoute("/_authenticated/auditoria")({
   head: () => ({
     ...metaPagina({
@@ -100,9 +99,7 @@ function AuditoriaPage() {
 
   const eventos = useMemo(
     () =>
-      (logs.data ?? []).filter(
-        (l) => filtro === "todos" || grupoDaEntidade(l.entity) === filtro,
-      ),
+      (logs.data ?? []).filter((l) => filtro === "todos" || grupoDaEntidade(l.entity) === filtro),
     [logs.data, filtro],
   );
 
@@ -149,7 +146,9 @@ function AuditoriaPage() {
               <span className="text-xs text-muted-foreground">
                 {new Date(l.created_at).toLocaleString("pt-BR")}
               </span>
-              <span className="text-xs text-muted-foreground">registro {l.entity_id?.slice(0, 8)}</span>
+              <span className="text-xs text-muted-foreground">
+                registro {l.entity_id?.slice(0, 8)}
+              </span>
             </summary>
             <div className="mt-3 grid gap-3 md:grid-cols-2">
               <div>

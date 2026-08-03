@@ -112,7 +112,6 @@ export function avaliarAcessoSimulacao(
   return { podeLer: true, podeEscrever: true, codigo: null, motivo: null };
 }
 
-
 /** Pode criar uma nova simulação na empresa selecionada. */
 export function podeCriarSimulacao(ctx: ContextoAcesso, organizationId: string | null): boolean {
   if (!organizationId) return false;

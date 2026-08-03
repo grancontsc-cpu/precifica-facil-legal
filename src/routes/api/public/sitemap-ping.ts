@@ -10,7 +10,10 @@ export const Route = createFileRoute("/api/public/sitemap-ping")({
       POST: async ({ request }) => {
         const segredo = process.env["SITEMAP_PING_SECRET"];
         if (!segredo) {
-          return Response.json({ ok: false, erro: "Agendamento não configurado." }, { status: 503 });
+          return Response.json(
+            { ok: false, erro: "Agendamento não configurado." },
+            { status: 503 },
+          );
         }
 
         const enviado = request.headers.get("x-sitemap-ping-secret") ?? "";

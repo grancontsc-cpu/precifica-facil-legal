@@ -29,7 +29,7 @@ function Entrando() {
       const { data: sessao } = await supabase.auth.getUser();
       const user = sessao.user;
       if (!user) {
-        navigate({ to: "/login", replace: true });
+        navigate({ to: "/login", search: { next: undefined }, replace: true });
         return;
       }
 
@@ -41,21 +41,22 @@ function Entrando() {
         /* provisionamento tolerante a falha: o guarda de acesso decide o destino */
       }
 
-      const [{ data: perfil }, { data: globais }, { data: vinculos }, { data: pedidoPendente }] = await Promise.all([
-        supabase.from("profiles").select("account_status").eq("id", user.id).maybeSingle(),
-        supabase.from("global_user_roles").select("role").eq("user_id", user.id),
-        supabase
-          .from("organization_members")
-          .select("role")
-          .eq("user_id", user.id)
-          .eq("membership_status", "active"),
-        supabase
-          .from("organization_join_requests")
-          .select("id")
-          .eq("user_id", user.id)
-          .eq("status", "pending")
-          .maybeSingle(),
-      ]);
+      const [{ data: perfil }, { data: globais }, { data: vinculos }, { data: pedidoPendente }] =
+        await Promise.all([
+          supabase.from("profiles").select("account_status").eq("id", user.id).maybeSingle(),
+          supabase.from("global_user_roles").select("role").eq("user_id", user.id),
+          supabase
+            .from("organization_members")
+            .select("role")
+            .eq("user_id", user.id)
+            .eq("membership_status", "active"),
+          supabase
+            .from("organization_join_requests")
+            .select("id")
+            .eq("user_id", user.id)
+            .eq("status", "pending")
+            .maybeSingle(),
+        ]);
 
       const { data: licenca } = await supabase
         .from("licenses")
@@ -63,7 +64,10 @@ function Entrando() {
         .eq("user_id", user.id)
         .maybeSingle();
 
-      await supabase.from("profiles").update({ last_access_at: new Date().toISOString() }).eq("id", user.id);
+      await supabase
+        .from("profiles")
+        .update({ last_access_at: new Date().toISOString() })
+        .eq("id", user.id);
 
       if (cancelado) return;
 
@@ -77,20 +81,22 @@ function Entrando() {
         status === "active" && !superAdmin && !situacao.liberado
           ? rotaBloqueio(situacao)
           : status === "suspended"
-          ? "/licenca-suspensa"
-          : status === "pending_approval"
-            ? "/aguardando-aprovacao"
-            : status === "pending_email_verification" || status === "invited"
-              ? "/confirmar-email"
-              : status !== "active"
-                ? "/acesso-negado"
-                : superAdmin
-                  ? "/admin"
-                  : (vinculos ?? []).length === 0
-                    ? (pedidoPendente ? "/aguardando-aprovacao" : "/onboarding")
-                    : gestor
-                      ? "/gestao"
-                      : "/simulador";
+            ? "/licenca-suspensa"
+            : status === "pending_approval"
+              ? "/aguardando-aprovacao"
+              : status === "pending_email_verification" || status === "invited"
+                ? "/confirmar-email"
+                : status !== "active"
+                  ? "/acesso-negado"
+                  : superAdmin
+                    ? "/admin"
+                    : (vinculos ?? []).length === 0
+                      ? pedidoPendente
+                        ? "/aguardando-aprovacao"
+                        : "/onboarding"
+                      : gestor
+                        ? "/gestao"
+                        : "/simulador";
 
       navigate({ to: destino, replace: true });
     })();

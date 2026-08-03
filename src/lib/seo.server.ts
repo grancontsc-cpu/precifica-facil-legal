@@ -47,7 +47,9 @@ function cobreODominio(siteUrl: string, alvo: URL) {
 export async function resolverPropriedade(): Promise<string> {
   const resposta = await fetch(`${GATEWAY}/webmasters/v3/sites`, { headers: cabecalhos() });
   if (!resposta.ok) {
-    throw new Error(`Não foi possível listar as propriedades [${resposta.status}]: ${await resposta.text()}`);
+    throw new Error(
+      `Não foi possível listar as propriedades [${resposta.status}]: ${await resposta.text()}`,
+    );
   }
 
   const { siteEntry = [] } = (await resposta.json()) as {
@@ -87,7 +89,9 @@ export async function consultarStatus(propriedadeConhecida?: string): Promise<St
     { headers: cabecalhos() },
   );
   if (!resposta.ok) {
-    throw new Error(`Não foi possível ler o status do sitemap [${resposta.status}]: ${await resposta.text()}`);
+    throw new Error(
+      `Não foi possível ler o status do sitemap [${resposta.status}]: ${await resposta.text()}`,
+    );
   }
 
   const { sitemap = [] } = (await resposta.json()) as {

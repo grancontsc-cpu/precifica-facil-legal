@@ -228,10 +228,7 @@ export function sincronizarOperacao(
 }
 
 /** Metadados da alíquota interna vigente do estado informado. */
-export function detalheInterna(
-  tabela: TabelaAliquotas | null,
-  uf: string,
-): DetalheAliquota | null {
+export function detalheInterna(tabela: TabelaAliquotas | null, uf: string): DetalheAliquota | null {
   if (!tabela) return null;
   return tabela.detalhesInternas[(uf ?? "").toUpperCase()] ?? null;
 }
@@ -262,10 +259,7 @@ export interface StatusBase {
  * Status da base de alíquotas: informa a vigência carregada e sinaliza quando
  * ela está antiga o bastante para merecer revisão (mais de 365 dias).
  */
-export function statusBase(
-  tabela: TabelaAliquotas | null,
-  agora: Date = new Date(),
-): StatusBase {
+export function statusBase(tabela: TabelaAliquotas | null, agora: Date = new Date()): StatusBase {
   const vazio: StatusBase = {
     situacao: "vazia",
     vigencia: null,
@@ -277,10 +271,7 @@ export function statusBase(
 
   const referencia = tabela.atualizadaEm ?? tabela.vigenciaMaisRecente;
   const dias = referencia
-    ? Math.max(
-        0,
-        Math.floor((agora.getTime() - new Date(referencia).getTime()) / 86_400_000),
-      )
+    ? Math.max(0, Math.floor((agora.getTime() - new Date(referencia).getTime()) / 86_400_000))
     : null;
   const desatualizada = dias !== null && dias > 365;
 

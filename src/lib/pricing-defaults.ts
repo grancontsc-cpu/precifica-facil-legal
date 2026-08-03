@@ -9,7 +9,6 @@ import type {
   SimulationState,
 } from "@/types/pricing";
 
-
 const baseTax = (
   id: PurchaseTaxId,
   label: string,
@@ -48,38 +47,63 @@ export function tributosCompraPadrao(): PurchaseTax[] {
       treatment: "incluido",
       creditMode: "nao",
     }),
-    baseTax("cofins", "Cofins", "Contribuição federal sobre a receita. Pode ou não gerar crédito.", {
-      enabled: true,
-      rate: 0,
-      treatment: "incluido",
-      creditMode: "nao",
-    }),
-    baseTax("ipi", "IPI", "Imposto federal sobre produtos industrializados, normalmente cobrado por fora da mercadoria.", {
-      enabled: false,
-      treatment: "porFora",
-      creditMode: "nao",
-    }),
-    baseTax("ibs", "IBS", "Imposto sobre Bens e Serviços (reforma tributária). Configure conforme orientação da contabilidade.", {
-      enabled: false,
-      treatment: "informativo",
-      creditMode: "nao",
-    }),
-    baseTax("cbs", "CBS", "Contribuição sobre Bens e Serviços (reforma tributária). Configure conforme orientação da contabilidade.", {
-      enabled: false,
-      treatment: "informativo",
-      creditMode: "nao",
-    }),
+    baseTax(
+      "cofins",
+      "Cofins",
+      "Contribuição federal sobre a receita. Pode ou não gerar crédito.",
+      {
+        enabled: true,
+        rate: 0,
+        treatment: "incluido",
+        creditMode: "nao",
+      },
+    ),
+    baseTax(
+      "ipi",
+      "IPI",
+      "Imposto federal sobre produtos industrializados, normalmente cobrado por fora da mercadoria.",
+      {
+        enabled: false,
+        treatment: "porFora",
+        creditMode: "nao",
+      },
+    ),
+    baseTax(
+      "ibs",
+      "IBS",
+      "Imposto sobre Bens e Serviços (reforma tributária). Configure conforme orientação da contabilidade.",
+      {
+        enabled: false,
+        treatment: "informativo",
+        creditMode: "nao",
+      },
+    ),
+    baseTax(
+      "cbs",
+      "CBS",
+      "Contribuição sobre Bens e Serviços (reforma tributária). Configure conforme orientação da contabilidade.",
+      {
+        enabled: false,
+        treatment: "informativo",
+        creditMode: "nao",
+      },
+    ),
     baseTax(
       "icmsSt",
       "ICMS-ST / antecipação",
       "Substituição tributária ou antecipação cobrada do comprador. Normalmente é custo e não gera crédito.",
       { enabled: false, treatment: "porFora", creditMode: "nao" },
     ),
-    baseTax("outroCompra", "Outro tributo ou custo", "Use para qualquer outro tributo ou encargo da compra.", {
-      enabled: false,
-      treatment: "porFora",
-      creditMode: "nao",
-    }),
+    baseTax(
+      "outroCompra",
+      "Outro tributo ou custo",
+      "Use para qualquer outro tributo ou encargo da compra.",
+      {
+        enabled: false,
+        treatment: "porFora",
+        creditMode: "nao",
+      },
+    ),
   ];
 }
 
@@ -124,10 +148,15 @@ export function tributosVendaPadrao(): SaleTax[] {
       enabled: false,
       treatment: "informativo",
     }),
-    saleTax("seletivoVenda", "Imposto Seletivo", "Aplicável apenas a produtos específicos previstos em lei.", {
-      enabled: false,
-      treatment: "porFora",
-    }),
+    saleTax(
+      "seletivoVenda",
+      "Imposto Seletivo",
+      "Aplicável apenas a produtos específicos previstos em lei.",
+      {
+        enabled: false,
+        treatment: "porFora",
+      },
+    ),
     saleTax(
       "dasVenda",
       "DAS — Simples Nacional",
@@ -246,7 +275,6 @@ export function estadoInicial(): SimulationState {
     modoAvancado: false,
     operacao: operacaoPadrao(),
   };
-
 }
 
 /** Simulação de exemplo com dados realistas de um comércio varejista. */
@@ -275,9 +303,30 @@ export function estadoExemplo(): SimulationState {
     aliquotaInterestadual: null,
   });
   s.tributosCompra = tributosCompraPadrao().map((t) => {
-    if (t.id === "icms") return { ...t, enabled: true, rate: 18, treatment: "incluido" as const, creditMode: "integral" as const };
-    if (t.id === "pis") return { ...t, enabled: true, rate: 1.65, treatment: "incluido" as const, creditMode: "integral" as const };
-    if (t.id === "cofins") return { ...t, enabled: true, rate: 7.6, treatment: "incluido" as const, creditMode: "integral" as const };
+    if (t.id === "icms")
+      return {
+        ...t,
+        enabled: true,
+        rate: 18,
+        treatment: "incluido" as const,
+        creditMode: "integral" as const,
+      };
+    if (t.id === "pis")
+      return {
+        ...t,
+        enabled: true,
+        rate: 1.65,
+        treatment: "incluido" as const,
+        creditMode: "integral" as const,
+      };
+    if (t.id === "cofins")
+      return {
+        ...t,
+        enabled: true,
+        rate: 7.6,
+        treatment: "incluido" as const,
+        creditMode: "integral" as const,
+      };
     return t;
   });
   s.tributosVenda = tributosVendaPadrao().map((t) => {
@@ -371,7 +420,11 @@ export function aplicarCenario(state: SimulationState, cenario: ScenarioId): Sim
 export const CENARIOS: Array<{ id: ScenarioId; nome: string; descricao: string }> = [
   { id: "atual", nome: "Sistema atual", descricao: "ICMS, PIS e Cofins" },
   { id: "transicao", nome: "Transição", descricao: "Sistema atual + IBS e CBS" },
-  { id: "transicao2026", nome: "Transição 2026 — teste", descricao: "IBS 0,10% e CBS 0,90% informativos" },
+  {
+    id: "transicao2026",
+    nome: "Transição 2026 — teste",
+    descricao: "IBS 0,10% e CBS 0,90% informativos",
+  },
   { id: "novo", nome: "Novo sistema", descricao: "IBS e CBS" },
   { id: "personalizado", nome: "Personalizado", descricao: "Você define cada tributo" },
 ];
