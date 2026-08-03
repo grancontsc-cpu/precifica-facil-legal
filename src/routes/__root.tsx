@@ -17,6 +17,8 @@ import { SITE_NOME, SITE_URL } from "../lib/seo-head";
 import { registrarPageView } from "../lib/analytics";
 import { analyticsPermitido } from "../lib/consentimento";
 import { ConsentimentoCookies } from "../components/app/ConsentimentoCookies";
+import { LogoGrancont } from "../components/app/LogoGrancont";
+
 
 
 
