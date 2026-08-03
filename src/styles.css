@@ -211,10 +211,40 @@
     background-color: color-mix(in oklab, var(--brand) 22%, transparent);
   }
 
+  /* Foco por teclado: contorno único e consistente em todo o app. */
   :focus-visible {
     outline: 2px solid var(--ring);
     outline-offset: 2px;
   }
+
+  /* Alguns componentes usam utilitários que zeram o contorno
+     (outline-none). Controles interativos sempre voltam ao padrão. */
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  summary:focus-visible,
+  [role="button"]:focus-visible,
+  [role="link"]:focus-visible,
+  [role="checkbox"]:focus-visible,
+  [role="radio"]:focus-visible,
+  [role="switch"]:focus-visible,
+  [role="combobox"]:focus-visible,
+  [role="tab"]:focus-visible,
+  [role="menuitem"]:focus-visible,
+  [role="option"]:focus-visible,
+  [tabindex]:not([tabindex="-1"]):focus-visible {
+    outline: 2px solid var(--ring) !important;
+    outline-offset: 2px;
+    box-shadow: var(--shadow-focus);
+  }
+
+  /* Contraste do contorno também em fundos escuros/coloridos. */
+  .dark :focus-visible {
+    outline-color: var(--ring);
+  }
+
 
   /* Números fiscais nunca "dançam" ao atualizar o cálculo. */
   input[inputmode="decimal"],
