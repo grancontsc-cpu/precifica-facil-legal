@@ -3,6 +3,7 @@ import { metaPagina } from "@/lib/seo-head";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { KeyRound, Search } from "lucide-react";
+import { useDebounce } from "@/hooks/useDebounce";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -51,6 +52,8 @@ function PainelLicencas() {
   const atualizar = useServerFn(atualizarLicenca);
   const queryClient = useQueryClient();
   const [busca, setBusca] = useState("");
+  // Evita refiltrar a lista a cada tecla; os demais filtros seguem instantâneos.
+  const buscaDebounce = useDebounce(busca, 300);
 
   const licencas = useQuery({
     queryKey: ["admin", "licencas"],
@@ -73,13 +76,13 @@ function PainelLicencas() {
   });
 
   const lista = useMemo(() => {
-    const termo = busca.trim().toLowerCase();
+    const termo = buscaDebounce.trim().toLowerCase();
     const todas = licencas.data ?? [];
     if (!termo) return todas;
     return todas.filter(
       (l) => (l.email ?? "").toLowerCase().includes(termo) || (l.full_name ?? "").toLowerCase().includes(termo),
     );
-  }, [licencas.data, busca]);
+  }, [licencas.data, buscaDebounce]);
 
   if (licencas.isLoading) return <Carregando texto="Carregando licenças…" />;
 

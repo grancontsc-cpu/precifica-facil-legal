@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { metaPagina } from "@/lib/seo-head";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useDebounce } from "@/hooks/useDebounce";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -50,6 +51,8 @@ function SimulacoesPage() {
   const qc = useQueryClient();
   const navigate = useNavigate();
   const [busca, setBusca] = useState("");
+  // Evita refiltrar a lista a cada tecla; os demais filtros seguem instantâneos.
+  const buscaDebounce = useDebounce(busca, 300);
   const [situacao, setSituacao] = useState<Situacao>("ativas");
 
   const ctxAcesso = useMemo(
@@ -74,7 +77,7 @@ function SimulacoesPage() {
   });
 
   const lista = useMemo(() => {
-    const termo = busca.trim().toLowerCase();
+    const termo = buscaDebounce.trim().toLowerCase();
     // Defesa em profundidade: além da RLS, filtra o que o usuário pode ver.
     const visiveis = filtrarSimulacoesVisiveis(
       ctxAcesso,
@@ -90,7 +93,7 @@ function SimulacoesPage() {
       if (!termo) return true;
       return `${s.titulo} ${s.produto_nome ?? ""} ${s.tax_profile_name ?? ""}`.toLowerCase().includes(termo);
     });
-  }, [simulacoes.data, busca, situacao, ctxAcesso]);
+  }, [simulacoes.data, buscaDebounce, situacao, ctxAcesso]);
 
   const podeAlterar = (s: { organization_id: string; created_by: string | null }) =>
     avaliarAcessoSimulacao(ctxAcesso, {
