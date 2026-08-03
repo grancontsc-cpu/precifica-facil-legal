@@ -50,6 +50,16 @@ function ProdutosPage() {
     },
   });
 
+  const lista = useMemo(() => {
+    const termo = buscaDebounce.trim().toLowerCase();
+    const todos = produtos.data ?? [];
+    if (!termo) return todos;
+    return todos.filter((p) =>
+      `${p.nome} ${p.sku ?? ""} ${p.ncm ?? ""}`.toLowerCase().includes(termo),
+    );
+  }, [produtos.data, buscaDebounce]);
+
+
   const criar = useMutation({
     mutationFn: async () => {
       if (!orgId) throw new Error("Selecione uma empresa.");
