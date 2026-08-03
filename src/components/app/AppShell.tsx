@@ -183,7 +183,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         )}
       </header>
 
-      {children}
+      <div id="conteudo-principal" tabIndex={-1} className="focus:outline-none">
+        {children}
+      </div>
+
 
       <NavegacaoMobile ehGestor={ehGestor} isSuperAdmin={isSuperAdmin} />
     </div>
