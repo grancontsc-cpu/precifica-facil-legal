@@ -76,8 +76,10 @@ function SimulacoesPage() {
     },
   });
 
+  const avaliacao = useMemo(() => avaliarBusca(buscaDebounce), [buscaDebounce]);
+
   const lista = useMemo(() => {
-    const termo = buscaDebounce.trim().toLowerCase();
+    const termo = avaliacao.termo.toLowerCase();
     // Defesa em profundidade: além da RLS, filtra o que o usuário pode ver.
     const visiveis = filtrarSimulacoesVisiveis(
       ctxAcesso,
@@ -93,7 +95,8 @@ function SimulacoesPage() {
       if (!termo) return true;
       return `${s.titulo} ${s.produto_nome ?? ""} ${s.tax_profile_name ?? ""}`.toLowerCase().includes(termo);
     });
-  }, [simulacoes.data, buscaDebounce, situacao, ctxAcesso]);
+  }, [simulacoes.data, avaliacao.termo, situacao, ctxAcesso]);
+
 
   const podeAlterar = (s: { organization_id: string; created_by: string | null }) =>
     avaliarAcessoSimulacao(ctxAcesso, {
