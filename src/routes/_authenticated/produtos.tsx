@@ -50,14 +50,17 @@ function ProdutosPage() {
     },
   });
 
+  const avaliacao = useMemo(() => avaliarBusca(buscaDebounce), [buscaDebounce]);
+
   const lista = useMemo(() => {
-    const termo = buscaDebounce.trim().toLowerCase();
+    const termo = avaliacao.termo.toLowerCase();
     const todos = produtos.data ?? [];
     if (!termo) return todos;
     return todos.filter((p) =>
       `${p.nome} ${p.sku ?? ""} ${p.ncm ?? ""}`.toLowerCase().includes(termo),
     );
-  }, [produtos.data, buscaDebounce]);
+  }, [produtos.data, avaliacao.termo]);
+
 
 
   const criar = useMutation({
