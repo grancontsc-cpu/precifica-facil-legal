@@ -2,6 +2,7 @@ import { metaPagina } from "@/lib/seo-head";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Hourglass } from "lucide-react";
 
+import { LogoGrancont } from "@/components/app/LogoGrancont";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 
