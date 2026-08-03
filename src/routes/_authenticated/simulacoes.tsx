@@ -224,6 +224,17 @@ function SimulacoesPage() {
         {busca !== buscaDebounce ? " · atualizando…" : ""}
       </p>
 
+      {avaliacao.aviso ? (
+        <p
+          className="mt-2 rounded-lg border border-border bg-surface px-3 py-2 text-xs text-muted-foreground"
+          role="status"
+          aria-live="polite"
+        >
+          {avaliacao.aviso}
+        </p>
+      ) : null}
+
+
 
 
       <section className="mt-5 overflow-x-auto rounded-xl border border-border bg-card">
