@@ -56,7 +56,7 @@ describe("sanitizarBusca", () => {
   });
 
   it("normaliza ligaduras e frações antes de montar o filtro", () => {
-    expect(sanitizarBusca("caﬁné ½ kg")).toBe("caifiné 1⁄2 kg");
+    expect(sanitizarBusca("caﬁné ½ kg")).toBe("cafiné 1⁄2 kg");
   });
 
   it("retorna vazio para entradas inválidas", () => {
