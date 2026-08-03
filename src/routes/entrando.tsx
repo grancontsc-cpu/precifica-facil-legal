@@ -29,7 +29,7 @@ function Entrando() {
       const { data: sessao } = await supabase.auth.getUser();
       const user = sessao.user;
       if (!user) {
-        navigate({ to: "/login", replace: true });
+        navigate({ to: "/login", search: { next: undefined }, replace: true });
         return;
       }
 
