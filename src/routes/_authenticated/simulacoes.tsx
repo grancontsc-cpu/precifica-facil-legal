@@ -212,6 +212,15 @@ function SimulacoesPage() {
         </Select>
       </div>
 
+      <p className="mt-3 text-sm text-muted-foreground" role="status" aria-live="polite">
+        {simulacoes.isLoading
+          ? "Carregando simulações…"
+          : `${lista.length} ${lista.length === 1 ? "simulação encontrada" : "simulações encontradas"}`}
+        {busca !== buscaDebounce ? " · atualizando…" : ""}
+      </p>
+
+
+
       <section className="mt-5 overflow-x-auto rounded-xl border border-border bg-card">
         <table className="w-full text-sm">
           <thead className="bg-surface text-left text-xs uppercase tracking-wide text-muted-foreground">
