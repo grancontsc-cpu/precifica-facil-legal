@@ -1,4 +1,4 @@
-import { useId, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
   AlertDialog,
@@ -25,7 +25,6 @@ export function LogoInicio({ naRotaInicial }: { naRotaInicial: boolean }) {
   const { pendente } = useAlteracoesPendentes();
   const [confirmando, setConfirmando] = useState(false);
   const [tooltipAberto, setTooltipAberto] = useState(false);
-  const dicaId = useId();
 
   // Texto lido pelo leitor de tela como descrição (aria-describedby) do link.
   const dica = pendente
@@ -46,13 +45,11 @@ export function LogoInicio({ naRotaInicial }: { naRotaInicial: boolean }) {
               to="/simulador"
               search={{ simulacao: undefined, produto: undefined }}
               className={cn(
-                "flex shrink-0 basis-auto items-center whitespace-nowrap rounded-md px-1.5 py-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                "flex shrink-0 basis-auto items-center whitespace-nowrap rounded-md px-1.5 py-1 transition-all",
                 "max-w-[45vw] sm:max-w-none",
                 naRotaInicial ? "bg-primary/10 ring-1 ring-primary/30" : "hover:opacity-80",
               )}
-
-              aria-label="Precifica Grancont"
-              aria-describedby={tooltipAberto ? dicaId : undefined}
+              aria-label="Precifica Grancont — ir para o simulador"
               aria-current={naRotaInicial ? "page" : undefined}
               onClick={(e) => {
                 if (!pendente) return;
@@ -63,11 +60,14 @@ export function LogoInicio({ naRotaInicial }: { naRotaInicial: boolean }) {
               <LogoGrancont className="h-6 sm:h-7" decorativa />
             </Link>
           </TooltipTrigger>
-          <TooltipContent id={dicaId} side="bottom" align="start">
+          {/* A dica é apenas visual: o Radix já associa a descrição ao link,
+              e o nome acessível do link não repete esse texto. */}
+          <TooltipContent side="bottom" align="start">
             {dica}
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
+
 
       <AlertDialog open={confirmando} onOpenChange={setConfirmando}>
         <AlertDialogContent>

@@ -2,7 +2,6 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { ChevronDown, ShieldCheck } from "lucide-react";
 
 import { Glossario } from "@/components/app/Glossario";
-import { LogoGrancont } from "@/components/app/LogoGrancont";
 import { MenuConta } from "@/components/app/MenuConta";
 import { NavegacaoMobile } from "@/components/app/NavegacaoMobile";
 import {
@@ -40,7 +39,9 @@ function LinkTopo({ item, ativo }: { item: ItemNav; ativo: boolean }) {
   return (
     <Link
       to={item.to}
-      title={item.descricao}
+      // Sem `title`: o texto visível já nomeia o link e o title seria lido
+      // logo em seguida como descrição, duplicando a leitura.
+      aria-current={ativo ? "page" : undefined}
       className={cn(
         "inline-flex shrink-0 items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors",
         ativo
@@ -79,11 +80,17 @@ function MenuSuspenso({
         >
           <ShieldCheck className="h-4 w-4" aria-hidden />
           {rotulo}
+          {algumAtivo ? <span className="sr-only">(seção atual)</span> : null}
           <ChevronDown className="h-3.5 w-3.5" aria-hidden />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-72">
-        <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
+        {/* O menu já recebe o nome do gatilho; o rótulo visível fica oculto
+            para leitores de tela para não repetir o mesmo texto. */}
+        <DropdownMenuLabel
+          aria-hidden
+          className="text-xs font-normal text-muted-foreground"
+        >
           {rotulo}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
@@ -91,7 +98,11 @@ function MenuSuspenso({
           const Icon = item.icon;
           return (
             <DropdownMenuItem key={item.to} asChild>
-              <Link to={item.to} className="items-start gap-3">
+              <Link
+                to={item.to}
+                aria-current={itemAtivo(pathname, item.to) ? "page" : undefined}
+                className="items-start gap-3"
+              >
                 <Icon className="mt-0.5 h-4 w-4 text-muted-foreground" aria-hidden />
                 <span className="min-w-0">
                   <span className="block text-sm font-medium text-foreground">{item.label}</span>
@@ -107,6 +118,7 @@ function MenuSuspenso({
     </DropdownMenu>
   );
 }
+
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { organizations, orgId, setOrgId, isSuperAdmin, memberships, situacaoLicenca } = useApp();
