@@ -154,4 +154,3 @@ describe("MenuSuspenso — clique fora", () => {
     await waitFor(() => expect(itens[0]).toHaveFocus());
   });
 });
-

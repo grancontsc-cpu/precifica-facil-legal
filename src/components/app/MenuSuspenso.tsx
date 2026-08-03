@@ -76,7 +76,6 @@ export function MenuSuspenso({
           gatilhoRef.current?.focus();
         }}
       >
-
         {/* O menu já recebe o nome do gatilho; o rótulo visível fica oculto
             para leitores de tela para não repetir o mesmo texto. */}
         <DropdownMenuLabel aria-hidden className="text-xs font-normal text-muted-foreground">
