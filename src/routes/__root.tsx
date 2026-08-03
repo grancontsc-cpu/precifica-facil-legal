@@ -28,10 +28,12 @@ function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <p className="num-destaque text-6xl font-bold text-primary/25">404</p>
+        <LogoGrancont className="mx-auto h-9 w-auto" />
+        <p className="num-destaque mt-8 text-6xl font-bold text-primary/25">404</p>
         <h1 className="mt-3 text-xl font-semibold tracking-tight text-foreground">
           Página não encontrada
         </h1>
+
         <p className="mt-2 text-sm text-muted-foreground">
           O endereço acessado não existe ou foi movido para outro lugar.
         </p>
