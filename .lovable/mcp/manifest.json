@@ -101,7 +101,8 @@
           "properties": {
             "busca": {
               "description": "Texto no nome, SKU ou NCM.",
-              "type": "string"
+              "type": "string",
+              "maxLength": 100
             },
             "limite": {
               "default": 20,
