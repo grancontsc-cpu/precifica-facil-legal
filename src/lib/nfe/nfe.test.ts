@@ -169,8 +169,8 @@ describe("precificação da nota inteira", () => {
   it("ICMS-ST e IPI aumentam o desembolso sem gerar crédito", () => {
     const { nota } = parseNfeXml(xmlNota({ st: true, ipi: true }), "nota.xml");
     const calc = precificarNota(nota!, { regime: "real", premissas });
-    // 2150 + ST (100 x 2 itens) + IPI (50 x 2 itens)
-    expect(calc.totais.desembolso).toBeCloseTo(2450, 2);
+    // 2150 + ICMS-ST (100 nos dois itens) + IPI (50, só no primeiro item)
+    expect(calc.totais.desembolso).toBeCloseTo(2400, 2);
   });
 
   it("sugere preço unitário acima do custo líquido do item", () => {
