@@ -4,7 +4,12 @@ import { describe, expect, it } from "vitest";
 import { distribuirProporcional } from "@/lib/nfe/rateio";
 import { parseNfeXml } from "@/lib/nfe/xml";
 import { itensDoTexto, notaDoTextoPdf } from "@/lib/nfe/pdf";
-import { creditaIcms, creditaPisCofins, precificarNota, premissasPadrao } from "@/lib/nfe/para-simulacao";
+import {
+  creditaIcms,
+  creditaPisCofins,
+  precificarNota,
+  premissasPadrao,
+} from "@/lib/nfe/para-simulacao";
 
 function xmlNota(opcoes: { st?: boolean; ipi?: boolean; csosn?: boolean } = {}) {
   const icms = opcoes.csosn

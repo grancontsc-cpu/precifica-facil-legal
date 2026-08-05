@@ -55,9 +55,8 @@ function ImportarPage() {
   const [lendo, setLendo] = useState(false);
   const [passo, setPasso] = useState<Passo>(1);
   const [regime, setRegime] = useState<Regime>(
-    (empresa?.regime as Regime | undefined) && ["simples", "presumido", "real", "mei"].includes(
-      empresa!.regime!,
-    )
+    (empresa?.regime as Regime | undefined) &&
+      ["simples", "presumido", "real", "mei"].includes(empresa!.regime!)
       ? (empresa!.regime as Regime)
       : "real",
   );
@@ -261,8 +260,8 @@ function ImportarPage() {
             <FileUp className="mx-auto mb-3 h-8 w-8 text-muted-foreground" aria-hidden="true" />
             <p className="text-sm font-medium">Arraste os arquivos aqui ou escolha no aparelho</p>
             <p className="mt-1 text-xs text-muted-foreground">
-              XML da NF-e (leitura exata) ou PDF do DANFE (leitura assistida). Até{" "}
-              {LIMITE_ARQUIVOS} arquivos de 10 MB.
+              XML da NF-e (leitura exata) ou PDF do DANFE (leitura assistida). Até {LIMITE_ARQUIVOS}{" "}
+              arquivos de 10 MB.
             </p>
             <input
               ref={entradaRef}
@@ -526,7 +525,9 @@ function ImportarPage() {
                     <tr className="border-t font-medium">
                       <td className="py-2 pr-3">Total da nota</td>
                       <td className="py-2 pr-3" />
-                      <td className="py-2 pr-3 tabular-nums">{formatBRL(calc.totais.desembolso)}</td>
+                      <td className="py-2 pr-3 tabular-nums">
+                        {formatBRL(calc.totais.desembolso)}
+                      </td>
                       <td className="py-2 pr-3 tabular-nums">{formatBRL(calc.totais.creditos)}</td>
                       <td className="py-2 pr-3 tabular-nums">
                         {formatBRL(calc.totais.custoLiquido)}

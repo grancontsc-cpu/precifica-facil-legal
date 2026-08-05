@@ -244,12 +244,15 @@ export function parseNfeXml(conteudo: string, arquivo: string): LeituraNota {
  * são rateados por item, na proporção do valor do produto. Quando o item já
  * traz o valor, ele prevalece.
  */
-export function ratearCabecalho(itens: ItemNota[], totais: {
-  frete: number;
-  seguro: number;
-  outras: number;
-  desconto: number;
-}): ItemNota[] {
+export function ratearCabecalho(
+  itens: ItemNota[],
+  totais: {
+    frete: number;
+    seguro: number;
+    outras: number;
+    desconto: number;
+  },
+): ItemNota[] {
   const pesos = itens.map((i) => i.valorProduto);
   const campos = ["frete", "seguro", "outras", "desconto"] as const;
   const rateios: Record<(typeof campos)[number], number[]> = {
