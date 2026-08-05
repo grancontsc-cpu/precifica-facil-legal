@@ -54,6 +54,13 @@ export const NAV_DIARIO: ItemNav[] = [
     acesso: "todos",
   },
   {
+    to: "/importar",
+    label: "Importar nota",
+    descricao: "Precifique a nota inteira a partir do XML ou do PDF",
+    icon: FileUp,
+    acesso: "todos",
+  },
+  {
     to: "/simulacoes",
     label: "Simulações",
     descricao: "Histórico dos cálculos já salvos",
