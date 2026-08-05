@@ -3,6 +3,7 @@ import {
   Building2,
   Calculator,
   ClipboardList,
+  FileUp,
   History,
   KeyRound,
   LayoutDashboard,
