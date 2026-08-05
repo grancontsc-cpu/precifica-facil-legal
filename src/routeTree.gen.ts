@@ -36,6 +36,7 @@ import { Route as AuthenticatedSimulacoesRouteImport } from './routes/_authentic
 import { Route as AuthenticatedRapidoRouteImport } from './routes/_authenticated/rapido'
 import { Route as AuthenticatedProdutosRouteImport } from './routes/_authenticated/produtos'
 import { Route as AuthenticatedPerfisRouteImport } from './routes/_authenticated/perfis'
+import { Route as AuthenticatedImportarRouteImport } from './routes/_authenticated/importar'
 import { Route as AuthenticatedEmpresasRouteImport } from './routes/_authenticated/empresas'
 import { Route as AuthenticatedCompararRouteImport } from './routes/_authenticated/comparar'
 import { Route as AuthenticatedAuditoriaRouteImport } from './routes/_authenticated/auditoria'
@@ -193,6 +194,11 @@ const AuthenticatedProdutosRoute = AuthenticatedProdutosRouteImport.update({
 const AuthenticatedPerfisRoute = AuthenticatedPerfisRouteImport.update({
   id: '/perfis',
   path: '/perfis',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedImportarRoute = AuthenticatedImportarRouteImport.update({
+  id: '/importar',
+  path: '/importar',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedEmpresasRoute = AuthenticatedEmpresasRouteImport.update({
@@ -358,6 +364,7 @@ export interface FileRoutesByFullPath {
   '/auditoria': typeof AuthenticatedAuditoriaRoute
   '/comparar': typeof AuthenticatedCompararRoute
   '/empresas': typeof AuthenticatedEmpresasRoute
+  '/importar': typeof AuthenticatedImportarRoute
   '/perfis': typeof AuthenticatedPerfisRoute
   '/produtos': typeof AuthenticatedProdutosRoute
   '/rapido': typeof AuthenticatedRapidoRoute
@@ -410,6 +417,7 @@ export interface FileRoutesByTo {
   '/auditoria': typeof AuthenticatedAuditoriaRoute
   '/comparar': typeof AuthenticatedCompararRoute
   '/empresas': typeof AuthenticatedEmpresasRoute
+  '/importar': typeof AuthenticatedImportarRoute
   '/perfis': typeof AuthenticatedPerfisRoute
   '/produtos': typeof AuthenticatedProdutosRoute
   '/rapido': typeof AuthenticatedRapidoRoute
@@ -464,6 +472,7 @@ export interface FileRoutesById {
   '/_authenticated/auditoria': typeof AuthenticatedAuditoriaRoute
   '/_authenticated/comparar': typeof AuthenticatedCompararRoute
   '/_authenticated/empresas': typeof AuthenticatedEmpresasRoute
+  '/_authenticated/importar': typeof AuthenticatedImportarRoute
   '/_authenticated/perfis': typeof AuthenticatedPerfisRoute
   '/_authenticated/produtos': typeof AuthenticatedProdutosRoute
   '/_authenticated/rapido': typeof AuthenticatedRapidoRoute
@@ -518,6 +527,7 @@ export interface FileRouteTypes {
     | '/auditoria'
     | '/comparar'
     | '/empresas'
+    | '/importar'
     | '/perfis'
     | '/produtos'
     | '/rapido'
@@ -570,6 +580,7 @@ export interface FileRouteTypes {
     | '/auditoria'
     | '/comparar'
     | '/empresas'
+    | '/importar'
     | '/perfis'
     | '/produtos'
     | '/rapido'
@@ -623,6 +634,7 @@ export interface FileRouteTypes {
     | '/_authenticated/auditoria'
     | '/_authenticated/comparar'
     | '/_authenticated/empresas'
+    | '/_authenticated/importar'
     | '/_authenticated/perfis'
     | '/_authenticated/produtos'
     | '/_authenticated/rapido'
@@ -872,6 +884,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPerfisRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/importar': {
+      id: '/_authenticated/importar'
+      path: '/importar'
+      fullPath: '/importar'
+      preLoaderRoute: typeof AuthenticatedImportarRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/empresas': {
       id: '/_authenticated/empresas'
       path: '/empresas'
@@ -1047,6 +1066,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAuditoriaRoute: typeof AuthenticatedAuditoriaRoute
   AuthenticatedCompararRoute: typeof AuthenticatedCompararRoute
   AuthenticatedEmpresasRoute: typeof AuthenticatedEmpresasRoute
+  AuthenticatedImportarRoute: typeof AuthenticatedImportarRoute
   AuthenticatedPerfisRoute: typeof AuthenticatedPerfisRoute
   AuthenticatedProdutosRoute: typeof AuthenticatedProdutosRoute
   AuthenticatedRapidoRoute: typeof AuthenticatedRapidoRoute
@@ -1074,6 +1094,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAuditoriaRoute: AuthenticatedAuditoriaRoute,
   AuthenticatedCompararRoute: AuthenticatedCompararRoute,
   AuthenticatedEmpresasRoute: AuthenticatedEmpresasRoute,
+  AuthenticatedImportarRoute: AuthenticatedImportarRoute,
   AuthenticatedPerfisRoute: AuthenticatedPerfisRoute,
   AuthenticatedProdutosRoute: AuthenticatedProdutosRoute,
   AuthenticatedRapidoRoute: AuthenticatedRapidoRoute,

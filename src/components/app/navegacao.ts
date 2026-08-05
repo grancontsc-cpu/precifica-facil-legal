@@ -3,6 +3,7 @@ import {
   Building2,
   Calculator,
   ClipboardList,
+  FileUp,
   History,
   KeyRound,
   LayoutDashboard,
@@ -51,6 +52,13 @@ export const NAV_DIARIO: ItemNav[] = [
     label: "Comparar",
     descricao: "Veja qual fornecedor sai mais barato de verdade",
     icon: Scale,
+    acesso: "todos",
+  },
+  {
+    to: "/importar",
+    label: "Importar nota",
+    descricao: "Precifique a nota inteira a partir do XML ou do PDF",
+    icon: FileUp,
     acesso: "todos",
   },
   {
