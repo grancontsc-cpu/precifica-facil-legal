@@ -69,6 +69,8 @@ function ImportarPage() {
   );
   const [fronteiraAtiva, setFronteiraAtiva] = useState(false);
   const [premissas, setPremissas] = useState<PremissasVenda>(() => premissasPadrao());
+  const [versoes, setVersoes] = useState<VersaoLote[]>([]);
+  const [versaoBaseId, setVersaoBaseId] = useState<string>("");
 
   const ufEmpresa = empresa?.uf ?? "";
   const internaSugerida = aliquotaInterna(tabela, ufEmpresa);
