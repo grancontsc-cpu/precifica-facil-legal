@@ -1,7 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { FileUp, FileText, FileSpreadsheet, Printer, Trash2, Loader2 } from "lucide-react";
+import {
+  FileUp,
+  FileText,
+  FileSpreadsheet,
+  Printer,
+  Trash2,
+  Loader2,
+  History as HistoryIcon,
+  RotateCcw,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
