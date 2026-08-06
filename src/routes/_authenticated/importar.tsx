@@ -521,7 +521,7 @@ function ImportarPage() {
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 <Button type="button" size="sm" onClick={salvarVersao}>
-                  <History className="mr-2 h-4 w-4" aria-hidden="true" /> Salvar versão atual
+                  <HistoryIcon className="mr-2 h-4 w-4" aria-hidden="true" /> Salvar versão atual
                 </Button>
                 {versoes.length > 0 && (
                   <div className="flex items-center gap-2">
