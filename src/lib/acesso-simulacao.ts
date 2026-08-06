@@ -38,10 +38,7 @@ export function contextoDoApp(app: DadosAcessoApp): ContextoAcesso {
 
 /** Códigos padronizados de negação — nunca revelam dados do registro. */
 export type CodigoAcesso =
-  | "sessao_expirada"
-  | "conta_inativa"
-  | "sem_permissao_leitura"
-  | "somente_leitura";
+  "sessao_expirada" | "conta_inativa" | "sem_permissao_leitura" | "somente_leitura";
 
 export interface MensagemAcesso {
   titulo: string;

@@ -150,10 +150,7 @@ function PerfisPage() {
         name: r.name.trim(),
         organization_id: r.organization_id,
         scenario: (r.scenario === "transicao2026" ? "transicao" : r.scenario) as
-          | "atual"
-          | "transicao"
-          | "novo"
-          | "personalizado",
+          "atual" | "transicao" | "novo" | "personalizado",
         valid_from: r.valid_from,
         valid_to: r.valid_to || null,
         notes: r.notes || null,
