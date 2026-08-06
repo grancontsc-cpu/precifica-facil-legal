@@ -501,6 +501,83 @@ function ImportarPage() {
             </div>
           </div>
 
+          <div className="rounded-xl border bg-card p-4">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h3 className="text-sm font-semibold">Reprocessar o lote e comparar</h3>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Salve a precificação atual como versão, mude as premissas e veja lado a lado o
+                  preço sugerido anterior e o recalculado.
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <Button type="button" size="sm" onClick={salvarVersao}>
+                  <History className="mr-2 h-4 w-4" aria-hidden="true" /> Salvar versão atual
+                </Button>
+                {versoes.length > 0 && (
+                  <div className="flex items-center gap-2">
+                    <Label htmlFor="versao-base" className="text-xs font-normal">
+                      Comparar com
+                    </Label>
+                    <Select value={versaoBaseId} onValueChange={setVersaoBaseId}>
+                      <SelectTrigger id="versao-base" className="w-[190px]">
+                        <SelectValue placeholder="Nenhuma versão" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {versoes.map((v) => (
+                          <SelectItem key={v.id} value={v.id}>
+                            {v.rotulo}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {versaoBase && (
+              <div className="mt-4 space-y-3 text-xs">
+                <div className="flex flex-wrap items-center gap-3">
+                  <Badge variant="secondary">
+                    {versaoBase.rotulo} ·{" "}
+                    {new Date(versaoBase.criadaEm).toLocaleString("pt-BR", {
+                      dateStyle: "short",
+                      timeStyle: "short",
+                    })}
+                  </Badge>
+                  <span className="text-muted-foreground">
+                    Receita da versão: {formatBRL(versaoBase.totais.receitaSugerida)} · agora:{" "}
+                    {formatBRL(totalGeral.receitaSugerida)}
+                  </span>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => restaurarVersao(versaoBase)}
+                  >
+                    <RotateCcw className="mr-2 h-4 w-4" aria-hidden="true" /> Restaurar premissas
+                  </Button>
+                </div>
+                {mudancasPremissas.length === 0 ? (
+                  <p className="text-muted-foreground">
+                    As premissas atuais são iguais às da versão comparada.
+                  </p>
+                ) : (
+                  <ul className="grid gap-1 sm:grid-cols-2 lg:grid-cols-3">
+                    {mudancasPremissas.map((d) => (
+                      <li key={d.campo} className="rounded-md bg-muted/60 px-2 py-1">
+                        <span className="font-medium">{d.campo}</span>: {String(d.anterior)} →{" "}
+                        {String(d.atual)}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
+          </div>
+
+
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {(
               [
