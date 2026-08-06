@@ -620,39 +620,78 @@ function ImportarPage() {
                       <th className="py-1 pr-3">Desembolso</th>
                       <th className="py-1 pr-3">Créditos</th>
                       <th className="py-1 pr-3">Custo líq. unit.</th>
+                      {versaoBase && <th className="py-1 pr-3">Preço anterior</th>}
                       <th className="py-1 pr-3">Preço sugerido</th>
+                      {versaoBase && <th className="py-1 pr-3">Variação</th>}
                       <th className="py-1 pr-3">Margem</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {calc.itens.map(({ item, resultado }) => (
-                      <tr key={`${calc.nota.id}-${item.numero}`} className="border-t">
-                        <td className="py-1 pr-3">{item.descricao}</td>
-                        <td className="py-1 pr-3">
-                          {formatNumero(item.quantidade)} {item.unidade}
-                        </td>
-                        <td className="py-1 pr-3 tabular-nums">
-                          {formatBRL(resultado.compra.desembolsoTotal)}
-                        </td>
-                        <td className="py-1 pr-3 tabular-nums">
-                          {formatBRL(resultado.compra.creditosTotais)}
-                        </td>
-                        <td className="py-1 pr-3 tabular-nums">
-                          {formatBRL(resultado.compra.custoLiquidoUnitario)}
-                        </td>
-                        <td className="py-1 pr-3 font-medium tabular-nums">
-                          {resultado.recomendado
-                            ? formatBRL(resultado.recomendado.precoFinal)
-                            : "não é possível"}
-                        </td>
-                        <td className="py-1 pr-3 tabular-nums">
-                          {resultado.recomendado
-                            ? formatPercent(resultado.recomendado.margemEfetiva)
-                            : "—"}
-                        </td>
-                      </tr>
-                    ))}
+                    {calc.itens.map(({ item, resultado }) => {
+                      const comp = compararItem(
+                        versaoBase,
+                        chaveItem(calc.nota.id, item.numero),
+                        resultado.recomendado?.precoFinal ?? null,
+                        resultado.recomendado?.margemEfetiva ?? null,
+                      );
+                      return (
+                        <tr key={`${calc.nota.id}-${item.numero}`} className="border-t">
+                          <td className="py-1 pr-3">{item.descricao}</td>
+                          <td className="py-1 pr-3">
+                            {formatNumero(item.quantidade)} {item.unidade}
+                          </td>
+                          <td className="py-1 pr-3 tabular-nums">
+                            {formatBRL(resultado.compra.desembolsoTotal)}
+                          </td>
+                          <td className="py-1 pr-3 tabular-nums">
+                            {formatBRL(resultado.compra.creditosTotais)}
+                          </td>
+                          <td className="py-1 pr-3 tabular-nums">
+                            {formatBRL(resultado.compra.custoLiquidoUnitario)}
+                          </td>
+                          {versaoBase && (
+                            <td className="py-1 pr-3 tabular-nums text-muted-foreground">
+                              {comp.precoAnterior !== null ? formatBRL(comp.precoAnterior) : "—"}
+                            </td>
+                          )}
+                          <td className="py-1 pr-3 font-medium tabular-nums">
+                            {resultado.recomendado
+                              ? formatBRL(resultado.recomendado.precoFinal)
+                              : "não é possível"}
+                          </td>
+                          {versaoBase && (
+                            <td className="py-1 pr-3 tabular-nums">
+                              {comp.variacaoAbsoluta === null ? (
+                                "—"
+                              ) : (
+                                <span
+                                  className={
+                                    comp.variacaoAbsoluta > 0
+                                      ? "text-emerald-600 dark:text-emerald-400"
+                                      : comp.variacaoAbsoluta < 0
+                                        ? "text-destructive"
+                                        : "text-muted-foreground"
+                                  }
+                                >
+                                  {comp.variacaoAbsoluta > 0 ? "+" : ""}
+                                  {formatBRL(comp.variacaoAbsoluta)}
+                                  {comp.variacaoPercentual !== null
+                                    ? ` (${comp.variacaoPercentual > 0 ? "+" : ""}${formatPercent(comp.variacaoPercentual)})`
+                                    : ""}
+                                </span>
+                              )}
+                            </td>
+                          )}
+                          <td className="py-1 pr-3 tabular-nums">
+                            {resultado.recomendado
+                              ? formatPercent(resultado.recomendado.margemEfetiva)
+                              : "—"}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
+
                   <tfoot>
                     <tr className="border-t font-medium">
                       <td className="py-2 pr-3">Total da nota</td>
