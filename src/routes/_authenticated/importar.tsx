@@ -1,7 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { FileUp, FileText, FileSpreadsheet, Printer, Trash2, Loader2 } from "lucide-react";
+import {
+  FileUp,
+  FileText,
+  FileSpreadsheet,
+  Printer,
+  Trash2,
+  Loader2,
+  History as HistoryIcon,
+  RotateCcw,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,6 +37,13 @@ import {
   type NotaPrecificada,
   type PremissasVenda,
 } from "@/lib/nfe/para-simulacao";
+import {
+  chaveItem,
+  compararItem,
+  criarVersao,
+  diferencasPremissas,
+  type VersaoLote,
+} from "@/lib/nfe/versoes";
 import type { NotaImportada } from "@/lib/nfe/tipos";
 import type { Regime } from "@/types/pricing";
 
@@ -62,6 +78,8 @@ function ImportarPage() {
   );
   const [fronteiraAtiva, setFronteiraAtiva] = useState(false);
   const [premissas, setPremissas] = useState<PremissasVenda>(() => premissasPadrao());
+  const [versoes, setVersoes] = useState<VersaoLote[]>([]);
+  const [versaoBaseId, setVersaoBaseId] = useState<string>("");
 
   const ufEmpresa = empresa?.uf ?? "";
   const internaSugerida = aliquotaInterna(tabela, ufEmpresa);
@@ -93,6 +111,42 @@ function ImportarPage() {
       ),
     [calculadas],
   );
+
+  const versaoBase = useMemo(
+    () => versoes.find((v) => v.id === versaoBaseId) ?? null,
+    [versoes, versaoBaseId],
+  );
+
+  const mudancasPremissas = useMemo(
+    () => (versaoBase ? diferencasPremissas(versaoBase, premissas, regime, fronteiraAtiva) : []),
+    [versaoBase, premissas, regime, fronteiraAtiva],
+  );
+
+  function salvarVersao() {
+    if (calculadas.length === 0) return;
+    const id =
+      typeof crypto !== "undefined" && "randomUUID" in crypto
+        ? crypto.randomUUID()
+        : String(Date.now());
+    const versao = criarVersao(calculadas, {
+      id,
+      rotulo: `Versão ${versoes.length + 1}`,
+      criadaEm: new Date().toISOString(),
+      regime,
+      fronteiraAtiva,
+      premissas,
+    });
+    setVersoes((v) => [...v, versao]);
+    setVersaoBaseId(id);
+    toast.success(`${versao.rotulo} salva. Altere as premissas para reprocessar e comparar.`);
+  }
+
+  function restaurarVersao(v: VersaoLote) {
+    setRegime(v.regime);
+    setFronteiraAtiva(v.fronteiraAtiva);
+    setPremissas({ ...v.premissas });
+    toast.success(`Premissas da ${v.rotulo} restauradas.`);
+  }
 
   async function receberArquivos(lista: FileList | null) {
     if (!lista || lista.length === 0) return;
@@ -455,6 +509,82 @@ function ImportarPage() {
             </div>
           </div>
 
+          <div className="rounded-xl border bg-card p-4">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h3 className="text-sm font-semibold">Reprocessar o lote e comparar</h3>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Salve a precificação atual como versão, mude as premissas e veja lado a lado o
+                  preço sugerido anterior e o recalculado.
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <Button type="button" size="sm" onClick={salvarVersao}>
+                  <HistoryIcon className="mr-2 h-4 w-4" aria-hidden="true" /> Salvar versão atual
+                </Button>
+                {versoes.length > 0 && (
+                  <div className="flex items-center gap-2">
+                    <Label htmlFor="versao-base" className="text-xs font-normal">
+                      Comparar com
+                    </Label>
+                    <Select value={versaoBaseId} onValueChange={setVersaoBaseId}>
+                      <SelectTrigger id="versao-base" className="w-[190px]">
+                        <SelectValue placeholder="Nenhuma versão" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {versoes.map((v) => (
+                          <SelectItem key={v.id} value={v.id}>
+                            {v.rotulo}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {versaoBase && (
+              <div className="mt-4 space-y-3 text-xs">
+                <div className="flex flex-wrap items-center gap-3">
+                  <Badge variant="secondary">
+                    {versaoBase.rotulo} ·{" "}
+                    {new Date(versaoBase.criadaEm).toLocaleString("pt-BR", {
+                      dateStyle: "short",
+                      timeStyle: "short",
+                    })}
+                  </Badge>
+                  <span className="text-muted-foreground">
+                    Receita da versão: {formatBRL(versaoBase.totais.receitaSugerida)} · agora:{" "}
+                    {formatBRL(totalGeral.receitaSugerida)}
+                  </span>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => restaurarVersao(versaoBase)}
+                  >
+                    <RotateCcw className="mr-2 h-4 w-4" aria-hidden="true" /> Restaurar premissas
+                  </Button>
+                </div>
+                {mudancasPremissas.length === 0 ? (
+                  <p className="text-muted-foreground">
+                    As premissas atuais são iguais às da versão comparada.
+                  </p>
+                ) : (
+                  <ul className="grid gap-1 sm:grid-cols-2 lg:grid-cols-3">
+                    {mudancasPremissas.map((d) => (
+                      <li key={d.campo} className="rounded-md bg-muted/60 px-2 py-1">
+                        <span className="font-medium">{d.campo}</span>: {String(d.anterior)} →{" "}
+                        {String(d.atual)}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
+          </div>
+
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {(
               [
@@ -488,39 +618,78 @@ function ImportarPage() {
                       <th className="py-1 pr-3">Desembolso</th>
                       <th className="py-1 pr-3">Créditos</th>
                       <th className="py-1 pr-3">Custo líq. unit.</th>
+                      {versaoBase && <th className="py-1 pr-3">Preço anterior</th>}
                       <th className="py-1 pr-3">Preço sugerido</th>
+                      {versaoBase && <th className="py-1 pr-3">Variação</th>}
                       <th className="py-1 pr-3">Margem</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {calc.itens.map(({ item, resultado }) => (
-                      <tr key={`${calc.nota.id}-${item.numero}`} className="border-t">
-                        <td className="py-1 pr-3">{item.descricao}</td>
-                        <td className="py-1 pr-3">
-                          {formatNumero(item.quantidade)} {item.unidade}
-                        </td>
-                        <td className="py-1 pr-3 tabular-nums">
-                          {formatBRL(resultado.compra.desembolsoTotal)}
-                        </td>
-                        <td className="py-1 pr-3 tabular-nums">
-                          {formatBRL(resultado.compra.creditosTotais)}
-                        </td>
-                        <td className="py-1 pr-3 tabular-nums">
-                          {formatBRL(resultado.compra.custoLiquidoUnitario)}
-                        </td>
-                        <td className="py-1 pr-3 font-medium tabular-nums">
-                          {resultado.recomendado
-                            ? formatBRL(resultado.recomendado.precoFinal)
-                            : "não é possível"}
-                        </td>
-                        <td className="py-1 pr-3 tabular-nums">
-                          {resultado.recomendado
-                            ? formatPercent(resultado.recomendado.margemEfetiva)
-                            : "—"}
-                        </td>
-                      </tr>
-                    ))}
+                    {calc.itens.map(({ item, resultado }) => {
+                      const comp = compararItem(
+                        versaoBase,
+                        chaveItem(calc.nota.id, item.numero),
+                        resultado.recomendado?.precoFinal ?? null,
+                        resultado.recomendado?.margemEfetiva ?? null,
+                      );
+                      return (
+                        <tr key={`${calc.nota.id}-${item.numero}`} className="border-t">
+                          <td className="py-1 pr-3">{item.descricao}</td>
+                          <td className="py-1 pr-3">
+                            {formatNumero(item.quantidade)} {item.unidade}
+                          </td>
+                          <td className="py-1 pr-3 tabular-nums">
+                            {formatBRL(resultado.compra.desembolsoTotal)}
+                          </td>
+                          <td className="py-1 pr-3 tabular-nums">
+                            {formatBRL(resultado.compra.creditosTotais)}
+                          </td>
+                          <td className="py-1 pr-3 tabular-nums">
+                            {formatBRL(resultado.compra.custoLiquidoUnitario)}
+                          </td>
+                          {versaoBase && (
+                            <td className="py-1 pr-3 tabular-nums text-muted-foreground">
+                              {comp.precoAnterior !== null ? formatBRL(comp.precoAnterior) : "—"}
+                            </td>
+                          )}
+                          <td className="py-1 pr-3 font-medium tabular-nums">
+                            {resultado.recomendado
+                              ? formatBRL(resultado.recomendado.precoFinal)
+                              : "não é possível"}
+                          </td>
+                          {versaoBase && (
+                            <td className="py-1 pr-3 tabular-nums">
+                              {comp.variacaoAbsoluta === null ? (
+                                "—"
+                              ) : (
+                                <span
+                                  className={
+                                    comp.variacaoAbsoluta > 0
+                                      ? "text-emerald-600 dark:text-emerald-400"
+                                      : comp.variacaoAbsoluta < 0
+                                        ? "text-destructive"
+                                        : "text-muted-foreground"
+                                  }
+                                >
+                                  {comp.variacaoAbsoluta > 0 ? "+" : ""}
+                                  {formatBRL(comp.variacaoAbsoluta)}
+                                  {comp.variacaoPercentual !== null
+                                    ? ` (${comp.variacaoPercentual > 0 ? "+" : ""}${formatPercent(comp.variacaoPercentual)})`
+                                    : ""}
+                                </span>
+                              )}
+                            </td>
+                          )}
+                          <td className="py-1 pr-3 tabular-nums">
+                            {resultado.recomendado
+                              ? formatPercent(resultado.recomendado.margemEfetiva)
+                              : "—"}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
+
                   <tfoot>
                     <tr className="border-t font-medium">
                       <td className="py-2 pr-3">Total da nota</td>
@@ -532,9 +701,11 @@ function ImportarPage() {
                       <td className="py-2 pr-3 tabular-nums">
                         {formatBRL(calc.totais.custoLiquido)}
                       </td>
+                      {versaoBase && <td className="py-2 pr-3" />}
                       <td className="py-2 pr-3 tabular-nums">
                         {formatBRL(calc.totais.receitaSugerida)}
                       </td>
+                      {versaoBase && <td className="py-2 pr-3" />}
                       <td className="py-2 pr-3 tabular-nums">
                         {formatBRL(calc.totais.resultadoSugerido)}
                       </td>
