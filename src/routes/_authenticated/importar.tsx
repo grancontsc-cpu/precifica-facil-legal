@@ -703,12 +703,15 @@ function ImportarPage() {
                       <td className="py-2 pr-3 tabular-nums">
                         {formatBRL(calc.totais.custoLiquido)}
                       </td>
+                      {versaoBase && <td className="py-2 pr-3" />}
                       <td className="py-2 pr-3 tabular-nums">
                         {formatBRL(calc.totais.receitaSugerida)}
                       </td>
+                      {versaoBase && <td className="py-2 pr-3" />}
                       <td className="py-2 pr-3 tabular-nums">
                         {formatBRL(calc.totais.resultadoSugerido)}
                       </td>
+
                     </tr>
                   </tfoot>
                 </table>
