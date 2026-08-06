@@ -103,6 +103,43 @@ function ImportarPage() {
     [calculadas],
   );
 
+  const versaoBase = useMemo(
+    () => versoes.find((v) => v.id === versaoBaseId) ?? null,
+    [versoes, versaoBaseId],
+  );
+
+  const mudancasPremissas = useMemo(
+    () => (versaoBase ? diferencasPremissas(versaoBase, premissas, regime, fronteiraAtiva) : []),
+    [versaoBase, premissas, regime, fronteiraAtiva],
+  );
+
+  function salvarVersao() {
+    if (calculadas.length === 0) return;
+    const id =
+      typeof crypto !== "undefined" && "randomUUID" in crypto
+        ? crypto.randomUUID()
+        : String(Date.now());
+    const versao = criarVersao(calculadas, {
+      id,
+      rotulo: `Versão ${versoes.length + 1}`,
+      criadaEm: new Date().toISOString(),
+      regime,
+      fronteiraAtiva,
+      premissas,
+    });
+    setVersoes((v) => [...v, versao]);
+    setVersaoBaseId(id);
+    toast.success(`${versao.rotulo} salva. Altere as premissas para reprocessar e comparar.`);
+  }
+
+  function restaurarVersao(v: VersaoLote) {
+    setRegime(v.regime);
+    setFronteiraAtiva(v.fronteiraAtiva);
+    setPremissas({ ...v.premissas });
+    toast.success(`Premissas da ${v.rotulo} restauradas.`);
+  }
+
+
   async function receberArquivos(lista: FileList | null) {
     if (!lista || lista.length === 0) return;
     const arquivos = Array.from(lista);
