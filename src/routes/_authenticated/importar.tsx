@@ -148,7 +148,6 @@ function ImportarPage() {
     toast.success(`Premissas da ${v.rotulo} restauradas.`);
   }
 
-
   async function receberArquivos(lista: FileList | null) {
     if (!lista || lista.length === 0) return;
     const arquivos = Array.from(lista);
@@ -586,7 +585,6 @@ function ImportarPage() {
             )}
           </div>
 
-
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {(
               [
@@ -711,7 +709,6 @@ function ImportarPage() {
                       <td className="py-2 pr-3 tabular-nums">
                         {formatBRL(calc.totais.resultadoSugerido)}
                       </td>
-
                     </tr>
                   </tfoot>
                 </table>
