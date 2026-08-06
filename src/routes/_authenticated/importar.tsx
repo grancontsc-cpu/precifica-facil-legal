@@ -28,6 +28,13 @@ import {
   type NotaPrecificada,
   type PremissasVenda,
 } from "@/lib/nfe/para-simulacao";
+import {
+  chaveItem,
+  compararItem,
+  criarVersao,
+  diferencasPremissas,
+  type VersaoLote,
+} from "@/lib/nfe/versoes";
 import type { NotaImportada } from "@/lib/nfe/tipos";
 import type { Regime } from "@/types/pricing";
 
