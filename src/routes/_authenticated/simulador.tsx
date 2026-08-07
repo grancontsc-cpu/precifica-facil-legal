@@ -398,7 +398,6 @@ function Simulador() {
   // Abertura da tela: nova simulação ou simulação carregada do histórico.
   useEffect(() => {
     eventoSimulacaoIniciada({ modo: "simples", origem: simulacaoId ? "carregada" : "nova" });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [simulacaoId]);
 
   const setOperacao = (patch: Partial<OperacaoFiscal>) => {
