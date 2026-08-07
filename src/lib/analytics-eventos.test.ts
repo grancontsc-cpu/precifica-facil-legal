@@ -9,7 +9,6 @@ import {
 } from "./analytics-eventos";
 
 declare global {
-  // eslint-disable-next-line no-var
   var gtag: ((...args: unknown[]) => void) | undefined;
 }
 
