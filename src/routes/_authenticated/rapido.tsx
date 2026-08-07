@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, Info, RotateCcw, Zap } from "lucide-react";
 
 import { metaPagina } from "@/lib/seo-head";
 import { Button } from "@/components/ui/button";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import {
   eventoParametroFiscal,
   eventoSimulacaoIniciada,
@@ -194,346 +195,348 @@ function ModoRapido() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-xl space-y-6 px-4 py-8 sm:py-12">
-      <header className="space-y-2 text-center">
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-          <Zap className="size-3.5" aria-hidden />
-          Modo rápido
-        </span>
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-          Preço de venda em poucos passos
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Uma estimativa imediata usando as alíquotas gerais do trajeto informado.
-        </p>
-      </header>
+    <TooltipProvider delayDuration={150}>
+      <div className="mx-auto w-full max-w-xl space-y-6 px-4 py-8 sm:py-12">
+        <header className="space-y-2 text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+            <Zap className="size-3.5" aria-hidden />
+            Modo rápido
+          </span>
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+            Preço de venda em poucos passos
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Uma estimativa imediata usando as alíquotas gerais do trajeto informado.
+          </p>
+        </header>
 
-      <Trilha passo={passo} maxPasso={maxPasso} onIr={irPara} />
-      {maxPasso >= 5 ? (
-        <p className="-mt-3 text-center text-xs text-muted-foreground">
-          Toque em qualquer etapa acima para ajustar valores, margem ou tributos e ver o preço
-          recalculado.
-        </p>
-      ) : null}
+        <Trilha passo={passo} maxPasso={maxPasso} onIr={irPara} />
+        {maxPasso >= 5 ? (
+          <p className="-mt-3 text-center text-xs text-muted-foreground">
+            Toque em qualquer etapa acima para ajustar valores, margem ou tributos e ver o preço
+            recalculado.
+          </p>
+        ) : null}
 
-      <div className="rounded-xl border border-border bg-surface p-5 sm:p-6">
-        {passo === 1 ? (
-          <div className="space-y-4">
-            <div>
-              <h2 className="text-base font-semibold text-foreground">
-                Qual produto você quer precificar?
-              </h2>
-              <p className="text-sm text-muted-foreground">
-                Só o nome, para você reconhecer o cálculo depois.
-              </p>
+        <div className="rounded-xl border border-border bg-surface p-5 sm:p-6">
+          {passo === 1 ? (
+            <div className="space-y-4">
+              <div>
+                <h2 className="text-base font-semibold text-foreground">
+                  Qual produto você quer precificar?
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  Só o nome, para você reconhecer o cálculo depois.
+                </p>
+              </div>
+              <CampoTexto
+                label="Nome do produto"
+                value={nome}
+                onChange={setNome}
+                placeholder="Ex.: Café torrado e moído 500g"
+              />
+              <div className="space-y-1.5">
+                <Label htmlFor="rapido-regime">Regime tributário da sua empresa</Label>
+                <Select
+                  value={regime}
+                  onValueChange={(v) => {
+                    eventoParametroFiscal({ modo: "rapido", campo: "regime", valor: v });
+                    setRegime(v as Regime);
+                  }}
+                >
+                  <SelectTrigger id="rapido-regime">
+                    <SelectValue placeholder="Selecione" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {REGIMES.map((r) => (
+                      <SelectItem key={r.id} value={r.id}>
+                        {r.nome}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  {empresa?.regime
+                    ? "Preenchido pelo cadastro da empresa — você pode simular outro regime."
+                    : "Define como o ICMS de fronteira entra no custo."}
+                </p>
+              </div>
             </div>
-            <CampoTexto
-              label="Nome do produto"
-              value={nome}
-              onChange={setNome}
-              placeholder="Ex.: Café torrado e moído 500g"
-            />
-            <div className="space-y-1.5">
-              <Label htmlFor="rapido-regime">Regime tributário da sua empresa</Label>
-              <Select
-                value={regime}
-                onValueChange={(v) => {
-                  eventoParametroFiscal({ modo: "rapido", campo: "regime", valor: v });
-                  setRegime(v as Regime);
-                }}
-              >
-                <SelectTrigger id="rapido-regime">
-                  <SelectValue placeholder="Selecione" />
-                </SelectTrigger>
-                <SelectContent>
-                  {REGIMES.map((r) => (
-                    <SelectItem key={r.id} value={r.id}>
-                      {r.nome}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+          ) : null}
+
+          {passo === 2 ? (
+            <div className="space-y-4">
+              <div>
+                <h2 className="text-base font-semibold text-foreground">Quanto você pagou?</h2>
+                <p className="text-sm text-muted-foreground">
+                  Valor por unidade na nota do fornecedor e a quantidade comprada.
+                </p>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <CampoNumero
+                  label="Valor unitário de compra"
+                  prefixo="R$"
+                  value={valorUnitario}
+                  onChange={setValorUnitario}
+                />
+                <CampoNumero label="Quantidade" value={quantidade} onChange={setQuantidade} />
+                <CampoNumero
+                  label="Margem desejada"
+                  sufixo="%"
+                  value={margem}
+                  onChange={setMargem}
+                  className="sm:col-span-2"
+                />
+              </div>
+            </div>
+          ) : null}
+
+          {passo === 3 ? (
+            <div className="space-y-4">
+              <div>
+                <h2 className="text-base font-semibold text-foreground">
+                  De onde vem e para onde vai?
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  O trajeto define a alíquota interestadual e o ICMS de fronteira.
+                </p>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-1.5">
+                  <Label htmlFor="rapido-origem">Estado de origem</Label>
+                  <Select
+                    value={ufOrigem || undefined}
+                    onValueChange={(v) => {
+                      eventoParametroFiscal({ modo: "rapido", campo: "ufOrigem", valor: v });
+                      setUfOrigem(v);
+                    }}
+                  >
+                    <SelectTrigger id="rapido-origem">
+                      <SelectValue placeholder="Selecione" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {UFS.map((u) => (
+                        <SelectItem key={u.sigla} value={u.sigla}>
+                          {u.sigla} — {u.nome}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="rapido-destino">Estado de destino</Label>
+                  <Select
+                    value={ufDestino || undefined}
+                    onValueChange={(v) => {
+                      eventoParametroFiscal({ modo: "rapido", campo: "ufDestino", valor: v });
+                      setUfDestino(v);
+                    }}
+                  >
+                    <SelectTrigger id="rapido-destino">
+                      <SelectValue placeholder="Selecione" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {UFS.map((u) => (
+                        <SelectItem key={u.sigla} value={u.sigla}>
+                          {u.sigla} — {u.nome}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <AliquotasTrajeto ufOrigem={ufOrigem} ufDestino={ufDestino} />
+
               <p className="text-xs text-muted-foreground">
-                {empresa?.regime
-                  ? "Preenchido pelo cadastro da empresa — você pode simular outro regime."
-                  : "Define como o ICMS de fronteira entra no custo."}
+                Regime considerado: {REGIMES.find((r) => r.id === regime)?.nome ?? regime}.
               </p>
             </div>
-          </div>
-        ) : null}
+          ) : null}
 
-        {passo === 2 ? (
-          <div className="space-y-4">
-            <div>
-              <h2 className="text-base font-semibold text-foreground">Quanto você pagou?</h2>
-              <p className="text-sm text-muted-foreground">
-                Valor por unidade na nota do fornecedor e a quantidade comprada.
-              </p>
-            </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <CampoNumero
-                label="Valor unitário de compra"
-                prefixo="R$"
-                value={valorUnitario}
-                onChange={setValorUnitario}
-              />
-              <CampoNumero label="Quantidade" value={quantidade} onChange={setQuantidade} />
-              <CampoNumero
-                label="Margem desejada"
-                sufixo="%"
-                value={margem}
-                onChange={setMargem}
-                className="sm:col-span-2"
-              />
-            </div>
-          </div>
-        ) : null}
-
-        {passo === 3 ? (
-          <div className="space-y-4">
-            <div>
-              <h2 className="text-base font-semibold text-foreground">
-                De onde vem e para onde vai?
-              </h2>
-              <p className="text-sm text-muted-foreground">
-                O trajeto define a alíquota interestadual e o ICMS de fronteira.
-              </p>
-            </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-1.5">
-                <Label htmlFor="rapido-origem">Estado de origem</Label>
-                <Select
-                  value={ufOrigem || undefined}
-                  onValueChange={(v) => {
-                    eventoParametroFiscal({ modo: "rapido", campo: "ufOrigem", valor: v });
-                    setUfOrigem(v);
-                  }}
-                >
-                  <SelectTrigger id="rapido-origem">
-                    <SelectValue placeholder="Selecione" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {UFS.map((u) => (
-                      <SelectItem key={u.sigla} value={u.sigla}>
-                        {u.sigla} — {u.nome}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+          {passo === 4 ? (
+            <div className="space-y-4">
+              <div>
+                <h2 className="text-base font-semibold text-foreground">
+                  Como esse produto é tributado?
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  Duas perguntas rápidas. Se não souber, marque “Não sei” — assumimos que é
+                  tributado, o que é mais prudente para o seu preço.
+                </p>
               </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="rapido-destino">Estado de destino</Label>
-                <Select
-                  value={ufDestino || undefined}
-                  onValueChange={(v) => {
-                    eventoParametroFiscal({ modo: "rapido", campo: "ufDestino", valor: v });
-                    setUfDestino(v);
-                  }}
-                >
-                  <SelectTrigger id="rapido-destino">
-                    <SelectValue placeholder="Selecione" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {UFS.map((u) => (
-                      <SelectItem key={u.sigla} value={u.sigla}>
-                        {u.sigla} — {u.nome}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              <PerguntasImpostos
+                state={estado}
+                regime={regime}
+                respostas={respostas}
+                onChange={(r) => {
+                  eventoParametroFiscal({ modo: "rapido", campo: "impostos" });
+                  setRespostas(r);
+                }}
+                aliquotaSimples={ajustes.aliquotaSimples}
+                onAliquotaSimples={(v) => {
+                  eventoParametroFiscal({ modo: "rapido", campo: "aliquotaSimples" });
+                  setAjustes((a) => ({ ...a, aliquotaSimples: v }));
+                }}
+              />
+            </div>
+          ) : null}
+
+          {passo === 5 ? (
+            <div className="space-y-5">
+              <div className="text-center">
+                <p className="text-sm text-muted-foreground">Preço de venda sugerido por unidade</p>
+                <p className="num-destaque mt-1 text-4xl font-bold text-foreground">
+                  {recomendado ? formatBRL(recomendado.precoFinal) : "—"}
+                </p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {nome || "Produto"} · margem de {margem}%
+                </p>
               </div>
-            </div>
-            <AliquotasTrajeto ufOrigem={ufOrigem} ufDestino={ufDestino} />
 
-            <p className="text-xs text-muted-foreground">
-              Regime considerado: {REGIMES.find((r) => r.id === regime)?.nome ?? regime}.
-            </p>
-          </div>
-        ) : null}
+              {recomendado ? (
+                <dl className="grid gap-3 sm:grid-cols-3">
+                  <div className="rounded-lg border border-border bg-background p-3">
+                    <dt className="text-xs text-muted-foreground">Custo líquido unitário</dt>
+                    <dd className="num-destaque text-base font-semibold">
+                      {formatBRL(recomendado.custoLiquidoUnitario)}
+                    </dd>
+                  </div>
+                  <div className="rounded-lg border border-border bg-background p-3">
+                    <dt className="text-xs text-muted-foreground">Créditos recuperáveis</dt>
+                    <dd className="num-destaque text-base font-semibold">
+                      {formatBRL(resultado.compra.creditosTotais ?? 0)}
+                    </dd>
+                  </div>
+                  <div className="rounded-lg border border-border bg-background p-3">
+                    <dt className="text-xs text-muted-foreground">Resultado por unidade</dt>
+                    <dd className="num-destaque text-base font-semibold">
+                      {formatBRL(recomendado.resultadoUnidade)}
+                    </dd>
+                  </div>
+                </dl>
+              ) : (
+                <Alert variant="destructive">
+                  <AlertDescription>
+                    {resultado.mensagemImpossivel ??
+                      "Não foi possível calcular um preço com esses dados. Revise os valores informados."}
+                  </AlertDescription>
+                </Alert>
+              )}
 
-        {passo === 4 ? (
-          <div className="space-y-4">
-            <div>
-              <h2 className="text-base font-semibold text-foreground">
-                Como esse produto é tributado?
-              </h2>
-              <p className="text-sm text-muted-foreground">
-                Duas perguntas rápidas. Se não souber, marque “Não sei” — assumimos que é tributado,
-                o que é mais prudente para o seu preço.
-              </p>
-            </div>
-            <PerguntasImpostos
-              state={estado}
-              regime={regime}
-              respostas={respostas}
-              onChange={(r) => {
-                eventoParametroFiscal({ modo: "rapido", campo: "impostos" });
-                setRespostas(r);
-              }}
-              aliquotaSimples={ajustes.aliquotaSimples}
-              onAliquotaSimples={(v) => {
-                eventoParametroFiscal({ modo: "rapido", campo: "aliquotaSimples" });
-                setAjustes((a) => ({ ...a, aliquotaSimples: v }));
-              }}
-            />
-          </div>
-        ) : null}
+              <SuposicoesFiscais
+                state={estado}
+                ajustes={ajustes}
+                onChange={(a) => {
+                  eventoParametroFiscal({ modo: "rapido", campo: "suposicoes" });
+                  setAjustes(a);
+                }}
+              />
 
-        {passo === 5 ? (
-          <div className="space-y-5">
-            <div className="text-center">
-              <p className="text-sm text-muted-foreground">Preço de venda sugerido por unidade</p>
-              <p className="num-destaque mt-1 text-4xl font-bold text-foreground">
-                {recomendado ? formatBRL(recomendado.precoFinal) : "—"}
-              </p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {nome || "Produto"} · margem de {margem}%
-              </p>
-            </div>
+              <PainelFronteira state={estado} resultado={resultado} compacto />
 
-            {recomendado ? (
-              <dl className="grid gap-3 sm:grid-cols-3">
-                <div className="rounded-lg border border-border bg-background p-3">
-                  <dt className="text-xs text-muted-foreground">Custo líquido unitário</dt>
-                  <dd className="num-destaque text-base font-semibold">
-                    {formatBRL(recomendado.custoLiquidoUnitario)}
-                  </dd>
-                </div>
-                <div className="rounded-lg border border-border bg-background p-3">
-                  <dt className="text-xs text-muted-foreground">Créditos recuperáveis</dt>
-                  <dd className="num-destaque text-base font-semibold">
-                    {formatBRL(resultado.compra.creditosTotais ?? 0)}
-                  </dd>
-                </div>
-                <div className="rounded-lg border border-border bg-background p-3">
-                  <dt className="text-xs text-muted-foreground">Resultado por unidade</dt>
-                  <dd className="num-destaque text-base font-semibold">
-                    {formatBRL(recomendado.resultadoUnidade)}
-                  </dd>
-                </div>
-              </dl>
-            ) : (
-              <Alert variant="destructive">
+              <Alert>
+                <Info className="size-4" aria-hidden />
                 <AlertDescription>
-                  {resultado.mensagemImpossivel ??
-                    "Não foi possível calcular um preço com esses dados. Revise os valores informados."}
+                  Este é um <strong>valor aproximado</strong>. O modo rápido usa apenas as alíquotas
+                  gerais do trajeto e não considera frete, despesas de venda, benefícios fiscais nem
+                  créditos específicos. Para precificar com precisão, use o modo Simples ou Completo
+                  do simulador.
                 </AlertDescription>
               </Alert>
-            )}
 
-            <SuposicoesFiscais
-              state={estado}
-              ajustes={ajustes}
-              onChange={(a) => {
-                eventoParametroFiscal({ modo: "rapido", campo: "suposicoes" });
-                setAjustes(a);
-              }}
-            />
+              <ComparativoModos state={estado} resultado={resultado} />
 
-            <PainelFronteira state={estado} resultado={resultado} compacto />
+              <div className="rounded-lg border border-dashed border-border p-3">
+                <p className="mb-2 text-xs font-medium text-muted-foreground">
+                  Testar outro cenário sem recomeçar
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <Button size="sm" variant="outline" onClick={() => irPara(2)}>
+                    Valor e margem
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={() => irPara(3)}>
+                    Trajeto
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={() => irPara(4)}>
+                    Impostos
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={() => irPara(1)}>
+                    Produto e regime
+                  </Button>
+                </div>
+              </div>
 
-            <Alert>
-              <Info className="size-4" aria-hidden />
-              <AlertDescription>
-                Este é um <strong>valor aproximado</strong>. O modo rápido usa apenas as alíquotas
-                gerais do trajeto e não considera frete, despesas de venda, benefícios fiscais nem
-                créditos específicos. Para precificar com precisão, use o modo Simples ou Completo
-                do simulador.
-              </AlertDescription>
-            </Alert>
-
-            <ComparativoModos state={estado} resultado={resultado} />
-
-            <div className="rounded-lg border border-dashed border-border p-3">
-              <p className="mb-2 text-xs font-medium text-muted-foreground">
-                Testar outro cenário sem recomeçar
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <Button size="sm" variant="outline" onClick={() => irPara(2)}>
-                  Valor e margem
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <Button className="flex-1" onClick={() => navigate({ to: "/simulador" })}>
+                  Refinar no simulador completo
                 </Button>
-                <Button size="sm" variant="outline" onClick={() => irPara(3)}>
-                  Trajeto
-                </Button>
-                <Button size="sm" variant="outline" onClick={() => irPara(4)}>
-                  Impostos
-                </Button>
-                <Button size="sm" variant="outline" onClick={() => irPara(1)}>
-                  Produto e regime
+                <Button variant="outline" className="flex-1" onClick={reiniciar}>
+                  <RotateCcw className="size-4" aria-hidden />
+                  Nova estimativa
                 </Button>
               </div>
             </div>
+          ) : null}
+        </div>
 
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <Button className="flex-1" onClick={() => navigate({ to: "/simulador" })}>
-                Refinar no simulador completo
-              </Button>
-              <Button variant="outline" className="flex-1" onClick={reiniciar}>
-                <RotateCcw className="size-4" aria-hidden />
-                Nova estimativa
-              </Button>
-            </div>
-          </div>
-        ) : null}
-      </div>
-
-      <div className="flex items-center justify-between gap-3">
-        <Button
-          variant="ghost"
-          onClick={() => irPara(Math.max(1, passo - 1))}
-          disabled={passo === 1}
-        >
-          <ArrowLeft className="size-4" aria-hidden />
-          Voltar
-        </Button>
-        {passo < 5 ? (
-          <div className="flex items-center gap-2">
-            {maxPasso >= 5 ? (
-              <Button variant="secondary" onClick={() => irPara(5)}>
-                Voltar ao preço
-              </Button>
-            ) : null}
-            <Button
-              onClick={() => {
-                if (passo === 4) {
-                  eventoSimular({
-                    modo: "rapido",
-                    regime,
-                    ufOrigem,
-                    ufDestino: ufDestino || ufOrigem,
-                    possuiResultado: !!recomendado,
-                  });
-                  if (recomendado) {
-                    eventoSimulacaoConcluida({
+        <div className="flex items-center justify-between gap-3">
+          <Button
+            variant="ghost"
+            onClick={() => irPara(Math.max(1, passo - 1))}
+            disabled={passo === 1}
+          >
+            <ArrowLeft className="size-4" aria-hidden />
+            Voltar
+          </Button>
+          {passo < 5 ? (
+            <div className="flex items-center gap-2">
+              {maxPasso >= 5 ? (
+                <Button variant="secondary" onClick={() => irPara(5)}>
+                  Voltar ao preço
+                </Button>
+              ) : null}
+              <Button
+                onClick={() => {
+                  if (passo === 4) {
+                    eventoSimular({
                       modo: "rapido",
                       regime,
                       ufOrigem,
                       ufDestino: ufDestino || ufOrigem,
+                      possuiResultado: !!recomendado,
                     });
+                    if (recomendado) {
+                      eventoSimulacaoConcluida({
+                        modo: "rapido",
+                        regime,
+                        ufOrigem,
+                        ufDestino: ufDestino || ufOrigem,
+                      });
+                    }
                   }
-                }
-                irPara(passo + 1);
-              }}
-              disabled={!podeAvancar}
-            >
-              {passo === 4 ? "Ver preço sugerido" : "Continuar"}
-              <ArrowRight className="size-4" aria-hidden />
-            </Button>
-          </div>
-        ) : (
-          <span />
-        )}
-      </div>
+                  irPara(passo + 1);
+                }}
+                disabled={!podeAvancar}
+              >
+                {passo === 4 ? "Ver preço sugerido" : "Continuar"}
+                <ArrowRight className="size-4" aria-hidden />
+              </Button>
+            </div>
+          ) : (
+            <span />
+          )}
+        </div>
 
-      <p className="text-center text-xs text-muted-foreground">
-        Precisa de todos os tributos abertos?{" "}
-        <Link
-          to="/simulador"
-          className="font-medium text-primary underline-offset-4 hover:underline"
-        >
-          Abrir o simulador completo
-        </Link>
-      </p>
-    </div>
+        <p className="text-center text-xs text-muted-foreground">
+          Precisa de todos os tributos abertos?{" "}
+          <Link
+            to="/simulador"
+            className="font-medium text-primary underline-offset-4 hover:underline"
+          >
+            Abrir o simulador completo
+          </Link>
+        </p>
+      </div>
+    </TooltipProvider>
   );
 }
