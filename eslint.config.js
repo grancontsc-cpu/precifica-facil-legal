@@ -6,7 +6,18 @@ import reactRefresh from "eslint-plugin-react-refresh";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: ["dist", ".output", ".vinxi"] },
+  // As rotas MCP são reescritas pelo plugin do @lovable.dev/mcp-js a cada build:
+  // formatá-las manualmente é inútil, o arquivo volta ao formato do gerador.
+  {
+    ignores: [
+      "dist",
+      ".output",
+      ".vinxi",
+      "src/routes/mcp.ts",
+      "src/routes/[.mcp]/**",
+      "src/routes/[.well-known]/**",
+    ],
+  },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ["**/*.{ts,tsx}"],
