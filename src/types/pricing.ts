@@ -16,7 +16,15 @@ export type CreditMode = "nao" | "integral" | "parcial" | "manual";
 export type BaseMode = "padrao" | "manual";
 
 export type PurchaseTaxId =
-  "icms" | "pis" | "cofins" | "ipi" | "ibs" | "cbs" | "icmsSt" | "icmsFronteira" | "outroCompra";
+  | "icms"
+  | "pis"
+  | "cofins"
+  | "ipi"
+  | "ibs"
+  | "cbs"
+  | "icmsSt"
+  | "icmsFronteira"
+  | "outroCompra";
 
 export type SaleTaxId =
   | "icmsVenda"

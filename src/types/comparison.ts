@@ -12,7 +12,12 @@ export const MAX_ALTERNATIVAS = 5;
 
 /** Regime tributário do fornecedor — campo apenas informativo. */
 export type RegimeFornecedor =
-  "naoInformado" | "simples" | "presumido" | "real" | "mei" | "produtorRural";
+  | "naoInformado"
+  | "simples"
+  | "presumido"
+  | "real"
+  | "mei"
+  | "produtorRural";
 
 export interface SupplierAlternative {
   id: string;
@@ -66,7 +71,11 @@ export interface SupplierComparisonRow {
 }
 
 export type DestaqueId =
-  "menorDesembolso" | "menorCustoLiquido" | "maiorCredito" | "melhorPrazo" | "melhorOpcao";
+  | "menorDesembolso"
+  | "menorCustoLiquido"
+  | "maiorCredito"
+  | "melhorPrazo"
+  | "melhorOpcao";
 
 export interface SupplierComparison {
   linhas: SupplierComparisonRow[];
