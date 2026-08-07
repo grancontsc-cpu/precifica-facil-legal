@@ -8,7 +8,8 @@ export const MAX_BYTES_BUSCA = 400;
 export type MotivoBloqueioBusca = "tipo" | "bytes" | "encoding";
 
 export type ValidacaoBusca =
-  { valida: true; texto: string } | { valida: false; motivo: MotivoBloqueioBusca };
+  | { valida: true; texto: string }
+  | { valida: false; motivo: MotivoBloqueioBusca };
 
 const CODIFICADOR = new TextEncoder();
 
