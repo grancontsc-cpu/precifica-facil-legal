@@ -24,6 +24,7 @@ import { CardTributoVenda } from "@/components/pricing/CardTributoVenda";
 import { PainelResultados } from "@/components/pricing/PainelResultados";
 import { EntendaOCalculo } from "@/components/pricing/EntendaOCalculo";
 import { PainelFronteira } from "@/components/pricing/PainelFronteira";
+import { CalculadoraRateio } from "@/components/pricing/CalculadoraRateio";
 import {
   AlternadorModo,
   DESCRICAO_MODO,
@@ -919,6 +920,21 @@ function Simulador() {
                         prefixo="R$"
                         value={state.produto.rateioPorUnidade}
                         onChange={(v) => setProduto({ rateioPorUnidade: v })}
+                      />
+                    </div>
+
+                    <div className="mt-4">
+                      <CalculadoraRateio
+                        valorItemSugerido={compra.valorBrutoProdutos}
+                        quantidade={state.produto.quantidade}
+                        onAplicar={(r) =>
+                          setProduto({
+                            freteTotal: r.frete,
+                            seguroTotal: r.seguro,
+                            outrasDespesas: r.outras,
+                            descontoTotal: r.desconto,
+                          })
+                        }
                       />
                     </div>
 

@@ -31,3 +31,21 @@ export function distribuirProporcional(pesos: number[], total: number, casas = 2
 
   return partes.map((p) => p.toNumber());
 }
+
+/**
+ * Parte de um total da nota (frete, seguro, outras despesas, desconto) que
+ * cabe a um único item, proporcional ao valor desse item dentro do valor
+ * total da nota. Usa o mesmo rateio proporcional de `distribuirProporcional`
+ * — o "resto dos itens" entra como segundo peso só para manter a proporção;
+ * apenas a primeira parte (a do item) é devolvida.
+ */
+export function ratearParaItem(valorItem: number, valorTotalNota: number, total: number): number {
+  const item = Number.isFinite(valorItem) && valorItem > 0 ? valorItem : 0;
+  const nota = Number.isFinite(valorTotalNota) && valorTotalNota > 0 ? valorTotalNota : 0;
+  // Sem um valor de nota válido não há proporção confiável: não atribuir o
+  // total inteiro a um único item por falta de referência.
+  if (item === 0 || nota === 0) return 0;
+  const restante = Math.max(0, nota - item);
+  const [parte] = distribuirProporcional([item, restante], total);
+  return parte ?? 0;
+}
