@@ -9,3 +9,7 @@ Rules:
 - Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
 - After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
 - After modifying code, also review this CLAUDE.md and update it if the change affects anything it documents (conventions, architecture, commands). Keep it in sync with the codebase, not just the graph.
+
+Observação: `graphify-out/` é saída local e está no `.gitignore` — não vem no clone.
+Se a pasta não existir, ignore as regras acima e navegue pelo código normalmente;
+rode `graphify update .` para gerá-la quando quiser usar o grafo.
