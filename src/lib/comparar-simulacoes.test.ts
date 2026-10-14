@@ -13,7 +13,10 @@ describe("comparar simulações salvas", () => {
   it("usa os resultados gravados e marca o maior lucro", () => {
     const a = sim("a", "real");
     const b = sim("b", "real");
-    b.resultado = { ...b.resultado, recomendado: { ...b.resultado.recomendado!, resultadoUnidade: 999 } };
+    b.resultado = {
+      ...b.resultado,
+      recomendado: { ...b.resultado.recomendado!, resultadoUnidade: 999 },
+    };
     const lucro = linhasComparacao([a, b]).find((l) => l.rotulo === "Lucro por unidade")!;
     expect(lucro.valores[1]).toBe(999);
     expect(lucro.melhor).toBe(1);
@@ -21,6 +24,9 @@ describe("comparar simulações salvas", () => {
   it("não destaca quando os valores são iguais", () => {
     const linhas = linhasComparacao([sim("a", "real"), sim("b", "real")]);
     expect(linhas.find((l) => l.rotulo === "Custo líquido unitário")!.melhor).toBeNull();
-    expect(linhas.find((l) => l.rotulo === "Regime")!.valores).toEqual(["Lucro Real", "Lucro Real"]);
+    expect(linhas.find((l) => l.rotulo === "Regime")!.valores).toEqual([
+      "Lucro Real",
+      "Lucro Real",
+    ]);
   });
 });

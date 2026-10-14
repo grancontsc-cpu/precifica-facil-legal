@@ -404,7 +404,7 @@ function SimulacoesPage() {
             ))}
             {!simulacoes.isLoading && lista.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
+                <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
                   Nenhuma simulação encontrada.
                 </td>
               </tr>

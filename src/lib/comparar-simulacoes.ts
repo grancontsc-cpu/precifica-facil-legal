@@ -66,7 +66,12 @@ export function linhasComparacao(sims: SimulacaoSalva[]): LinhaComparacao[] {
 
   add("Premissas", "Produto", "texto", (s) => s.produto);
   add("Premissas", "Regime", "texto", (s) => REGIMES[s.state.operacao?.regime ?? ""] ?? "—");
-  add("Premissas", "Período da Reforma", "texto", (s) => PERIODOS[s.state.operacao?.marcoTemporal ?? "atual"] ?? "—");
+  add(
+    "Premissas",
+    "Período da Reforma",
+    "texto",
+    (s) => PERIODOS[s.state.operacao?.marcoTemporal ?? "atual"] ?? "—",
+  );
   add("Premissas", "Trajeto", "texto", (s) =>
     s.state.operacao ? `${s.state.operacao.ufOrigem} → ${s.state.operacao.ufDestino}` : "—",
   );
@@ -76,16 +81,52 @@ export function linhasComparacao(sims: SimulacaoSalva[]): LinhaComparacao[] {
   add("Compra", "Desembolso total", "brl", (s) => s.resultado.compra.desembolsoTotal, "menor");
   add("Compra", "Créditos recuperáveis", "brl", (s) => s.resultado.compra.creditosTotais, "maior");
   add("Compra", "Custo líquido total", "brl", (s) => s.resultado.compra.custoLiquidoTotal, "menor");
-  add("Compra", "Custo líquido unitário", "brl", (s) => s.resultado.compra.custoLiquidoUnitario, "menor");
+  add(
+    "Compra",
+    "Custo líquido unitário",
+    "brl",
+    (s) => s.resultado.compra.custoLiquidoUnitario,
+    "menor",
+  );
 
   const r = (s: SimulacaoSalva) => s.resultado.recomendado;
   add("Venda (por unidade)", "Preço final", "brl", (s) => r(s)?.precoFinal ?? null);
-  add("Venda (por unidade)", "Tributos incluídos no preço", "brl", (s) => r(s)?.tributosIncluidos ?? null, "menor");
-  add("Venda (por unidade)", "Tributos por fora", "brl", (s) => r(s)?.tributosPorFora ?? null, "menor");
-  add("Venda (por unidade)", "Despesas variáveis", "brl", (s) => r(s)?.despesasVariaveis ?? null, "menor");
-  add("Venda (por unidade)", "Lucro por unidade", "brl", (s) => r(s)?.resultadoUnidade ?? null, "maior");
+  add(
+    "Venda (por unidade)",
+    "Tributos incluídos no preço",
+    "brl",
+    (s) => r(s)?.tributosIncluidos ?? null,
+    "menor",
+  );
+  add(
+    "Venda (por unidade)",
+    "Tributos por fora",
+    "brl",
+    (s) => r(s)?.tributosPorFora ?? null,
+    "menor",
+  );
+  add(
+    "Venda (por unidade)",
+    "Despesas variáveis",
+    "brl",
+    (s) => r(s)?.despesasVariaveis ?? null,
+    "menor",
+  );
+  add(
+    "Venda (por unidade)",
+    "Lucro por unidade",
+    "brl",
+    (s) => r(s)?.resultadoUnidade ?? null,
+    "maior",
+  );
   add("Venda (por unidade)", "Margem efetiva", "pct", (s) => r(s)?.margemEfetiva ?? null, "maior");
   add("Venda (por unidade)", "Markup", "pct", (s) => r(s)?.markupPercentual ?? null);
-  add("Venda (por unidade)", "Preço mínimo", "brl", (s) => s.resultado.precoMinimo?.precoFinal ?? null, "menor");
+  add(
+    "Venda (por unidade)",
+    "Preço mínimo",
+    "brl",
+    (s) => s.resultado.precoMinimo?.precoFinal ?? null,
+    "menor",
+  );
   return linhas;
 }

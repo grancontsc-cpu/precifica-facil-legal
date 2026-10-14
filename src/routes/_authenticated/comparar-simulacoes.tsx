@@ -26,7 +26,11 @@ export const Route = createFileRoute("/_authenticated/comparar-simulacoes")({
 function CompararSimulacoes() {
   const { ids } = Route.useSearch();
   const lista = useMemo(
-    () => (ids ?? "").split(",").filter((i) => /^[0-9a-f-]{36}$/i.test(i)).slice(0, 4),
+    () =>
+      (ids ?? "")
+        .split(",")
+        .filter((i) => /^[0-9a-f-]{36}$/i.test(i))
+        .slice(0, 4),
     [ids],
   );
 
@@ -36,7 +40,9 @@ function CompararSimulacoes() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("simulations")
-        .select("id, titulo, produto_nome, tax_profile_name, tax_profile_version, input_snapshot, result_snapshot")
+        .select(
+          "id, titulo, produto_nome, tax_profile_name, tax_profile_version, input_snapshot, result_snapshot",
+        )
         .in("id", lista);
       if (error) throw error;
       const porId = new Map((data ?? []).map((d) => [d.id, d]));
@@ -95,7 +101,10 @@ function CompararSimulacoes() {
           <table className="w-full min-w-[640px] text-sm">
             <thead className="bg-surface text-left">
               <tr>
-                <th scope="col" className="sticky left-0 bg-surface px-4 py-3 text-xs uppercase text-muted-foreground">
+                <th
+                  scope="col"
+                  className="sticky left-0 bg-surface px-4 py-3 text-xs uppercase text-muted-foreground"
+                >
                   Item
                 </th>
                 {sims.map((s) => (
@@ -110,7 +119,11 @@ function CompararSimulacoes() {
             {grupos.map((g) => (
               <tbody key={g}>
                 <tr className="border-t border-border bg-surface/60">
-                  <th colSpan={sims.length + 1} scope="colgroup" className="px-4 py-2 text-left text-xs uppercase tracking-wide text-muted-foreground">
+                  <th
+                    colSpan={sims.length + 1}
+                    scope="colgroup"
+                    className="px-4 py-2 text-left text-xs uppercase tracking-wide text-muted-foreground"
+                  >
                     {g}
                   </th>
                 </tr>
@@ -118,7 +131,10 @@ function CompararSimulacoes() {
                   .filter((l) => l.grupo === g)
                   .map((l) => (
                     <tr key={l.rotulo} className="border-t border-border">
-                      <th scope="row" className="sticky left-0 bg-card px-4 py-2 text-left font-normal text-muted-foreground">
+                      <th
+                        scope="row"
+                        className="sticky left-0 bg-card px-4 py-2 text-left font-normal text-muted-foreground"
+                      >
                         {l.rotulo}
                       </th>
                       {l.valores.map((v, i) => (
@@ -127,7 +143,10 @@ function CompararSimulacoes() {
                           className={`px-4 py-2 text-right tabular-nums ${l.melhor === i ? "font-semibold text-primary" : ""}`}
                         >
                           {l.melhor === i && (
-                            <Trophy className="mr-1 inline h-3.5 w-3.5" aria-label="Melhor resultado" />
+                            <Trophy
+                              className="mr-1 inline h-3.5 w-3.5"
+                              aria-label="Melhor resultado"
+                            />
                           )}
                           {fmt(v, l.formato)}
                         </td>
