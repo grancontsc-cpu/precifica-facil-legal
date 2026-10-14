@@ -5,14 +5,20 @@ import { pendentes, premissasReforma } from "./revisao-premissas";
 describe("revisão de premissas da Reforma", () => {
   it("Simples Nacional inclui a alíquota do DAS e o modelo", () => {
     const s = estadoExemplo();
-    const simples = { ...s, operacao: { ...s.operacao!, regime: "simples" as const, aliquotaSimples: 6 } };
+    const simples = {
+      ...s,
+      operacao: { ...s.operacao!, regime: "simples" as const, aliquotaSimples: 6 },
+    };
     const ids = premissasReforma(simples).map((p) => p.id);
     expect(ids).toContain("aliquotaSimples:6");
     expect(ids.some((i) => i.startsWith("modeloSimples:"))).toBe(true);
   });
   it("confirmar remove a pendência e mudar o valor a reabre", () => {
     const s = estadoExemplo();
-    const simples = { ...s, operacao: { ...s.operacao!, regime: "simples" as const, aliquotaSimples: 6 } };
+    const simples = {
+      ...s,
+      operacao: { ...s.operacao!, regime: "simples" as const, aliquotaSimples: 6 },
+    };
     const conf = { ...simples, premissasConfirmadas: premissasReforma(simples).map((p) => p.id) };
     expect(pendentes(conf)).toHaveLength(0);
     const mudou = { ...conf, operacao: { ...conf.operacao, aliquotaSimples: 7.5 } };

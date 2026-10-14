@@ -11,6 +11,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { toast } from "sonner";
+import { RevisaoPremissas } from "@/components/pricing/RevisaoPremissas";
 import { PerguntasContador } from "@/components/pricing/PerguntasContador";
 import {
   marcoDe,
@@ -1360,10 +1361,17 @@ function Simulador() {
                 titulo="Impacto da Reforma Tributária"
                 descricao="Quanto aumentar o preço para manter o lucro e quanto você perde mantendo o preço, de 2026 a 2033."
               >
-                <ProjecaoReforma
+                <RevisaoPremissas
                   state={state}
-                  onEtapas={(etapasReforma) => setState((s) => ({ ...s, etapasReforma }))}
-                />
+                  onConfirmar={(premissasConfirmadas) =>
+                    setState((s) => ({ ...s, premissasConfirmadas }))
+                  }
+                >
+                  <ProjecaoReforma
+                    state={state}
+                    onEtapas={(etapasReforma) => setState((s) => ({ ...s, etapasReforma }))}
+                  />
+                </RevisaoPremissas>
               </Secao>
 
               <Secao

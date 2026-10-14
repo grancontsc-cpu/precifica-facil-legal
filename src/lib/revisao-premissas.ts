@@ -32,7 +32,8 @@ export function premissasReforma(state: SimulationState): Pendencia[] {
     itens.push({
       id: `cbs2027:${e2027.cbs}:${e2027.ibs}`,
       titulo: `2027: CBS ${pct(e2027.cbs)} e IBS ${pct(e2027.ibs)}`,
-      detalhe: "CBS cheia com extinção de PIS/Cofins. A alíquota de referência pode ser ajustada por lei.",
+      detalhe:
+        "CBS cheia com extinção de PIS/Cofins. A alíquota de referência pode ser ajustada por lei.",
     });
   }
   const fatores = etapas.map((e) => `${e.ano}:${e.fatorIcms}`).join(",");
@@ -57,7 +58,8 @@ export function premissasReforma(state: SimulationState): Pendencia[] {
     itens.push({
       id: `modeloSimples:${modelo}`,
       titulo: `Simples Nacional ${modelo === "hibrido" ? "híbrido (IBS/CBS por fora)" : "puro (IBS/CBS dentro do DAS)"}`,
-      detalhe: "A projeção mantém o mesmo DAS em todos os anos. Confirme a opção da empresa para 2027 em diante.",
+      detalhe:
+        "A projeção mantém o mesmo DAS em todos os anos. Confirme a opção da empresa para 2027 em diante.",
     });
   }
   return itens;
