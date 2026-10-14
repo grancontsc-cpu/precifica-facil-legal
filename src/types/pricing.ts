@@ -40,6 +40,15 @@ export type SaleTaxId =
 /** Regime tributário da empresa que está precificando. */
 export type Regime = "simples" | "presumido" | "real" | "mei";
 
+/** Marco temporal da Reforma Tributária (EC 132/2023 e LC 214/2025). */
+export type MarcoTemporal = "atual" | "transicao2026" | "vigencia2027" | "definitivo2033";
+
+/** Forma de apuração do IBS/CBS por empresa do Simples Nacional. */
+export type ModeloSimples = "puro" | "hibrido";
+
+/** Enquadramento do fornecedor da mercadoria. */
+export type RegimeFornecedor = "regular" | "simplesPuro" | "simplesHibrido";
+
 /** Finalidade da compra (por enquanto o simulador cobre revenda). */
 export type FinalidadeCompra = "revenda";
 
@@ -68,6 +77,12 @@ export interface OperacaoFiscal {
   creditarDifal: boolean | null;
   /** Alíquota efetiva do DAS em % (apenas Simples/MEI). */
   aliquotaSimples: number;
+  /** Período fiscal da reforma (ausente = "atual"). */
+  marcoTemporal?: MarcoTemporal;
+  /** Simples Nacional puro (IBS/CBS no DAS) ou híbrido (IBS/CBS por fora). */
+  modeloSimples?: ModeloSimples;
+  /** Enquadramento do fornecedor de origem. */
+  regimeFornecedor?: RegimeFornecedor;
 }
 
 export interface PurchaseTax {
@@ -106,7 +121,7 @@ export interface SaleTax {
   treatment: TaxTreatment;
 }
 
-export type ScenarioId = "atual" | "transicao" | "novo" | "personalizado" | "transicao2026";
+export type ScenarioId = "atual" | "transicao" | "novo" | "personalizado" | "transicao2026" | "vigencia2027";
 
 export interface ProdutoCompra {
   nome: string;
