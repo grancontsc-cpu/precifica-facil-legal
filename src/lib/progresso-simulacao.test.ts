@@ -4,7 +4,9 @@ import { etapasPreenchimento } from "@/lib/progresso-simulacao";
 
 describe("guia de preenchimento", () => {
   it("simulação nova só tem a margem padrão preenchida", () => {
-    const feitas = etapasPreenchimento(estadoInicial()).filter((e) => e.feito).map((e) => e.id);
+    const feitas = etapasPreenchimento(estadoInicial())
+      .filter((e) => e.feito)
+      .map((e) => e.id);
     expect(feitas).toEqual(["margem"]);
   });
 

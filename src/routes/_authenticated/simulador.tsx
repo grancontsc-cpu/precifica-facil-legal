@@ -199,6 +199,7 @@ function Simulador() {
   const [, setCarregado] = useState(false);
   const [titulo, setTitulo] = useState("Nova simulação");
   const [doRapido, setDoRapido] = useState(false);
+  const veioDoRapido = useRef(false);
   const irParaEtapa = (etapa: EtapaPreenchimento) => {
     if (etapa.completo) setState((s) => (s.modoAvancado ? s : { ...s, modoAvancado: true }));
     window.setTimeout(() => {
@@ -206,7 +207,9 @@ function Simulador() {
       if (!alvo) return;
       const reduzir = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       alvo.scrollIntoView({ behavior: reduzir ? "auto" : "smooth", block: "start" });
-      alvo.querySelector<HTMLElement>("input, button, [role=combobox]")?.focus({ preventScroll: true });
+      alvo
+        .querySelector<HTMLElement>("input, button, [role=combobox]")
+        ?.focus({ preventScroll: true });
     }, 60);
   };
   const [perfilId, setPerfilId] = useState<string | null>(null);
@@ -365,6 +368,7 @@ function Simulador() {
     if (simulacaoId) return;
     const doRapido = receberDoRapido();
     if (doRapido) {
+      veioDoRapido.current = true;
       setState({ ...doRapido, modoAvancado: true });
       setDoRapido(true);
       setCarregado(true);
@@ -469,7 +473,7 @@ function Simulador() {
   // O regime cadastrado da empresa vale como padrão da primeira simulação.
   useEffect(() => {
     const regimeEmpresa = empresa?.regime as Regime | undefined;
-    if (!regimeEmpresa || simulacaoId) return;
+    if (!regimeEmpresa || simulacaoId || veioDoRapido.current) return;
     setState((s) =>
       s.operacao?.regime && s.operacao.regime !== "real"
         ? s
@@ -828,7 +832,7 @@ function Simulador() {
                   <Secao
                     numero="Seção 1"
                     titulo="Produto e preço"
-                ancora="sec-produto"
+                    ancora="sec-produto"
                     descricao="O essencial para uma estimativa rápida do preço de venda."
                   >
                     <div className="grid gap-4 sm:grid-cols-2">
@@ -873,7 +877,7 @@ function Simulador() {
                   <Secao
                     numero="Seção 1"
                     titulo="Produto e compra"
-                ancora="sec-produto"
+                    ancora="sec-produto"
                     descricao="Informe o que foi comprado e quanto foi pago ao fornecedor."
                   >
                     <div className="grid gap-4 sm:grid-cols-2">
@@ -1054,7 +1058,7 @@ function Simulador() {
                   <Secao
                     numero="Seção 3"
                     titulo="Tributos da compra"
-                ancora="sec-tributos-compra"
+                    ancora="sec-tributos-compra"
                     descricao="Alíquota e direito ao crédito são informações independentes. Configure cada tributo conforme a nota e a orientação da contabilidade."
                   >
                     <div className="space-y-3">
@@ -1073,7 +1077,7 @@ function Simulador() {
                   <Secao
                     numero="Seção 4"
                     titulo="Venda e margem"
-                ancora="sec-venda"
+                    ancora="sec-venda"
                     descricao="Calcule o preço a partir da margem desejada ou analise a margem de um preço já praticado."
                   >
                     <Tabs

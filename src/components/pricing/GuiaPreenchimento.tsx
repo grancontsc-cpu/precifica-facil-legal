@@ -35,8 +35,8 @@ export function GuiaPreenchimento({
           <Sparkles className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
           <p className="flex-1">
             <strong>Trouxemos tudo o que você preencheu no modo rápido.</strong> Agora é só
-            completar os detalhes abaixo para chegar ao preço exato — nada precisa ser digitado
-            de novo.
+            completar os detalhes abaixo para chegar ao preço exato — nada precisa ser digitado de
+            novo.
           </p>
           <Button
             variant="ghost"
