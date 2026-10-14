@@ -407,11 +407,11 @@ export function whatsappRelatorio(rel: Relatorio): string {
     `Margem: ${r.margem === null ? "—" : formatPercent(r.margem)}`,
     ...(rel.reforma
       ? [
-          "",
-          "*Reforma Tributária — preço para manter o lucro*",
-          ...rel.reforma.linhas
-            .filter((l) => ["2027", "2029", "2033"].includes(l.rotulo))
-            .map((l) => `${l.rotulo}: ${l.valor}`),
+          "Reforma (aumento p/ manter lucro): " +
+            rel.reforma.linhas
+              .filter((l) => ["2027", "2033"].includes(l.rotulo))
+              .map((l) => `${l.rotulo} ${l.valor.match(/\(([^)]*)\)/)?.[1] ?? "—"}`)
+              .join(" · "),
         ]
       : []),
     `Observação: ${r.principalObservacao}`,
