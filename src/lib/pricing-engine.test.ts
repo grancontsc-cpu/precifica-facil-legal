@@ -622,7 +622,7 @@ import type { Regime } from "@/types/pricing";
 
 function estado2027(regime: Regime, extra: Partial<SimulationState["operacao"]> = {}) {
   let s = estadoInicial();
-  s.produto = { ...s.produto, quantidade: 1, valorUnitario: 100 };
+  s.produto = { ...s.produto, nome: "Item 2027", quantidade: 1, valorUnitario: 100 };
   s.operacao = operacaoPadrao({ regime, difalAtivo: false, aliquotaSimples: 6, ...extra });
   s = aplicarRegime(s, regime);
   return aplicarMarcoTemporal(s, "vigencia2027");
