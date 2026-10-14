@@ -1,4 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { enviarDoRapido } from "@/lib/progresso-simulacao";
 import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
@@ -663,10 +664,11 @@ function ImportarPage() {
                       <th className="py-1 pr-3">Preço sugerido</th>
                       {versaoBase && <th className="py-1 pr-3">Variação</th>}
                       <th className="py-1 pr-3">Margem</th>
+                      <th className="py-1 pr-3"><span className="sr-only">Ações</span></th>
                     </tr>
                   </thead>
                   <tbody>
-                    {calc.itens.map(({ item, resultado }) => {
+                    {calc.itens.map(({ item, resultado, estado }) => {
                       const comp = compararItem(
                         versaoBase,
                         chaveItem(calc.nota.id, item.numero),
@@ -725,6 +727,18 @@ function ImportarPage() {
                             {resultado.recomendado
                               ? formatPercent(resultado.recomendado.margemEfetiva)
                               : "—"}
+                          </td>
+                          <td className="py-1 pr-3">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => {
+                                enviarDoRapido({ ...estado, nomeProduto: item.descricao });
+                                void navegar({ to: "/simulador" });
+                              }}
+                            >
+                              Abrir no simulador
+                            </Button>
                           </td>
                         </tr>
                       );
