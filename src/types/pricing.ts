@@ -121,7 +121,13 @@ export interface SaleTax {
   treatment: TaxTreatment;
 }
 
-export type ScenarioId = "atual" | "transicao" | "novo" | "personalizado" | "transicao2026" | "vigencia2027";
+export type ScenarioId =
+  | "atual"
+  | "transicao"
+  | "novo"
+  | "personalizado"
+  | "transicao2026"
+  | "vigencia2027";
 
 export interface ProdutoCompra {
   nome: string;

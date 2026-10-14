@@ -5,9 +5,7 @@
   "auth": {
     "type": "oauth",
     "issuer": "https://gayqsinndhkxoscxxujj.supabase.co/auth/v1",
-    "accepted_audiences": [
-      "authenticated"
-    ]
+    "accepted_audiences": ["authenticated"]
   },
   "mcp": {
     "server": {
@@ -69,20 +67,10 @@
               "default": "real",
               "description": "Regime tributário da empresa compradora.",
               "type": "string",
-              "enum": [
-                "real",
-                "presumido",
-                "simples",
-                "mei"
-              ]
+              "enum": ["real", "presumido", "simples", "mei"]
             }
           },
-          "required": [
-            "produto",
-            "valor_unitario",
-            "uf_origem",
-            "uf_destino"
-          ]
+          "required": ["produto", "valor_unitario", "uf_origem", "uf_destino"]
         },
         "outputSchema": null
       },
@@ -136,11 +124,7 @@
             "status": {
               "description": "Filtra pelo status da simulação.",
               "type": "string",
-              "enum": [
-                "rascunho",
-                "final",
-                "arquivada"
-              ]
+              "enum": ["rascunho", "final", "arquivada"]
             },
             "limite": {
               "default": 10,
@@ -173,9 +157,7 @@
               "description": "ID da simulação."
             }
           },
-          "required": [
-            "id"
-          ]
+          "required": ["id"]
         },
         "outputSchema": null
       }
