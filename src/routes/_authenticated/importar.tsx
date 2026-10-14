@@ -203,9 +203,14 @@ function ImportarPage() {
         try {
           const imagem = await imagemParaEnvio(arquivo);
           const r = await lerFotoNota({ data: { imagem } });
-          leitura = r.dados ? notaDaFoto(r.dados, arquivo.name) : { nota: null, erro: `${arquivo.name}: ${r.erro}` };
+          leitura = r.dados
+            ? notaDaFoto(r.dados, arquivo.name)
+            : { nota: null, erro: `${arquivo.name}: ${r.erro}` };
         } catch {
-          leitura = { nota: null, erro: `${arquivo.name}: não foi possível enviar a foto. Tente novamente.` };
+          leitura = {
+            nota: null,
+            erro: `${arquivo.name}: não foi possível enviar a foto. Tente novamente.`,
+          };
         }
       } else {
         falhas.push(`${arquivo.name}: envie .xml (NF-e), .pdf (DANFE) ou foto da nota.`);
