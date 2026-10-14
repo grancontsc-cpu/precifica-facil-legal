@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { enviarDoRapido } from "@/lib/progresso-simulacao";
 import { ArrowLeft, ArrowRight, Info, RotateCcw, Zap } from "lucide-react";
 
 import { metaPagina } from "@/lib/seo-head";
@@ -467,7 +468,13 @@ function ModoRapido() {
               </div>
 
               <div className="flex flex-col gap-2 sm:flex-row">
-                <Button className="flex-1" onClick={() => navigate({ to: "/simulador" })}>
+                <Button
+                  className="flex-1"
+                  onClick={() => {
+                    enviarDoRapido(estado);
+                    navigate({ to: "/simulador" });
+                  }}
+                >
                   Refinar no simulador completo
                 </Button>
                 <Button variant="outline" className="flex-1" onClick={reiniciar}>
@@ -531,6 +538,9 @@ function ModoRapido() {
           Precisa de todos os tributos abertos?{" "}
           <Link
             to="/simulador"
+            onClick={() => {
+              if (nome.trim() || valorUnitario > 0) enviarDoRapido(estado);
+            }}
             className="font-medium text-primary underline-offset-4 hover:underline"
           >
             Abrir o simulador completo

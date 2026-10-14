@@ -23,6 +23,8 @@ import { CardTributoCompra } from "@/components/pricing/CardTributoCompra";
 import { CardTributoVenda } from "@/components/pricing/CardTributoVenda";
 import { PainelResultados } from "@/components/pricing/PainelResultados";
 import { ProjecaoReforma } from "@/components/pricing/ProjecaoReforma";
+import { GuiaPreenchimento } from "@/components/pricing/GuiaPreenchimento";
+import { receberDoRapido, type EtapaPreenchimento } from "@/lib/progresso-simulacao";
 import { EntendaOCalculo } from "@/components/pricing/EntendaOCalculo";
 import { PainelFronteira } from "@/components/pricing/PainelFronteira";
 import { CalculadoraRateio } from "@/components/pricing/CalculadoraRateio";
@@ -130,7 +132,9 @@ function Secao({
   descricao,
   children,
   acao,
+  ancora,
 }: {
+  ancora?: string;
   numero: string;
   titulo: string;
   descricao: string;
@@ -142,9 +146,10 @@ function Secao({
   const descricaoId = `${id}-descricao`;
   return (
     <section
+      id={ancora}
       aria-labelledby={tituloId}
       aria-describedby={descricaoId}
-      className="rounded-xl border border-border bg-card p-5 shadow-[var(--shadow-card)]"
+      className="scroll-mt-44 rounded-xl border border-border bg-card p-5 shadow-[var(--shadow-card)]"
     >
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
         <div className="min-w-0">
@@ -193,6 +198,23 @@ function Simulador() {
   const [salvoEm, setSalvoEm] = useState<Date | null>(null);
   const [, setCarregado] = useState(false);
   const [titulo, setTitulo] = useState("Nova simulação");
+  const [doRapido, setDoRapido] = useState(false);
+  const veioDoRapido = useRef(false);
+  const irParaEtapa = (etapa: EtapaPreenchimento) => {
+    if (etapa.completo) {
+      setModo("completo");
+      setState((s) => (s.modoAvancado ? s : { ...s, modoAvancado: true }));
+    }
+    window.setTimeout(() => {
+      const alvo = document.getElementById(etapa.ancora);
+      if (!alvo) return;
+      const reduzir = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      alvo.scrollIntoView({ behavior: reduzir ? "auto" : "smooth", block: "start" });
+      alvo
+        .querySelector<HTMLElement>("input, button, [role=combobox]")
+        ?.focus({ preventScroll: true });
+    }, 60);
+  };
   const [perfilId, setPerfilId] = useState<string | null>(null);
   const [produtoId, setProdutoId] = useState<string | null>(produtoQuery ?? null);
   const [baseline, setBaseline] = useState<SimulationState | null>(null);
@@ -347,6 +369,15 @@ function Simulador() {
 
   useEffect(() => {
     if (simulacaoId) return;
+    const doRapido = receberDoRapido();
+    if (doRapido) {
+      veioDoRapido.current = true;
+      setModo("completo");
+      setState({ ...doRapido, modoAvancado: true });
+      setDoRapido(true);
+      setCarregado(true);
+      return;
+    }
     try {
       const bruto = localStorage.getItem(STORAGE_KEY);
       if (bruto) {
@@ -446,7 +477,7 @@ function Simulador() {
   // O regime cadastrado da empresa vale como padrão da primeira simulação.
   useEffect(() => {
     const regimeEmpresa = empresa?.regime as Regime | undefined;
-    if (!regimeEmpresa || simulacaoId) return;
+    if (!regimeEmpresa || simulacaoId || veioDoRapido.current) return;
     setState((s) =>
       s.operacao?.regime && s.operacao.regime !== "real"
         ? s
@@ -776,9 +807,19 @@ function Simulador() {
                 </p>
               </div>
 
+              {podeEditarAtual ? (
+                <GuiaPreenchimento
+                  state={state}
+                  doRapido={doRapido}
+                  onIr={irParaEtapa}
+                  onFecharBoasVindas={() => setDoRapido(false)}
+                />
+              ) : null}
+
               <Secao
                 numero="Contexto fiscal"
                 titulo="Regime e trajeto da mercadoria"
+                ancora="sec-contexto"
                 descricao="O regime da empresa e os estados de origem e destino definem o ICMS de fronteira e se ele vira crédito ou custo."
               >
                 <ContextoFiscal
@@ -795,6 +836,7 @@ function Simulador() {
                   <Secao
                     numero="Seção 1"
                     titulo="Produto e preço"
+                    ancora="sec-produto"
                     descricao="O essencial para uma estimativa rápida do preço de venda."
                   >
                     <div className="grid gap-4 sm:grid-cols-2">
@@ -839,6 +881,7 @@ function Simulador() {
                   <Secao
                     numero="Seção 1"
                     titulo="Produto e compra"
+                    ancora="sec-produto"
                     descricao="Informe o que foi comprado e quanto foi pago ao fornecedor."
                   >
                     <div className="grid gap-4 sm:grid-cols-2">
@@ -1019,6 +1062,7 @@ function Simulador() {
                   <Secao
                     numero="Seção 3"
                     titulo="Tributos da compra"
+                    ancora="sec-tributos-compra"
                     descricao="Alíquota e direito ao crédito são informações independentes. Configure cada tributo conforme a nota e a orientação da contabilidade."
                   >
                     <div className="space-y-3">
@@ -1037,6 +1081,7 @@ function Simulador() {
                   <Secao
                     numero="Seção 4"
                     titulo="Venda e margem"
+                    ancora="sec-venda"
                     descricao="Calcule o preço a partir da margem desejada ou analise a margem de um preço já praticado."
                   >
                     <Tabs
