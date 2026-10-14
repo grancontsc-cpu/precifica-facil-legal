@@ -23,7 +23,8 @@ export const perguntarSobreSimulacao = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => entrada.parse(d))
   .handler(async ({ data }): Promise<{ resposta: string | null; erro: string | null }> => {
     const chave = process.env.LOVABLE_API_KEY;
-    if (!chave) return { resposta: null, erro: "Assistente indisponível no momento (configuração)." };
+    if (!chave)
+      return { resposta: null, erro: "Assistente indisponível no momento (configuração)." };
 
     const historico = data.historico.map((m) => ({
       role: m.papel === "contador" ? "user" : "assistant",
@@ -58,8 +59,7 @@ export const perguntarSobreSimulacao = createServerFn({ method: "POST" })
     if (!resp.ok || !resp.body) {
       let msg = "";
       try {
-        msg =
-          ((await resp.json()) as { error?: { message?: string } })?.error?.message ?? "";
+        msg = ((await resp.json()) as { error?: { message?: string } })?.error?.message ?? "";
       } catch {
         /* sem corpo */
       }
@@ -68,7 +68,10 @@ export const perguntarSobreSimulacao = createServerFn({ method: "POST" })
       if (resp.status === 402)
         return { resposta: null, erro: msg || "Os créditos de IA do escritório acabaram." };
       if (resp.status === 403)
-        return { resposta: null, erro: msg || "O assistente está bloqueado para este espaço de trabalho." };
+        return {
+          resposta: null,
+          erro: msg || "O assistente está bloqueado para este espaço de trabalho.",
+        };
       return { resposta: null, erro: "Não foi possível responder agora. Tente novamente." };
     }
 
@@ -91,7 +94,11 @@ export const perguntarSobreSimulacao = createServerFn({ method: "POST" })
         try {
           const ev = JSON.parse(json) as { type?: string; delta?: string };
           if (ev.type === "response.output_text.delta" && ev.delta) texto += ev.delta;
-          else if (ev.type === "response.failed" || ev.type === "error" || ev.type === "response.refusal.delta")
+          else if (
+            ev.type === "response.failed" ||
+            ev.type === "error" ||
+            ev.type === "response.refusal.delta"
+          )
             falha = true;
         } catch {
           /* linha parcial */

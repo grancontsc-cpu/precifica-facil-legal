@@ -11,6 +11,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { toast } from "sonner";
+import { PerguntasContador } from "@/components/pricing/PerguntasContador";
 import {
   marcoDe,
   perfilDoPeriodo,
@@ -1363,6 +1364,14 @@ function Simulador() {
                   state={state}
                   onEtapas={(etapasReforma) => setState((s) => ({ ...s, etapasReforma }))}
                 />
+              </Secao>
+
+              <Secao
+                numero="Pergunte"
+                titulo="Pergunte sobre esta simulação"
+                descricao="Faça perguntas em texto livre e receba a explicação dos impactos anuais no lucro."
+              >
+                <PerguntasContador state={state} />
               </Secao>
 
               <EntendaOCalculo

@@ -62,7 +62,14 @@ export function PerguntasContador({ state }: { state: SimulationState }) {
       {mensagens.length === 0 && (
         <div className="flex flex-wrap gap-2">
           {SUGESTOES.map((s) => (
-            <Button key={s} type="button" variant="outline" size="sm" className="h-auto whitespace-normal text-left" onClick={() => void enviar(s)}>
+            <Button
+              key={s}
+              type="button"
+              variant="outline"
+              size="sm"
+              className="h-auto whitespace-normal text-left"
+              onClick={() => void enviar(s)}
+            >
               {s}
             </Button>
           ))}
@@ -72,7 +79,10 @@ export function PerguntasContador({ state }: { state: SimulationState }) {
       <div className="space-y-3" aria-live="polite">
         {mensagens.map((m, i) =>
           m.papel === "contador" ? (
-            <div key={i} className="ml-auto max-w-[85%] rounded-lg bg-primary px-3 py-2 text-sm text-primary-foreground">
+            <div
+              key={i}
+              className="ml-auto max-w-[85%] rounded-lg bg-primary px-3 py-2 text-sm text-primary-foreground"
+            >
               {m.texto}
             </div>
           ) : (
@@ -84,7 +94,8 @@ export function PerguntasContador({ state }: { state: SimulationState }) {
         )}
         {enviando && (
           <p className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> Analisando os resultados…
+            <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> Analisando os
+            resultados…
           </p>
         )}
         {erro && <p className="text-sm text-destructive">{erro}</p>}
@@ -111,7 +122,12 @@ export function PerguntasContador({ state }: { state: SimulationState }) {
             }
           }}
         />
-        <Button type="submit" size="icon" disabled={enviando || pergunta.trim().length < 3} aria-label="Enviar pergunta">
+        <Button
+          type="submit"
+          size="icon"
+          disabled={enviando || pergunta.trim().length < 3}
+          aria-label="Enviar pergunta"
+        >
           <Send className="h-4 w-4" aria-hidden="true" />
         </Button>
       </form>
