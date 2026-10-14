@@ -23,6 +23,7 @@ export type TaxProfileRow = {
   notes: string | null;
   active: boolean;
   version: number;
+  marco_temporal?: string | null;
   locked_fields: unknown;
   created_at: string;
   updated_at: string;
