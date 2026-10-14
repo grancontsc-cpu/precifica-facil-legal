@@ -8,6 +8,13 @@
       "when": 1792008619014,
       "tag": "0000_fix_license_status_check",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792011606846,
+      "tag": "0001_tax_profiles_marco_temporal",
+      "breakpoints": true
     }
   ]
 }

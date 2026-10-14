@@ -12,6 +12,12 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import {
+  marcoDe,
+  perfilDoPeriodo,
+  trocarPeriodo,
+  type AjustesPorPeriodo,
+} from "@/lib/ajustes-por-periodo";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -55,6 +61,7 @@ import {
   ajustarCreditosReforma,
   aplicarCenario,
   aplicarMarcoTemporal,
+  MARCOS_TEMPORAIS,
   aplicarRegime,
   estadoExemplo,
   estadoInicial,
@@ -77,6 +84,7 @@ import { registrarNegativa } from "@/lib/registro-seguranca";
 import { supabase } from "@/integrations/supabase/client";
 import {
   aplicarPerfil,
+  linhasDoEstado,
   camposAlterados,
   lockedFieldsOf,
   type TaxProfileLineRow,
@@ -253,6 +261,89 @@ function Simulador() {
   });
 
   const perfilSelecionado = (perfisQuery.data ?? []).find((p) => p.id === perfilId) ?? null;
+
+  // Ajustes de tributos guardados por período, por empresa, neste aparelho.
+  const chaveAjustes = `precifica-grancont:ajustes-periodo:${orgId ?? "sem-empresa"}`;
+  const ajustesRef = useRef<AjustesPorPeriodo>({});
+  useEffect(() => {
+    try {
+      ajustesRef.current = JSON.parse(localStorage.getItem(chaveAjustes) ?? "{}");
+    } catch {
+      ajustesRef.current = {};
+    }
+  }, [chaveAjustes]);
+  const gravarAjustes = (m: AjustesPorPeriodo) => {
+    ajustesRef.current = m;
+    try {
+      localStorage.setItem(chaveAjustes, JSON.stringify(m));
+    } catch {
+      /* armazenamento indisponível */
+    }
+  };
+
+  const NOMES_PERIODO: Record<string, string> = Object.fromEntries(
+    MARCOS_TEMPORAIS.map((m) => [m.id, m.nome]),
+  );
+  const marcoAtual = marcoDe(state);
+  const perfilDoPeriodoAtual = perfilDoPeriodo(perfisQuery.data ?? [], orgId ?? null, marcoAtual);
+
+  const salvarPerfilPeriodo = useMutation({
+    mutationFn: async () => {
+      if (!orgId) throw new Error("Selecione uma empresa para salvar o perfil.");
+      const existente =
+        perfilDoPeriodoAtual?.organization_id === orgId ? perfilDoPeriodoAtual : null;
+      const nome = `${empresa?.name ?? "Empresa"} — ${NOMES_PERIODO[marcoAtual] ?? marcoAtual}`;
+      const cenario = (
+        state.cenario === "transicao2026" || state.cenario === "vigencia2027"
+          ? "transicao"
+          : state.cenario
+      ) as "atual" | "transicao" | "novo" | "personalizado";
+      let id = existente?.id;
+      if (id) {
+        const { error } = await supabase
+          .from("tax_profiles")
+          .update({ scenario: cenario, version: (existente!.version ?? 1) + 1 })
+          .eq("id", id);
+        if (error) throw error;
+        const { error: e2 } = await supabase
+          .from("tax_profile_lines")
+          .delete()
+          .eq("tax_profile_id", id);
+        if (e2) throw e2;
+      } else {
+        const { data, error } = await supabase
+          .from("tax_profiles")
+          .insert({
+            name: nome,
+            organization_id: orgId,
+            scenario: cenario,
+            marco_temporal: marcoAtual,
+            valid_from: new Date().toISOString().slice(0, 10),
+            active: true,
+            notes: "Salvo pelo simulador a partir dos ajustes do período.",
+          })
+          .select("id")
+          .single();
+        if (error) throw error;
+        id = data.id;
+      }
+      const linhas = linhasDoEstado(state).map((l) => ({ ...l, tax_profile_id: id! }));
+      const { error: e3 } = await supabase.from("tax_profile_lines").insert(linhas);
+      if (e3) throw e3;
+      return { id: id!, atualizado: !!existente, nome: existente?.name ?? nome };
+    },
+    onSuccess: async (r) => {
+      await qc.invalidateQueries({ queryKey: ["tax_profiles"] });
+      setPerfilId(r.id);
+      setBaseline(state);
+      toast.success(
+        r.atualizado
+          ? `Perfil "${r.nome}" atualizado com os ajustes deste período.`
+          : `Perfil "${r.nome}" salvo. Ele será usado sempre que você escolher este período.`,
+      );
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
 
   const aplicarPerfilNoEstado = async (id: string) => {
     if (id === "manual") {
@@ -438,6 +529,26 @@ function Simulador() {
   const setOperacao = (patch: Partial<OperacaoFiscal>) => {
     for (const [campo, valor] of Object.entries(patch)) {
       eventoParametroFiscal({ modo, campo, valor: valor as string | number | boolean });
+    }
+    if (patch.marcoTemporal && patch.marcoTemporal !== marcoDe(state)) {
+      const novoMarco = patch.marcoTemporal;
+      const base = {
+        ...operacaoPadrao(),
+        ...(state.operacao ?? {}),
+        ...patch,
+        marcoTemporal: marcoDe(state),
+      };
+      const atual = { ...state, operacao: sincronizarOperacao(base, tabela) };
+      const r = trocarPeriodo(atual, novoMarco, ajustesRef.current);
+      gravarAjustes(r.memoria);
+      setState(r.state);
+      const perfil = perfilDoPeriodo(perfisQuery.data ?? [], orgId ?? null, novoMarco);
+      if (!r.restaurado && perfil) {
+        void aplicarPerfilNoEstado(perfil.id);
+      } else if (r.restaurado) {
+        toast.info(`Seus ajustes de ${NOMES_PERIODO[novoMarco] ?? novoMarco} foram restaurados.`);
+      }
+      return;
     }
     setState((s) => {
       const base = { ...operacaoPadrao(), ...(s.operacao ?? {}), ...patch };
@@ -773,6 +884,30 @@ function Simulador() {
                 />
               }
             />
+            {podeEditarAtual && orgId && (
+              <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm">
+                <p className="text-muted-foreground">
+                  Período{" "}
+                  <strong className="text-foreground">
+                    {NOMES_PERIODO[marcoAtual] ?? marcoAtual}
+                  </strong>
+                  {perfilDoPeriodoAtual
+                    ? ` · perfil salvo: ${perfilDoPeriodoAtual.name} (v${perfilDoPeriodoAtual.version})`
+                    : " · sem perfil salvo para esta empresa"}
+                </p>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={salvarPerfilPeriodo.isPending}
+                  onClick={() => salvarPerfilPeriodo.mutate()}
+                >
+                  <Save className="mr-2 h-4 w-4" aria-hidden="true" />
+                  {perfilDoPeriodoAtual?.organization_id === orgId
+                    ? "Atualizar perfil deste período"
+                    : "Salvar como perfil deste período"}
+                </Button>
+              </div>
+            )}
           </div>
           <div className="grid gap-6 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] lg:items-start">
             <div className="space-y-6">

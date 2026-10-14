@@ -1235,6 +1235,7 @@ export type Database = {
           created_by: string | null
           id: string
           locked_fields: Json
+          marco_temporal: string | null
           name: string
           notes: string | null
           organization_id: string | null
@@ -1250,6 +1251,7 @@ export type Database = {
           created_by?: string | null
           id?: string
           locked_fields?: Json
+          marco_temporal?: string | null
           name: string
           notes?: string | null
           organization_id?: string | null
@@ -1265,6 +1267,7 @@ export type Database = {
           created_by?: string | null
           id?: string
           locked_fields?: Json
+          marco_temporal?: string | null
           name?: string
           notes?: string | null
           organization_id?: string | null
