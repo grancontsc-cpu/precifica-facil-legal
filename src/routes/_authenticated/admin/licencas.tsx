@@ -187,8 +187,13 @@ function PainelLicencas() {
             const dias = prazos[l.user_id] ?? 30;
             const nome = l.full_name ?? l.email ?? "usuário";
             const bloqueado = !situacao.liberado;
-            const fim = situacao.status === "trial" || situacao.emTeste ? l.trial_ends_at : l.expires_at;
-            const Icone = bloqueado ? AlertTriangle : situacao.status === "trial" ? Clock : CheckCircle2;
+            const fim =
+              situacao.status === "trial" || situacao.emTeste ? l.trial_ends_at : l.expires_at;
+            const Icone = bloqueado
+              ? AlertTriangle
+              : situacao.status === "trial"
+                ? Clock
+                : CheckCircle2;
             return (
               <li
                 key={l.user_id}
@@ -253,7 +258,9 @@ function PainelLicencas() {
                       })
                     }
                   >
-                    {situacao.status === "trial" ? `Novo teste de ${dias} dias` : `Estender teste ${dias} dias`}
+                    {situacao.status === "trial"
+                      ? `Novo teste de ${dias} dias`
+                      : `Estender teste ${dias} dias`}
                   </Button>
                   <Button
                     size="sm"
