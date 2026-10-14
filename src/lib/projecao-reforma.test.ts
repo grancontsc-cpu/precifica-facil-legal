@@ -36,7 +36,16 @@ const linha = (p: ReturnType<typeof projetarReforma>, ano: string) =>
 describe("projeção da reforma ano a ano", () => {
   it("tem as etapas de 2026 a 2033 com ICMS caindo 10% ao ano a partir de 2029", () => {
     const e = etapasReformaPadrao();
-    expect(e.map((x) => x.ano)).toEqual(["2026", "2027", "2028", "2029", "2030", "2031", "2032", "2033"]);
+    expect(e.map((x) => x.ano)).toEqual([
+      "2026",
+      "2027",
+      "2028",
+      "2029",
+      "2030",
+      "2031",
+      "2032",
+      "2033",
+    ]);
     expect(e.find((x) => x.ano === "2029")).toMatchObject({ fatorIcms: 90, ibs: 1.77 });
     expect(e.find((x) => x.ano === "2032")).toMatchObject({ fatorIcms: 60, ibs: 7.08 });
     expect(e.find((x) => x.ano === "2033")).toMatchObject({ fatorIcms: 0, ibs: 17.7, cbs: 8.8 });

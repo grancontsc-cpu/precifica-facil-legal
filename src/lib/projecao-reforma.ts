@@ -79,8 +79,7 @@ export function estadoDaEtapa(state: SimulationState, etapa: EtapaReforma): Simu
             op.aliquotaInterestadual == null
               ? null
               : fator(op.aliquotaInterestadual, etapa.fatorIcms),
-          difalManual:
-            op.difalManual == null ? null : fator(op.difalManual, etapa.fatorIcms),
+          difalManual: op.difalManual == null ? null : fator(op.difalManual, etapa.fatorIcms),
         }
       : op,
   };

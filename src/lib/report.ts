@@ -15,6 +15,7 @@ import {
 } from "@/lib/pricing-engine";
 import type { SimulationResult, SimulationState } from "@/types/pricing";
 import type { SupplierComparison } from "@/types/comparison";
+import { projetarReforma } from "@/lib/projecao-reforma";
 
 export const AVISO_GERENCIAL =
   "Aviso: esta é uma simulação gerencial de precificação, não constitui apuração fiscal nem parecer tributário. " +
@@ -50,6 +51,7 @@ export interface Relatorio {
   meta: RelatorioMeta;
   blocos: BlocoRelatorio[];
   comparacao: BlocoRelatorio | null;
+  reforma: BlocoRelatorio | null;
   premissas: string[];
   observacoes: string;
   aviso: string;
@@ -306,10 +308,44 @@ export function montarRelatorio(
       ? "Comparação de fornecedores considerada no custo líquido."
       : "Simulação gerencial — validar tratamento tributário com a contabilidade.");
 
+  const projecao = projetarReforma(state);
+  const pct = (v: number | null) =>
+    v === null ? "inviável" : `${v > 0 ? "+" : ""}${formatPercent(v)}`;
+  const blocoReforma: BlocoRelatorio | null = projecao
+    ? {
+        titulo: "Impacto da Reforma Tributária (2026–2033)",
+        descricao:
+          "Preço de hoje: " +
+          formatBRL(projecao.hoje.precoFinal) +
+          ", lucro " +
+          formatBRL(projecao.hoje.resultadoUnidade) +
+          " por unidade, margem " +
+          formatPercent(projecao.hoje.margemEfetiva) +
+          ".",
+        linhas: projecao.linhas.map((l) => ({
+          rotulo: l.ano,
+          valor:
+            "Manter lucro: " +
+            (l.mantendoLucro.preco ? formatBRL(l.mantendoLucro.preco.precoFinal) : "inviável") +
+            ` (${pct(l.mantendoLucro.aumentoPercent)}) · Manter margem: ` +
+            (l.mantendoMargem.preco ? formatBRL(l.mantendoMargem.preco.precoFinal) : "inviável") +
+            ` (${pct(l.mantendoMargem.aumentoPercent)})`,
+          detalhe:
+            "Mantendo o preço: lucro " +
+            formatBRL(l.mantendoPreco.resultadoUnidade) +
+            ` (${l.perdaLucro > 0 ? "+" : ""}${formatBRL(l.perdaLucro)}), margem ` +
+            formatPercent(l.mantendoPreco.margemEfetiva) +
+            ` (${formatNumero(l.perdaMargemPp, 2)} p.p.)`,
+          destaque: l.ano === projecao.piorAno,
+        })),
+      }
+    : null;
+
   return {
     meta,
     blocos: [dadosCompra, tributos, custo, formacao, resultadoFinal],
     comparacao: blocoComparacao,
+    reforma: blocoReforma,
     premissas,
     observacoes: meta.observacoes?.trim() ?? "",
     aviso: AVISO_GERENCIAL,
@@ -344,7 +380,9 @@ export function csvRelatorio(rel: Relatorio): string {
   ];
   if (rel.meta.emitidoPor) linhas.push(["Identificação", "Emitido por", rel.meta.emitidoPor, ""]);
 
-  const todos = rel.comparacao ? [...rel.blocos, rel.comparacao] : rel.blocos;
+  const todos = [...rel.blocos, rel.comparacao, rel.reforma].filter(
+    (b): b is BlocoRelatorio => !!b,
+  );
   for (const bloco of todos) {
     for (const l of bloco.linhas) {
       linhas.push([bloco.titulo, l.rotulo, l.valor, l.detalhe ?? ""]);
@@ -367,6 +405,15 @@ export function whatsappRelatorio(rel: Relatorio): string {
     `Custo líquido unitário: ${formatBRL(r.custoLiquidoUnitario)}`,
     `Preço sugerido: ${r.precoSugerido === null ? "—" : formatBRL(r.precoSugerido)}`,
     `Margem: ${r.margem === null ? "—" : formatPercent(r.margem)}`,
+    ...(rel.reforma
+      ? [
+          "",
+          "*Reforma Tributária — preço para manter o lucro*",
+          ...rel.reforma.linhas
+            .filter((l) => ["2027", "2029", "2033"].includes(l.rotulo))
+            .map((l) => `${l.rotulo}: ${l.valor}`),
+        ]
+      : []),
     `Observação: ${r.principalObservacao}`,
     "",
     "Simulação gerencial. Valide as premissas com a contabilidade.",
