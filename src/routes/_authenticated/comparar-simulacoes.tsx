@@ -195,7 +195,12 @@ function CompararSimulacoes() {
                   className="px-4 py-2 text-left text-xs uppercase tracking-wide text-muted-foreground"
                 >
                   <span className="mr-3">Pergunte sobre esta simulação</span>
-                  <Button size="sm" variant="outline" onClick={perguntarPerdas} disabled={perguntando}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={perguntarPerdas}
+                    disabled={perguntando}
+                  >
                     <Sparkles className="mr-2 h-3.5 w-3.5" aria-hidden="true" />
                     {perguntando ? "Consultando…" : "Perguntar quanto cada uma perde de lucro"}
                   </Button>
@@ -209,7 +214,11 @@ function CompararSimulacoes() {
                   Perda de lucro (resposta da IA)
                 </th>
                 {sims.map((s) => (
-                  <td key={s.id} className="px-4 py-2 text-left align-top text-sm" aria-live="polite">
+                  <td
+                    key={s.id}
+                    className="px-4 py-2 text-left align-top text-sm"
+                    aria-live="polite"
+                  >
                     {respostas[s.id] ?? "—"}
                   </td>
                 ))}
