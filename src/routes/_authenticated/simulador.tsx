@@ -149,7 +149,7 @@ function Secao({
       id={ancora}
       aria-labelledby={tituloId}
       aria-describedby={descricaoId}
-      className="rounded-xl border border-border bg-card p-5 shadow-[var(--shadow-card)]"
+      className="scroll-mt-44 rounded-xl border border-border bg-card p-5 shadow-[var(--shadow-card)]"
     >
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
         <div className="min-w-0">
