@@ -26,21 +26,68 @@ const str = { type: ["string", "null"] };
 const ESQUEMA = {
   type: "object",
   additionalProperties: false,
-  required: ["legivel", "numero", "emissao", "emitenteNome", "emitenteCnpj", "emitenteUf", "destinatarioCnpj", "frete", "desconto", "seguro", "outras", "valorTotalNota", "itens"],
+  required: [
+    "legivel",
+    "numero",
+    "emissao",
+    "emitenteNome",
+    "emitenteCnpj",
+    "emitenteUf",
+    "destinatarioCnpj",
+    "frete",
+    "desconto",
+    "seguro",
+    "outras",
+    "valorTotalNota",
+    "itens",
+  ],
   properties: {
     legivel: { type: "boolean" },
-    numero: str, emissao: str, emitenteNome: str, emitenteCnpj: str, emitenteUf: str, destinatarioCnpj: str,
-    frete: num, desconto: num, seguro: num, outras: num, valorTotalNota: num,
+    numero: str,
+    emissao: str,
+    emitenteNome: str,
+    emitenteCnpj: str,
+    emitenteUf: str,
+    destinatarioCnpj: str,
+    frete: num,
+    desconto: num,
+    seguro: num,
+    outras: num,
+    valorTotalNota: num,
     itens: {
       type: "array",
       items: {
         type: "object",
         additionalProperties: false,
-        required: ["descricao", "codigo", "ncm", "cfop", "unidade", "quantidade", "valorUnitario", "valorTotal", "icms", "ipi", "pis", "cofins", "icmsSt"],
+        required: [
+          "descricao",
+          "codigo",
+          "ncm",
+          "cfop",
+          "unidade",
+          "quantidade",
+          "valorUnitario",
+          "valorTotal",
+          "icms",
+          "ipi",
+          "pis",
+          "cofins",
+          "icmsSt",
+        ],
         properties: {
-          descricao: str, codigo: str, ncm: str, cfop: str, unidade: str,
-          quantidade: num, valorUnitario: num, valorTotal: num,
-          icms: trib, ipi: trib, pis: trib, cofins: trib, icmsSt: num,
+          descricao: str,
+          codigo: str,
+          ncm: str,
+          cfop: str,
+          unidade: str,
+          quantidade: num,
+          valorUnitario: num,
+          valorTotal: num,
+          icms: trib,
+          ipi: trib,
+          pis: trib,
+          cofins: trib,
+          icmsSt: num,
         },
       },
     },
@@ -58,7 +105,8 @@ export const lerFotoNota = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => entrada.parse(d))
   .handler(async ({ data }): Promise<{ dados: NotaExtraida | null; erro: string | null }> => {
     const chave = process.env.LOVABLE_API_KEY;
-    if (!chave) return { dados: null, erro: "Leitura por foto indisponível no momento (configuração)." };
+    if (!chave)
+      return { dados: null, erro: "Leitura por foto indisponível no momento (configuração)." };
 
     const resp = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
       method: "POST",
@@ -83,20 +131,33 @@ export const lerFotoNota = createServerFn({ method: "POST" })
             ],
           },
         ],
-        text: { format: { type: "json_schema", name: "nota_fiscal", strict: true, schema: ESQUEMA } },
+        text: {
+          format: { type: "json_schema", name: "nota_fiscal", strict: true, schema: ESQUEMA },
+        },
       }),
     });
 
     if (!resp.ok || !resp.body) {
       let msg = "";
       try {
-        msg = ((await resp.json()) as { error?: { message?: string }; message?: string })?.error?.message ?? "";
+        msg =
+          ((await resp.json()) as { error?: { message?: string }; message?: string })?.error
+            ?.message ?? "";
       } catch {
         /* sem corpo */
       }
-      if (resp.status === 429) return { dados: null, erro: "Muitas leituras ao mesmo tempo. Aguarde um minuto e tente de novo." };
-      if (resp.status === 402) return { dados: null, erro: msg || "Os créditos de IA do escritório acabaram." };
-      if (resp.status === 403) return { dados: null, erro: msg || "A leitura por IA está bloqueada para este espaço de trabalho." };
+      if (resp.status === 429)
+        return {
+          dados: null,
+          erro: "Muitas leituras ao mesmo tempo. Aguarde um minuto e tente de novo.",
+        };
+      if (resp.status === 402)
+        return { dados: null, erro: msg || "Os créditos de IA do escritório acabaram." };
+      if (resp.status === 403)
+        return {
+          dados: null,
+          erro: msg || "A leitura por IA está bloqueada para este espaço de trabalho.",
+        };
       return { dados: null, erro: "Não foi possível ler a foto agora. Tente novamente." };
     }
 
@@ -117,16 +178,22 @@ export const lerFotoNota = createServerFn({ method: "POST" })
         const json = linha.slice(5).trim();
         if (!json || json === "[DONE]") continue;
         try {
-          const ev = JSON.parse(json) as { type?: string; delta?: string; error?: { message?: string } };
+          const ev = JSON.parse(json) as {
+            type?: string;
+            delta?: string;
+            error?: { message?: string };
+          };
           if (ev.type === "response.output_text.delta" && ev.delta) texto += ev.delta;
-          else if (ev.type === "response.failed" || ev.type === "error") falha = ev.error?.message ?? "falha";
+          else if (ev.type === "response.failed" || ev.type === "error")
+            falha = ev.error?.message ?? "falha";
           else if (ev.type === "response.refusal.delta") falha = "recusa";
         } catch {
           /* linha parcial */
         }
       }
     }
-    if (falha || !texto) return { dados: null, erro: "A IA não conseguiu ler esta foto. Tente outra imagem." };
+    if (falha || !texto)
+      return { dados: null, erro: "A IA não conseguiu ler esta foto. Tente outra imagem." };
     try {
       return { dados: JSON.parse(texto) as NotaExtraida, erro: null };
     } catch {

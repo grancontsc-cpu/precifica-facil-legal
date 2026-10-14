@@ -38,20 +38,30 @@ export interface NotaExtraida {
   itens: ItemExtraido[];
 }
 
-const n = (v: number | null | undefined) => (typeof v === "number" && Number.isFinite(v) && v > 0 ? v : 0);
+const n = (v: number | null | undefined) =>
+  typeof v === "number" && Number.isFinite(v) && v > 0 ? v : 0;
 const t = (v: string | null | undefined) => (v ?? "").toString().trim();
 const digitos = (v: string | null | undefined) => t(v).replace(/\D/g, "");
 
 const TRIB_NULO: TributoExtraido = { cst: null, aliquota: null, valor: null };
 function tributo(x: TributoExtraido | undefined, base: number) {
   const tr = x ?? TRIB_NULO;
-  return { ...tributoVazio(), cst: t(tr.cst), aliquota: n(tr.aliquota), valor: n(tr.valor), base: n(tr.valor) > 0 ? base : 0 };
+  return {
+    ...tributoVazio(),
+    cst: t(tr.cst),
+    aliquota: n(tr.aliquota),
+    valor: n(tr.valor),
+    base: n(tr.valor) > 0 ? base : 0,
+  };
 }
 
 /** Converte a leitura da foto em nota revisável. Sempre marcada para conferência. */
 export function notaDaFoto(dados: NotaExtraida, arquivo: string): LeituraNota {
   if (!dados?.legivel) {
-    return { nota: null, erro: `${arquivo}: a foto não está legível. Tire outra com boa luz, sem cortes e sem reflexo.` };
+    return {
+      nota: null,
+      erro: `${arquivo}: a foto não está legível. Tire outra com boa luz, sem cortes e sem reflexo.`,
+    };
   }
   const itens: ItemNota[] = [];
   for (const i of dados.itens ?? []) {
@@ -87,9 +97,13 @@ export function notaDaFoto(dados: NotaExtraida, arquivo: string): LeituraNota {
     });
   }
   if (itens.length === 0) {
-    return { nota: null, erro: `${arquivo}: nenhum item foi reconhecido na foto. Confira se a lista de produtos aparece inteira.` };
+    return {
+      nota: null,
+      erro: `${arquivo}: nenhum item foi reconhecido na foto. Confira se a lista de produtos aparece inteira.`,
+    };
   }
-  const soma = (f: (i: ItemNota) => number) => Number(itens.reduce((a, i) => a + f(i), 0).toFixed(2));
+  const soma = (f: (i: ItemNota) => number) =>
+    Number(itens.reduce((a, i) => a + f(i), 0).toFixed(2));
   const totais = {
     ...totaisVazios(),
     produtos: soma((i) => i.valorProduto),
@@ -105,7 +119,17 @@ export function notaDaFoto(dados: NotaExtraida, arquivo: string): LeituraNota {
   };
   totais.nota =
     n(dados.valorTotalNota) ||
-    Number((totais.produtos - totais.desconto + totais.frete + totais.seguro + totais.outras + totais.ipi + totais.icmsSt).toFixed(2));
+    Number(
+      (
+        totais.produtos -
+        totais.desconto +
+        totais.frete +
+        totais.seguro +
+        totais.outras +
+        totais.ipi +
+        totais.icmsSt
+      ).toFixed(2),
+    );
 
   const nota = {
     id: `foto-${arquivo}-${Date.now()}`,
@@ -116,7 +140,11 @@ export function notaDaFoto(dados: NotaExtraida, arquivo: string): LeituraNota {
     numero: digitos(dados.numero),
     serie: "",
     emissao: t(dados.emissao),
-    emitente: { nome: t(dados.emitenteNome), cnpj: digitos(dados.emitenteCnpj), uf: t(dados.emitenteUf).toUpperCase().slice(0, 2) },
+    emitente: {
+      nome: t(dados.emitenteNome),
+      cnpj: digitos(dados.emitenteCnpj),
+      uf: t(dados.emitenteUf).toUpperCase().slice(0, 2),
+    },
     destinatario: { ...parteVazia(), cnpj: digitos(dados.destinatarioCnpj) },
     totais,
     itens: ratearCabecalho(itens, totais),

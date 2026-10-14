@@ -31,6 +31,34 @@ import { aliquotaInterna } from "@/lib/aliquotas";
 import { REGIMES } from "@/lib/pricing-engine";
 import { parseNfeXml } from "@/lib/nfe/xml";
 import { lerDanfePdf } from "@/lib/nfe/pdf";
+import { notaDaFoto } from "@/lib/nfe/foto";
+import { lerFotoNota } from "@/lib/nfe/foto.functions";
+
+/** Reduz a foto (máx. 2000 px, JPEG) antes de enviar para leitura. */
+async function imagemParaEnvio(arquivo: File): Promise<string> {
+  const original = await new Promise<string>((ok, erro) => {
+    const r = new FileReader();
+    r.onload = () => ok(String(r.result));
+    r.onerror = erro;
+    r.readAsDataURL(arquivo);
+  });
+  try {
+    const img = new Image();
+    await new Promise((ok, erro) => {
+      img.onload = ok;
+      img.onerror = erro;
+      img.src = original;
+    });
+    const escala = Math.min(1, 2000 / Math.max(img.width, img.height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(img.width * escala);
+    canvas.height = Math.round(img.height * escala);
+    canvas.getContext("2d")?.drawImage(img, 0, 0, canvas.width, canvas.height);
+    return canvas.toDataURL("image/jpeg", 0.88);
+  } catch {
+    return original;
+  }
+}
 import {
   precificarNota,
   premissasPadrao,
@@ -171,8 +199,16 @@ function ImportarPage() {
         leitura = parseNfeXml(await arquivo.text(), arquivo.name);
       } else if (nome.endsWith(".pdf")) {
         leitura = await lerDanfePdf(arquivo);
+      } else if (arquivo.type.startsWith("image/") || /\.(jpe?g|png|webp|heic|heif)$/.test(nome)) {
+        try {
+          const imagem = await imagemParaEnvio(arquivo);
+          const r = await lerFotoNota({ data: { imagem } });
+          leitura = r.dados ? notaDaFoto(r.dados, arquivo.name) : { nota: null, erro: `${arquivo.name}: ${r.erro}` };
+        } catch {
+          leitura = { nota: null, erro: `${arquivo.name}: não foi possível enviar a foto. Tente novamente.` };
+        }
       } else {
-        falhas.push(`${arquivo.name}: envie arquivos .xml (NF-e) ou .pdf (DANFE).`);
+        falhas.push(`${arquivo.name}: envie .xml (NF-e), .pdf (DANFE) ou foto da nota.`);
         continue;
       }
 
