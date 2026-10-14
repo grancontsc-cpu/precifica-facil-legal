@@ -79,7 +79,8 @@ const CENARIO: Record<string, string> = {
   atual: "Modelo atual (ICMS, PIS, Cofins, IPI)",
   transicao: "Transição da reforma",
   transicao2026: "Transição 2026 (IBS 0,10% e CBS 0,90%)",
-  novo: "Modelo pleno IBS/CBS",
+  vigencia2027: "Vigência 2027 (CBS plena + IBS 0,10%, sem PIS/Cofins)",
+  novo: "Modelo pleno IBS/CBS (2033)",
   personalizado: "Configuração personalizada",
 };
 

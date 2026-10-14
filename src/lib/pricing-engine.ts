@@ -326,7 +326,17 @@ export function tributoFronteira(op: OperacaoFiscal | undefined): PurchaseTax | 
  * usuário mais o ICMS de fronteira derivado do regime e das UFs.
  */
 export function tributosCompraEfetivos(state: SimulationState): PurchaseTax[] {
-  const informados = (state.tributosCompra ?? []).filter((t) => t.id !== "icmsFronteira");
+  const op = state.operacao;
+  // Simples Puro e MEI nunca se creditam de IBS/CBS da compra.
+  const semCreditoReforma =
+    !!op && (op.regime === "mei" || (op.regime === "simples" && op.modeloSimples !== "hibrido"));
+  const informados = (state.tributosCompra ?? [])
+    .filter((t) => t.id !== "icmsFronteira")
+    .map((t) =>
+      semCreditoReforma && (t.id === "ibs" || t.id === "cbs")
+        ? { ...t, creditMode: "nao" as const }
+        : t,
+    );
   const fronteira = tributoFronteira(state.operacao);
   return fronteira ? [...informados, fronteira] : informados;
 }
@@ -341,16 +351,23 @@ export function tributosVendaEfetivos(state: SimulationState): SaleTax[] {
   if (!op) return lista.filter((t) => t.id !== "dasVenda" || t.enabled);
 
   if (apuraPeloSimples(op.regime)) {
+    // Simples Híbrido (2027+): IBS/CBS saem do DAS e incidem por fora na venda.
+    const hibrido =
+      op.regime === "simples" &&
+      op.modeloSimples === "hibrido" &&
+      (op.marcoTemporal === "vigencia2027" || op.marcoTemporal === "definitivo2033");
     return lista.map((t) =>
-      t.id === "dasVenda"
-        ? {
-            ...t,
-            enabled: true,
-            rate: D(op.aliquotaSimples).toNumber(),
-            treatment: "incluido" as const,
-            baseMode: "padrao" as const,
-          }
-        : { ...t, enabled: t.treatment === "informativo" ? t.enabled : false },
+      hibrido && (t.id === "ibsVenda" || t.id === "cbsVenda")
+        ? t
+        : t.id === "dasVenda"
+          ? {
+              ...t,
+              enabled: true,
+              rate: D(op.aliquotaSimples).toNumber(),
+              treatment: "incluido" as const,
+              baseMode: "padrao" as const,
+            }
+          : { ...t, enabled: t.treatment === "informativo" ? t.enabled : false },
     );
   }
   return lista.map((t) => (t.id === "dasVenda" ? { ...t, enabled: false } : t));

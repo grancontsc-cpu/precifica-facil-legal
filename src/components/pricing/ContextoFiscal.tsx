@@ -12,8 +12,16 @@ import { Switch } from "@/components/ui/switch";
 import { CampoNumero } from "@/components/pricing/CampoNumero";
 import { AliquotasTrajeto } from "@/components/pricing/AliquotasTrajeto";
 import { UFS } from "@/lib/aliquotas";
+import { MARCOS_TEMPORAIS, MODELOS_SIMPLES } from "@/lib/pricing-defaults";
+import { cn } from "@/lib/utils";
 import { REGIMES, apuraPeloSimples, calcularFronteira } from "@/lib/pricing-engine";
-import type { OperacaoFiscal, Regime } from "@/types/pricing";
+import type { OperacaoFiscal, Regime, RegimeFornecedor } from "@/types/pricing";
+
+const FORNECEDORES: Array<{ id: RegimeFornecedor; nome: string }> = [
+  { id: "regular", nome: "Regime regular (Real/Presumido)" },
+  { id: "simplesPuro", nome: "Simples Nacional Puro" },
+  { id: "simplesHibrido", nome: "Simples Nacional Híbrido" },
+];
 
 /**
  * Contexto fiscal da operação: regime da empresa, estado de origem da
@@ -39,6 +47,31 @@ export function ContextoFiscal({
 
   return (
     <div className="space-y-4">
+      <fieldset className="space-y-2">
+        <legend className="text-sm font-medium">Período fiscal / Reforma Tributária</legend>
+        <div role="radiogroup" className="grid gap-2 sm:grid-cols-4">
+          {MARCOS_TEMPORAIS.map((m) => {
+            const ativo = (operacao.marcoTemporal ?? "atual") === m.id;
+            return (
+              <button
+                key={m.id}
+                type="button"
+                role="radio"
+                aria-checked={ativo}
+                onClick={() => onChange({ marcoTemporal: m.id })}
+                className={cn(
+                  "rounded-lg border p-3 text-left transition-colors",
+                  ativo ? "border-primary bg-primary/10" : "border-border hover:bg-muted",
+                )}
+              >
+                <span className="block text-sm font-semibold">{m.nome}</span>
+                <span className="block text-xs text-muted-foreground">{m.descricao}</span>
+              </button>
+            );
+          })}
+        </div>
+      </fieldset>
+
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="space-y-1.5">
           <Label htmlFor="regime">Regime tributário</Label>
@@ -103,6 +136,62 @@ export function ContextoFiscal({
         ufDestino={operacao.ufDestino}
         importada={operacao.importada}
       />
+
+      {operacao.regime === "simples" ? (
+        <fieldset className="space-y-2">
+          <legend className="text-sm font-medium">Modelo do Simples Nacional</legend>
+          <div role="radiogroup" className="grid gap-2 sm:grid-cols-2">
+            {MODELOS_SIMPLES.map((m) => {
+              const ativo = (operacao.modeloSimples ?? "puro") === m.id;
+              return (
+                <button
+                  key={m.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={ativo}
+                  onClick={() => onChange({ modeloSimples: m.id })}
+                  className={cn(
+                    "rounded-lg border p-3 text-left transition-colors",
+                    ativo ? "border-primary bg-primary/10" : "border-border hover:bg-muted",
+                  )}
+                >
+                  <span className="block text-sm font-semibold">{m.nome}</span>
+                  <span className="block text-xs text-muted-foreground">({m.descricao})</span>
+                </button>
+              );
+            })}
+          </div>
+          {operacao.modeloSimples === "hibrido" ? (
+            <p className="text-xs text-muted-foreground">
+              Informe no DAS a alíquota efetiva sem a fatia de IBS/CBS. A partir de 2027, IBS e CBS
+              saem por fora na venda e geram crédito na compra.
+            </p>
+          ) : null}
+        </fieldset>
+      ) : null}
+
+      <div className="space-y-1.5 sm:max-w-sm">
+        <Label htmlFor="regime-fornecedor">Enquadramento do fornecedor</Label>
+        <Select
+          value={operacao.regimeFornecedor ?? "regular"}
+          onValueChange={(v) => onChange({ regimeFornecedor: v as RegimeFornecedor })}
+        >
+          <SelectTrigger id="regime-fornecedor">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {FORNECEDORES.map((f) => (
+              <SelectItem key={f.id} value={f.id}>
+                {f.nome}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <p className="text-xs text-muted-foreground">
+          Fornecedor do Simples Puro recolhe IBS/CBS no DAS: o crédito fica desligado e pode ser
+          informado manualmente no card do tributo.
+        </p>
+      </div>
 
       {simples ? (
         <CampoNumero

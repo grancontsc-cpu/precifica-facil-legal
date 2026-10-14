@@ -1,4 +1,6 @@
 import type {
+  MarcoTemporal,
+  ModeloSimples,
   OperacaoFiscal,
   PurchaseTax,
   PurchaseTaxId,
@@ -229,12 +231,12 @@ export function aplicarRegime(state: SimulationState, regime: Regime): Simulatio
     return t;
   });
 
-  return {
+  return ajustarCreditosReforma({
     ...state,
     tributosCompra,
     tributosVenda,
     operacao: { ...operacaoPadrao(), ...(state.operacao ?? {}), regime },
-  };
+  });
 }
 
 export function estadoInicial(): SimulationState {
@@ -409,6 +411,20 @@ export function aplicarCenario(state: SimulationState, cenario: ScenarioId): Sim
       setV("ibsVenda", { enabled: true, treatment: "incluido" });
       setV("cbsVenda", { enabled: true, treatment: "incluido" });
       break;
+    case "vigencia2027": {
+      const r = ALIQUOTAS_REFORMA_PADRAO.vigencia2027;
+      set("icms", { enabled: true });
+      set("pis", { enabled: false });
+      set("cofins", { enabled: false });
+      set("ibs", { enabled: true, rate: r.ibs, treatment: "porFora", note: r.notaIbs });
+      set("cbs", { enabled: true, rate: r.cbs, treatment: "porFora" });
+      setV("icmsVenda", { enabled: true });
+      setV("pisVenda", { enabled: false });
+      setV("cofinsVenda", { enabled: false });
+      setV("ibsVenda", { enabled: true, rate: r.ibs, treatment: "porFora" });
+      setV("cbsVenda", { enabled: true, rate: r.cbs, treatment: "porFora" });
+      break;
+    }
     case "personalizado":
     default:
       break;
@@ -425,6 +441,128 @@ export const CENARIOS: Array<{ id: ScenarioId; nome: string; descricao: string }
     nome: "Transição 2026 — teste",
     descricao: "IBS 0,10% e CBS 0,90% informativos",
   },
+  {
+    id: "vigencia2027",
+    nome: "Vigência 2027",
+    descricao: "CBS plena + IBS 0,10%; PIS e Cofins extintos",
+  },
   { id: "novo", nome: "Novo sistema", descricao: "IBS e CBS" },
   { id: "personalizado", nome: "Personalizado", descricao: "Você define cada tributo" },
 ];
+
+/* ------------------------------------------------------------------ */
+/* Reforma Tributária — marcos temporais                               */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Alíquotas de referência sugeridas por marco. São apenas pontos de partida:
+ * o usuário pode editar qualquer alíquota nos cards de tributos.
+ */
+export const ALIQUOTAS_REFORMA_PADRAO = {
+  transicao2026: { cbs: 0.9, ibs: 0.1 },
+  vigencia2027: { cbs: 8.8, ibs: 0.1, notaIbs: "0,05% estadual + 0,05% municipal" },
+  definitivo2033: { cbs: 8.8, ibs: 17.7 },
+} as const;
+
+export const MARCOS_TEMPORAIS: Array<{ id: MarcoTemporal; nome: string; descricao: string }> = [
+  { id: "atual", nome: "Atual", descricao: "PIS/Cofins + ICMS" },
+  { id: "transicao2026", nome: "2026", descricao: "Ano teste — CBS 0,9% e IBS 0,1% informativos" },
+  {
+    id: "vigencia2027",
+    nome: "2027",
+    descricao: "CBS plena + IBS 0,1% + extinção de PIS/Cofins",
+  },
+  { id: "definitivo2033", nome: "2033", descricao: "IBS + CBS plenos, sem ICMS" },
+];
+
+export const MODELOS_SIMPLES: Array<{ id: ModeloSimples; nome: string; descricao: string }> = [
+  {
+    id: "puro",
+    nome: "Simples Nacional Puro",
+    descricao: "Recolhimento unificado no DAS",
+  },
+  {
+    id: "hibrido",
+    nome: "Simples Nacional Híbrido",
+    descricao: "Opção pelo IBS/CBS no regime regular, por fora, com direito a crédito",
+  },
+];
+
+/** IBS/CBS cobrados por fora e creditáveis (a partir de 2027)? */
+export function reformaPorFora(marco: MarcoTemporal | undefined): boolean {
+  return marco === "vigencia2027" || marco === "definitivo2033";
+}
+
+/**
+ * Quem se credita do IBS/CBS da compra: Lucro Real, Lucro Presumido (a CBS é
+ * não cumulativa para todos) e o Simples Híbrido. Simples Puro e MEI, não.
+ * Fornecedor do Simples Puro destaca IBS/CBS dentro do DAS: por padrão o
+ * crédito fica desligado e o usuário informa o valor manual, se houver.
+ */
+export function creditaIbsCbs(op: OperacaoFiscal): boolean {
+  if (!reformaPorFora(op.marcoTemporal)) return false;
+  if (op.regimeFornecedor === "simplesPuro") return false;
+  if (op.regime === "mei") return false;
+  if (op.regime === "simples") return op.modeloSimples === "hibrido";
+  return true;
+}
+
+/** Aplica o marco temporal da reforma: liga/desliga tributos e sugere alíquotas. */
+export function aplicarMarcoTemporal(
+  state: SimulationState,
+  marco: MarcoTemporal,
+): SimulationState {
+  const op: OperacaoFiscal = {
+    ...operacaoPadrao(),
+    ...(state.operacao ?? {}),
+    marcoTemporal: marco,
+  };
+  const cenario: ScenarioId =
+    marco === "atual"
+      ? "atual"
+      : marco === "transicao2026"
+        ? "transicao2026"
+        : marco === "vigencia2027"
+          ? "vigencia2027"
+          : "novo";
+  let s = aplicarCenario({ ...state, operacao: op }, cenario);
+  if (marco === "definitivo2033") {
+    const r = ALIQUOTAS_REFORMA_PADRAO.definitivo2033;
+    s = {
+      ...s,
+      tributosCompra: s.tributosCompra.map((t) =>
+        t.id === "ibs" || t.id === "cbs"
+          ? { ...t, rate: t.id === "ibs" ? r.ibs : r.cbs, treatment: "porFora" as const }
+          : t.id === "icmsSt"
+            ? { ...t, enabled: false }
+            : t,
+      ),
+      tributosVenda: s.tributosVenda.map((t) =>
+        t.id === "ibsVenda" || t.id === "cbsVenda"
+          ? {
+              ...t,
+              rate: t.id === "ibsVenda" ? r.ibs : r.cbs,
+              treatment: "porFora" as const,
+            }
+          : t,
+      ),
+      operacao: { ...op, difalAtivo: false },
+    };
+  }
+  return ajustarCreditosReforma(s);
+}
+
+/** Ajusta o direito a crédito de IBS/CBS da compra conforme regime e fornecedor. */
+export function ajustarCreditosReforma(state: SimulationState): SimulationState {
+  const op = state.operacao;
+  if (!op || !reformaPorFora(op.marcoTemporal)) return state;
+  const credita = creditaIbsCbs(op);
+  return {
+    ...state,
+    tributosCompra: state.tributosCompra.map((t) =>
+      t.id === "ibs" || t.id === "cbs"
+        ? { ...t, creditMode: credita ? ("integral" as const) : ("nao" as const) }
+        : t,
+    ),
+  };
+}

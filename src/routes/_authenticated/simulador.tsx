@@ -49,7 +49,9 @@ import { VoltarAoTopo } from "@/components/app/VoltarAoTopo";
 import { simular } from "@/lib/pricing-engine";
 import {
   CENARIOS,
+  ajustarCreditosReforma,
   aplicarCenario,
+  aplicarMarcoTemporal,
   aplicarRegime,
   estadoExemplo,
   estadoInicial,
@@ -407,7 +409,10 @@ function Simulador() {
     }
     setState((s) => {
       const base = { ...operacaoPadrao(), ...(s.operacao ?? {}), ...patch };
-      return { ...s, operacao: sincronizarOperacao(base, tabela) };
+      const proximo = { ...s, operacao: sincronizarOperacao(base, tabela) };
+      if (patch.marcoTemporal) return aplicarMarcoTemporal(proximo, patch.marcoTemporal);
+      if (patch.modeloSimples || patch.regimeFornecedor) return ajustarCreditosReforma(proximo);
+      return proximo;
     });
   };
 

@@ -14,6 +14,7 @@ export default tseslint.config(
       ".output",
       ".vinxi",
       "src/routes/mcp.ts",
+      "src/integrations/supabase/previewAuthStorage.ts",
       "src/routes/?.mcp?/**",
       "src/routes/?.well-known?/**",
     ],
