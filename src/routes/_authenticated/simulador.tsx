@@ -201,7 +201,10 @@ function Simulador() {
   const [doRapido, setDoRapido] = useState(false);
   const veioDoRapido = useRef(false);
   const irParaEtapa = (etapa: EtapaPreenchimento) => {
-    if (etapa.completo) setState((s) => (s.modoAvancado ? s : { ...s, modoAvancado: true }));
+    if (etapa.completo) {
+      setModo("completo");
+      setState((s) => (s.modoAvancado ? s : { ...s, modoAvancado: true }));
+    }
     window.setTimeout(() => {
       const alvo = document.getElementById(etapa.ancora);
       if (!alvo) return;
@@ -369,6 +372,7 @@ function Simulador() {
     const doRapido = receberDoRapido();
     if (doRapido) {
       veioDoRapido.current = true;
+      setModo("completo");
       setState({ ...doRapido, modoAvancado: true });
       setDoRapido(true);
       setCarregado(true);
