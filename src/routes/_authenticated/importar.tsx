@@ -92,6 +92,7 @@ type Passo = 1 | 2 | 3;
 
 function ImportarPage() {
   const { empresa } = useApp();
+  const navegar = useNavigate();
   const { tabela } = useAliquotas();
   const entradaRef = useRef<HTMLInputElement>(null);
 
@@ -733,7 +734,7 @@ function ImportarPage() {
                               size="sm"
                               variant="outline"
                               onClick={() => {
-                                enviarDoRapido({ ...estado, nomeProduto: item.descricao });
+                                enviarDoRapido(estado);
                                 void navegar({ to: "/simulador" });
                               }}
                             >
@@ -764,6 +765,7 @@ function ImportarPage() {
                       <td className="py-2 pr-3 tabular-nums">
                         {formatBRL(calc.totais.resultadoSugerido)}
                       </td>
+                      <td className="py-2 pr-3" />
                     </tr>
                   </tfoot>
                 </table>
