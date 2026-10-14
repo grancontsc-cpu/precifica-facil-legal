@@ -1,0 +1,2 @@
+ALTER TABLE public.licenses DROP CONSTRAINT IF EXISTS licenses_status_check;
+ALTER TABLE public.licenses ADD CONSTRAINT licenses_status_check CHECK (status IN ('trial','trial_expired','active','courtesy','suspended','expired','canceled'));
