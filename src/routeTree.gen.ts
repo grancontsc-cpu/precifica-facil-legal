@@ -38,6 +38,7 @@ import { Route as AuthenticatedProdutosRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedPerfisRouteImport } from './routes/_authenticated/perfis'
 import { Route as AuthenticatedImportarRouteImport } from './routes/_authenticated/importar'
 import { Route as AuthenticatedEmpresasRouteImport } from './routes/_authenticated/empresas'
+import { Route as AuthenticatedCompararSimulacoesRouteImport } from './routes/_authenticated/comparar-simulacoes'
 import { Route as AuthenticatedCompararRouteImport } from './routes/_authenticated/comparar'
 import { Route as AuthenticatedAuditoriaRouteImport } from './routes/_authenticated/auditoria'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
@@ -45,7 +46,6 @@ import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]
 import { Route as AuthenticatedGestaoIndexRouteImport } from './routes/_authenticated/gestao/index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as ApiPublicSitemapPingRouteImport } from './routes/api/public/sitemap-ping'
-import { Route as AuthenticatedSimulacoesCompararRouteImport } from './routes/_authenticated/simulacoes.comparar'
 import { Route as AuthenticatedGestaoVinculosRouteImport } from './routes/_authenticated/gestao/vinculos'
 import { Route as AuthenticatedGestaoUsuariosRouteImport } from './routes/_authenticated/gestao/usuarios'
 import { Route as AuthenticatedGestaoConvitesRouteImport } from './routes/_authenticated/gestao/convites'
@@ -207,6 +207,12 @@ const AuthenticatedEmpresasRoute = AuthenticatedEmpresasRouteImport.update({
   path: '/empresas',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCompararSimulacoesRoute =
+  AuthenticatedCompararSimulacoesRouteImport.update({
+    id: '/comparar-simulacoes',
+    path: '/comparar-simulacoes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedCompararRoute = AuthenticatedCompararRouteImport.update({
   id: '/comparar',
   path: '/comparar',
@@ -245,12 +251,6 @@ const ApiPublicSitemapPingRoute = ApiPublicSitemapPingRouteImport.update({
   path: '/api/public/sitemap-ping',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedSimulacoesCompararRoute =
-  AuthenticatedSimulacoesCompararRouteImport.update({
-    id: '/comparar',
-    path: '/comparar',
-    getParentRoute: () => AuthenticatedSimulacoesRoute,
-  } as any)
 const AuthenticatedGestaoVinculosRoute =
   AuthenticatedGestaoVinculosRouteImport.update({
     id: '/gestao/vinculos',
@@ -370,12 +370,13 @@ export interface FileRoutesByFullPath {
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/auditoria': typeof AuthenticatedAuditoriaRoute
   '/comparar': typeof AuthenticatedCompararRoute
+  '/comparar-simulacoes': typeof AuthenticatedCompararSimulacoesRoute
   '/empresas': typeof AuthenticatedEmpresasRoute
   '/importar': typeof AuthenticatedImportarRoute
   '/perfis': typeof AuthenticatedPerfisRoute
   '/produtos': typeof AuthenticatedProdutosRoute
   '/rapido': typeof AuthenticatedRapidoRoute
-  '/simulacoes': typeof AuthenticatedSimulacoesRouteWithChildren
+  '/simulacoes': typeof AuthenticatedSimulacoesRoute
   '/simulador': typeof AuthenticatedSimuladorRoute
   '/app/$': typeof AppSplatRoute
   '/app/': typeof AppIndexRoute
@@ -395,7 +396,6 @@ export interface FileRoutesByFullPath {
   '/gestao/convites': typeof AuthenticatedGestaoConvitesRoute
   '/gestao/usuarios': typeof AuthenticatedGestaoUsuariosRoute
   '/gestao/vinculos': typeof AuthenticatedGestaoVinculosRoute
-  '/simulacoes/comparar': typeof AuthenticatedSimulacoesCompararRoute
   '/api/public/sitemap-ping': typeof ApiPublicSitemapPingRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/gestao/': typeof AuthenticatedGestaoIndexRoute
@@ -424,12 +424,13 @@ export interface FileRoutesByTo {
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/auditoria': typeof AuthenticatedAuditoriaRoute
   '/comparar': typeof AuthenticatedCompararRoute
+  '/comparar-simulacoes': typeof AuthenticatedCompararSimulacoesRoute
   '/empresas': typeof AuthenticatedEmpresasRoute
   '/importar': typeof AuthenticatedImportarRoute
   '/perfis': typeof AuthenticatedPerfisRoute
   '/produtos': typeof AuthenticatedProdutosRoute
   '/rapido': typeof AuthenticatedRapidoRoute
-  '/simulacoes': typeof AuthenticatedSimulacoesRouteWithChildren
+  '/simulacoes': typeof AuthenticatedSimulacoesRoute
   '/simulador': typeof AuthenticatedSimuladorRoute
   '/app/$': typeof AppSplatRoute
   '/app': typeof AppIndexRoute
@@ -449,7 +450,6 @@ export interface FileRoutesByTo {
   '/gestao/convites': typeof AuthenticatedGestaoConvitesRoute
   '/gestao/usuarios': typeof AuthenticatedGestaoUsuariosRoute
   '/gestao/vinculos': typeof AuthenticatedGestaoVinculosRoute
-  '/simulacoes/comparar': typeof AuthenticatedSimulacoesCompararRoute
   '/api/public/sitemap-ping': typeof ApiPublicSitemapPingRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/gestao': typeof AuthenticatedGestaoIndexRoute
@@ -480,12 +480,13 @@ export interface FileRoutesById {
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/_authenticated/auditoria': typeof AuthenticatedAuditoriaRoute
   '/_authenticated/comparar': typeof AuthenticatedCompararRoute
+  '/_authenticated/comparar-simulacoes': typeof AuthenticatedCompararSimulacoesRoute
   '/_authenticated/empresas': typeof AuthenticatedEmpresasRoute
   '/_authenticated/importar': typeof AuthenticatedImportarRoute
   '/_authenticated/perfis': typeof AuthenticatedPerfisRoute
   '/_authenticated/produtos': typeof AuthenticatedProdutosRoute
   '/_authenticated/rapido': typeof AuthenticatedRapidoRoute
-  '/_authenticated/simulacoes': typeof AuthenticatedSimulacoesRouteWithChildren
+  '/_authenticated/simulacoes': typeof AuthenticatedSimulacoesRoute
   '/_authenticated/simulador': typeof AuthenticatedSimuladorRoute
   '/app/$': typeof AppSplatRoute
   '/app/': typeof AppIndexRoute
@@ -505,7 +506,6 @@ export interface FileRoutesById {
   '/_authenticated/gestao/convites': typeof AuthenticatedGestaoConvitesRoute
   '/_authenticated/gestao/usuarios': typeof AuthenticatedGestaoUsuariosRoute
   '/_authenticated/gestao/vinculos': typeof AuthenticatedGestaoVinculosRoute
-  '/_authenticated/simulacoes/comparar': typeof AuthenticatedSimulacoesCompararRoute
   '/api/public/sitemap-ping': typeof ApiPublicSitemapPingRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/gestao/': typeof AuthenticatedGestaoIndexRoute
@@ -536,6 +536,7 @@ export interface FileRouteTypes {
     | '/.well-known/oauth-protected-resource'
     | '/auditoria'
     | '/comparar'
+    | '/comparar-simulacoes'
     | '/empresas'
     | '/importar'
     | '/perfis'
@@ -561,7 +562,6 @@ export interface FileRouteTypes {
     | '/gestao/convites'
     | '/gestao/usuarios'
     | '/gestao/vinculos'
-    | '/simulacoes/comparar'
     | '/api/public/sitemap-ping'
     | '/admin/'
     | '/gestao/'
@@ -590,6 +590,7 @@ export interface FileRouteTypes {
     | '/.well-known/oauth-protected-resource'
     | '/auditoria'
     | '/comparar'
+    | '/comparar-simulacoes'
     | '/empresas'
     | '/importar'
     | '/perfis'
@@ -615,7 +616,6 @@ export interface FileRouteTypes {
     | '/gestao/convites'
     | '/gestao/usuarios'
     | '/gestao/vinculos'
-    | '/simulacoes/comparar'
     | '/api/public/sitemap-ping'
     | '/admin'
     | '/gestao'
@@ -645,6 +645,7 @@ export interface FileRouteTypes {
     | '/.well-known/oauth-protected-resource'
     | '/_authenticated/auditoria'
     | '/_authenticated/comparar'
+    | '/_authenticated/comparar-simulacoes'
     | '/_authenticated/empresas'
     | '/_authenticated/importar'
     | '/_authenticated/perfis'
@@ -670,7 +671,6 @@ export interface FileRouteTypes {
     | '/_authenticated/gestao/convites'
     | '/_authenticated/gestao/usuarios'
     | '/_authenticated/gestao/vinculos'
-    | '/_authenticated/simulacoes/comparar'
     | '/api/public/sitemap-ping'
     | '/_authenticated/admin/'
     | '/_authenticated/gestao/'
@@ -911,6 +911,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedEmpresasRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/comparar-simulacoes': {
+      id: '/_authenticated/comparar-simulacoes'
+      path: '/comparar-simulacoes'
+      fullPath: '/comparar-simulacoes'
+      preLoaderRoute: typeof AuthenticatedCompararSimulacoesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/comparar': {
       id: '/_authenticated/comparar'
       path: '/comparar'
@@ -959,13 +966,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/public/sitemap-ping'
       preLoaderRoute: typeof ApiPublicSitemapPingRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/simulacoes/comparar': {
-      id: '/_authenticated/simulacoes/comparar'
-      path: '/comparar'
-      fullPath: '/simulacoes/comparar'
-      preLoaderRoute: typeof AuthenticatedSimulacoesCompararRouteImport
-      parentRoute: typeof AuthenticatedSimulacoesRoute
     }
     '/_authenticated/gestao/vinculos': {
       id: '/_authenticated/gestao/vinculos'
@@ -1082,29 +1082,16 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface AuthenticatedSimulacoesRouteChildren {
-  AuthenticatedSimulacoesCompararRoute: typeof AuthenticatedSimulacoesCompararRoute
-}
-
-const AuthenticatedSimulacoesRouteChildren: AuthenticatedSimulacoesRouteChildren =
-  {
-    AuthenticatedSimulacoesCompararRoute: AuthenticatedSimulacoesCompararRoute,
-  }
-
-const AuthenticatedSimulacoesRouteWithChildren =
-  AuthenticatedSimulacoesRoute._addFileChildren(
-    AuthenticatedSimulacoesRouteChildren,
-  )
-
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAuditoriaRoute: typeof AuthenticatedAuditoriaRoute
   AuthenticatedCompararRoute: typeof AuthenticatedCompararRoute
+  AuthenticatedCompararSimulacoesRoute: typeof AuthenticatedCompararSimulacoesRoute
   AuthenticatedEmpresasRoute: typeof AuthenticatedEmpresasRoute
   AuthenticatedImportarRoute: typeof AuthenticatedImportarRoute
   AuthenticatedPerfisRoute: typeof AuthenticatedPerfisRoute
   AuthenticatedProdutosRoute: typeof AuthenticatedProdutosRoute
   AuthenticatedRapidoRoute: typeof AuthenticatedRapidoRoute
-  AuthenticatedSimulacoesRoute: typeof AuthenticatedSimulacoesRouteWithChildren
+  AuthenticatedSimulacoesRoute: typeof AuthenticatedSimulacoesRoute
   AuthenticatedSimuladorRoute: typeof AuthenticatedSimuladorRoute
   AuthenticatedAdminAuditoriaRoute: typeof AuthenticatedAdminAuditoriaRoute
   AuthenticatedAdminConvitesRoute: typeof AuthenticatedAdminConvitesRoute
@@ -1127,12 +1114,13 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAuditoriaRoute: AuthenticatedAuditoriaRoute,
   AuthenticatedCompararRoute: AuthenticatedCompararRoute,
+  AuthenticatedCompararSimulacoesRoute: AuthenticatedCompararSimulacoesRoute,
   AuthenticatedEmpresasRoute: AuthenticatedEmpresasRoute,
   AuthenticatedImportarRoute: AuthenticatedImportarRoute,
   AuthenticatedPerfisRoute: AuthenticatedPerfisRoute,
   AuthenticatedProdutosRoute: AuthenticatedProdutosRoute,
   AuthenticatedRapidoRoute: AuthenticatedRapidoRoute,
-  AuthenticatedSimulacoesRoute: AuthenticatedSimulacoesRouteWithChildren,
+  AuthenticatedSimulacoesRoute: AuthenticatedSimulacoesRoute,
   AuthenticatedSimuladorRoute: AuthenticatedSimuladorRoute,
   AuthenticatedAdminAuditoriaRoute: AuthenticatedAdminAuditoriaRoute,
   AuthenticatedAdminConvitesRoute: AuthenticatedAdminConvitesRoute,
