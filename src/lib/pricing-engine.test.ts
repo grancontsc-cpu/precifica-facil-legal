@@ -612,3 +612,94 @@ describe("coerência da simulação completa", () => {
     expect(res.recomendado).toBeNull();
   });
 });
+
+/* ================================================================== */
+/* 15. Reforma Tributária — vigência 2027                              */
+/* ================================================================== */
+import { aplicarMarcoTemporal, aplicarRegime, operacaoPadrao } from "./pricing-defaults";
+import { tributosCompraEfetivos, tributosVendaEfetivos } from "./pricing-engine";
+import type { Regime } from "@/types/pricing";
+
+function estado2027(regime: Regime, extra: Partial<SimulationState["operacao"]> = {}) {
+  let s = estadoInicial();
+  s.produto = { ...s.produto, quantidade: 1, valorUnitario: 100 };
+  s.operacao = operacaoPadrao({ regime, difalAtivo: false, aliquotaSimples: 6, ...extra });
+  s = aplicarRegime(s, regime);
+  return aplicarMarcoTemporal(s, "vigencia2027");
+}
+const achar = <T extends { id: string }>(l: T[], id: string) => l.find((t) => t.id === id)!;
+
+describe("15. reforma tributária — vigência 2027", () => {
+  it("extingue PIS/Cofins e ativa CBS 8,8% e IBS 0,1% por fora", () => {
+    const s = estado2027("real");
+    expect(achar(s.tributosCompra, "pis").enabled).toBe(false);
+    expect(achar(s.tributosCompra, "cofins").enabled).toBe(false);
+    expect(achar(s.tributosVenda, "pisVenda").enabled).toBe(false);
+    expect(achar(s.tributosCompra, "cbs")).toMatchObject({
+      enabled: true,
+      rate: 8.8,
+      treatment: "porFora",
+    });
+    expect(achar(s.tributosCompra, "ibs")).toMatchObject({
+      enabled: true,
+      rate: 0.1,
+      treatment: "porFora",
+    });
+    expect(achar(s.tributosVenda, "cbsVenda")).toMatchObject({
+      enabled: true,
+      rate: 8.8,
+      treatment: "porFora",
+    });
+    expect(achar(s.tributosCompra, "icms").enabled).toBe(true);
+  });
+
+  it("Lucro Real: compra paga 8,9 por fora e credita tudo", () => {
+    const r = simular(estado2027("real"));
+    expect(round2(r.compra.desembolsoTotal)).toBe(108.9);
+    expect(round2(r.compra.creditosTotais)).toBe(8.9);
+    expect(round2(r.compra.custoLiquidoTotal)).toBe(100);
+  });
+
+  it("Lucro Presumido: CBS e IBS também geram crédito", () => {
+    const r = simular(estado2027("presumido"));
+    expect(round2(r.compra.creditosTotais)).toBe(8.9);
+    expect(round2(r.compra.custoLiquidoTotal)).toBe(100);
+  });
+
+  it("venda no Real destaca IBS/CBS por fora sobre o preço base", () => {
+    const r = simular(estado2027("real"));
+    const v = r.recomendado!;
+    expect(v.tributosPorFora).toBeCloseTo(v.precoBase * 0.089, 6);
+    expect(v.precoFinal).toBeCloseTo(v.precoBase * 1.089, 6);
+  });
+
+  it("Simples Híbrido: credita IBS/CBS e cobra por fora na venda junto do DAS", () => {
+    const s = estado2027("simples", { modeloSimples: "hibrido" });
+    const r = simular(s);
+    expect(round2(r.compra.creditosTotais)).toBe(8.9);
+    const vendas = tributosVendaEfetivos(s);
+    expect(achar(vendas, "dasVenda")).toMatchObject({ enabled: true, rate: 6 });
+    expect(achar(vendas, "cbsVenda")).toMatchObject({ enabled: true, treatment: "porFora" });
+    expect(r.recomendado!.tributosPorFora).toBeGreaterThan(0);
+  });
+
+  it("Simples Puro: sem crédito de IBS/CBS e sem IBS/CBS por fora na venda", () => {
+    const s = estado2027("simples", { modeloSimples: "puro" });
+    expect(achar(tributosCompraEfetivos(s), "cbs").creditMode).toBe("nao");
+    expect(achar(tributosVendaEfetivos(s), "cbsVenda").enabled).toBe(false);
+    const r = simular(s);
+    expect(round2(r.compra.custoLiquidoTotal)).toBe(108.9);
+    expect(r.recomendado!.tributosPorFora).toBe(0);
+  });
+
+  it("fornecedor do Simples Puro não gera crédito de IBS/CBS por padrão", () => {
+    const s = estado2027("real", { regimeFornecedor: "simplesPuro" });
+    expect(achar(s.tributosCompra, "cbs").creditMode).toBe("nao");
+  });
+
+  it("alíquotas continuam editáveis pelo usuário", () => {
+    const s = estado2027("real");
+    s.tributosCompra = s.tributosCompra.map((t) => (t.id === "cbs" ? { ...t, rate: 9.3 } : t));
+    expect(round2(simular(s).compra.creditosTotais)).toBe(9.4);
+  });
+});
