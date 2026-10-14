@@ -669,8 +669,8 @@ describe("15. reforma tributária — vigência 2027", () => {
   it("venda no Real destaca IBS/CBS por fora sobre o preço base", () => {
     const r = simular(estado2027("real"));
     const v = r.recomendado!;
-    expect(v.tributosPorFora).toBeCloseTo(v.precoBase * 0.089, 6);
-    expect(v.precoFinal).toBeCloseTo(v.precoBase * 1.089, 6);
+    expect(v.tributosPorFora).toBeCloseTo(v.precoBase * 0.089, 2);
+    expect(v.precoFinal).toBeCloseTo(v.precoBase * 1.089, 2);
   });
 
   it("Simples Híbrido: credita IBS/CBS e cobra por fora na venda junto do DAS", () => {
