@@ -1,4 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { enviarDoRapido } from "@/lib/progresso-simulacao";
 import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
@@ -91,6 +92,7 @@ type Passo = 1 | 2 | 3;
 
 function ImportarPage() {
   const { empresa } = useApp();
+  const navegar = useNavigate();
   const { tabela } = useAliquotas();
   const entradaRef = useRef<HTMLInputElement>(null);
 
@@ -663,10 +665,11 @@ function ImportarPage() {
                       <th className="py-1 pr-3">Preço sugerido</th>
                       {versaoBase && <th className="py-1 pr-3">Variação</th>}
                       <th className="py-1 pr-3">Margem</th>
+                      <th className="py-1 pr-3"><span className="sr-only">Ações</span></th>
                     </tr>
                   </thead>
                   <tbody>
-                    {calc.itens.map(({ item, resultado }) => {
+                    {calc.itens.map(({ item, resultado, estado }) => {
                       const comp = compararItem(
                         versaoBase,
                         chaveItem(calc.nota.id, item.numero),
@@ -726,6 +729,18 @@ function ImportarPage() {
                               ? formatPercent(resultado.recomendado.margemEfetiva)
                               : "—"}
                           </td>
+                          <td className="py-1 pr-3">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => {
+                                enviarDoRapido(estado);
+                                void navegar({ to: "/simulador" });
+                              }}
+                            >
+                              Abrir no simulador
+                            </Button>
+                          </td>
                         </tr>
                       );
                     })}
@@ -750,6 +765,7 @@ function ImportarPage() {
                       <td className="py-2 pr-3 tabular-nums">
                         {formatBRL(calc.totais.resultadoSugerido)}
                       </td>
+                      <td className="py-2 pr-3" />
                     </tr>
                   </tfoot>
                 </table>
