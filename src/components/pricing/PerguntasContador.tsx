@@ -1,5 +1,7 @@
 import { useMemo, useState } from "react";
 import { Calculator, Loader2, Send } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -88,7 +90,9 @@ export function PerguntasContador({ state }: { state: SimulationState }) {
           ) : (
             <div key={i} className="flex gap-2 text-sm">
               <Calculator className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
-              <div className="whitespace-pre-wrap leading-relaxed">{m.texto}</div>
+              <div className="min-w-0 space-y-2 leading-relaxed [&_table]:w-full [&_table]:text-xs [&_td]:border-b [&_td]:border-border [&_td]:px-2 [&_td]:py-1 [&_th]:px-2 [&_th]:py-1 [&_th]:text-left [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 overflow-x-auto">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.texto}</ReactMarkdown>
+              </div>
             </div>
           ),
         )}
