@@ -33,6 +33,7 @@ import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as AuthenticatedAuditoriaRouteImport } from './routes/_authenticated/auditoria'
 import { Route as AuthenticatedCompararRouteImport } from './routes/_authenticated/comparar'
+import { Route as AuthenticatedCompararSimulacoesRouteImport } from './routes/_authenticated/comparar-simulacoes'
 import { Route as AuthenticatedEmpresasRouteImport } from './routes/_authenticated/empresas'
 import { Route as AuthenticatedImportarRouteImport } from './routes/_authenticated/importar'
 import { Route as AuthenticatedPerfisRouteImport } from './routes/_authenticated/perfis'
@@ -183,6 +184,12 @@ const AuthenticatedCompararRoute = AuthenticatedCompararRouteImport.update({
   path: '/comparar',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCompararSimulacoesRoute =
+  AuthenticatedCompararSimulacoesRouteImport.update({
+    id: '/comparar-simulacoes',
+    path: '/comparar-simulacoes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedEmpresasRoute = AuthenticatedEmpresasRouteImport.update({
   id: '/empresas',
   path: '/empresas',
@@ -363,6 +370,7 @@ export interface FileRoutesByFullPath {
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/auditoria': typeof AuthenticatedAuditoriaRoute
   '/comparar': typeof AuthenticatedCompararRoute
+  '/comparar-simulacoes': typeof AuthenticatedCompararSimulacoesRoute
   '/empresas': typeof AuthenticatedEmpresasRoute
   '/importar': typeof AuthenticatedImportarRoute
   '/perfis': typeof AuthenticatedPerfisRoute
@@ -416,6 +424,7 @@ export interface FileRoutesByTo {
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/auditoria': typeof AuthenticatedAuditoriaRoute
   '/comparar': typeof AuthenticatedCompararRoute
+  '/comparar-simulacoes': typeof AuthenticatedCompararSimulacoesRoute
   '/empresas': typeof AuthenticatedEmpresasRoute
   '/importar': typeof AuthenticatedImportarRoute
   '/perfis': typeof AuthenticatedPerfisRoute
@@ -471,6 +480,7 @@ export interface FileRoutesById {
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/_authenticated/auditoria': typeof AuthenticatedAuditoriaRoute
   '/_authenticated/comparar': typeof AuthenticatedCompararRoute
+  '/_authenticated/comparar-simulacoes': typeof AuthenticatedCompararSimulacoesRoute
   '/_authenticated/empresas': typeof AuthenticatedEmpresasRoute
   '/_authenticated/importar': typeof AuthenticatedImportarRoute
   '/_authenticated/perfis': typeof AuthenticatedPerfisRoute
@@ -526,6 +536,7 @@ export interface FileRouteTypes {
     | '/.well-known/oauth-protected-resource'
     | '/auditoria'
     | '/comparar'
+    | '/comparar-simulacoes'
     | '/empresas'
     | '/importar'
     | '/perfis'
@@ -579,6 +590,7 @@ export interface FileRouteTypes {
     | '/.well-known/oauth-protected-resource'
     | '/auditoria'
     | '/comparar'
+    | '/comparar-simulacoes'
     | '/empresas'
     | '/importar'
     | '/perfis'
@@ -633,6 +645,7 @@ export interface FileRouteTypes {
     | '/.well-known/oauth-protected-resource'
     | '/_authenticated/auditoria'
     | '/_authenticated/comparar'
+    | '/_authenticated/comparar-simulacoes'
     | '/_authenticated/empresas'
     | '/_authenticated/importar'
     | '/_authenticated/perfis'
@@ -863,6 +876,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCompararRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/comparar-simulacoes': {
+      id: '/_authenticated/comparar-simulacoes'
+      path: '/comparar-simulacoes'
+      fullPath: '/comparar-simulacoes'
+      preLoaderRoute: typeof AuthenticatedCompararSimulacoesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/empresas': {
       id: '/_authenticated/empresas'
       path: '/empresas'
@@ -1065,6 +1085,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAuditoriaRoute: typeof AuthenticatedAuditoriaRoute
   AuthenticatedCompararRoute: typeof AuthenticatedCompararRoute
+  AuthenticatedCompararSimulacoesRoute: typeof AuthenticatedCompararSimulacoesRoute
   AuthenticatedEmpresasRoute: typeof AuthenticatedEmpresasRoute
   AuthenticatedImportarRoute: typeof AuthenticatedImportarRoute
   AuthenticatedPerfisRoute: typeof AuthenticatedPerfisRoute
@@ -1093,6 +1114,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAuditoriaRoute: AuthenticatedAuditoriaRoute,
   AuthenticatedCompararRoute: AuthenticatedCompararRoute,
+  AuthenticatedCompararSimulacoesRoute: AuthenticatedCompararSimulacoesRoute,
   AuthenticatedEmpresasRoute: AuthenticatedEmpresasRoute,
   AuthenticatedImportarRoute: AuthenticatedImportarRoute,
   AuthenticatedPerfisRoute: AuthenticatedPerfisRoute,

@@ -102,6 +102,23 @@ function SimulacoesPage() {
     });
   }, [simulacoes.data, avaliacao.termo, situacao, ctxAcesso]);
 
+  const [selecionadas, setSelecionadas] = useState<string[]>([]);
+  const alternarSelecao = (id: string) =>
+    setSelecionadas((a) =>
+      a.includes(id) ? a.filter((x) => x !== id) : a.length >= 4 ? a : [...a, id],
+    );
+  const renomear = useMutation({
+    mutationFn: async ({ id, titulo }: { id: string; titulo: string }) => {
+      const { error } = await supabase.from("simulations").update({ titulo }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Nome da simulação atualizado.");
+      qc.invalidateQueries({ queryKey: ["simulations"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const podeAlterar = (s: { organization_id: string; created_by: string | null }) =>
     avaliarAcessoSimulacao(ctxAcesso, {
       organizationId: s.organization_id,
@@ -237,10 +254,35 @@ function SimulacoesPage() {
         </p>
       ) : null}
 
+      <div className="mt-3 flex flex-wrap items-center gap-3 rounded-lg border border-border bg-surface px-3 py-2 text-sm">
+        <span className="text-muted-foreground">
+          {selecionadas.length === 0
+            ? "Marque de 2 a 4 simulações para comparar lado a lado."
+            : `${selecionadas.length} de 4 selecionada(s)`}
+        </span>
+        <Button
+          size="sm"
+          disabled={selecionadas.length < 2}
+          onClick={() =>
+            navigate({ to: "/comparar-simulacoes", search: { ids: selecionadas.join(",") } })
+          }
+        >
+          Comparar selecionadas
+        </Button>
+        {selecionadas.length > 0 && (
+          <Button size="sm" variant="ghost" onClick={() => setSelecionadas([])}>
+            Limpar
+          </Button>
+        )}
+      </div>
+
       <section className="mt-5 overflow-x-auto rounded-xl border border-border bg-card">
         <table className="w-full text-sm">
           <thead className="bg-surface text-left text-xs uppercase tracking-wide text-muted-foreground">
             <tr>
+              <th className="w-10 px-4 py-3">
+                <span className="sr-only">Selecionar para comparar</span>
+              </th>
               <th className="px-4 py-3">Simulação</th>
               <th className="px-4 py-3">Perfil tributário</th>
               <th className="px-4 py-3 text-right">Custo líquido un.</th>
@@ -252,6 +294,16 @@ function SimulacoesPage() {
           <tbody>
             {lista.map((s) => (
               <tr key={s.id} className="border-t border-border">
+                <td className="px-4 py-3">
+                  <input
+                    type="checkbox"
+                    className="h-4 w-4 accent-primary"
+                    aria-label={`Comparar ${s.titulo}`}
+                    checked={selecionadas.includes(s.id)}
+                    disabled={!selecionadas.includes(s.id) && selecionadas.length >= 4}
+                    onChange={() => alternarSelecao(s.id)}
+                  />
+                </td>
                 <td className="px-4 py-3">
                   <p className="font-medium text-foreground">{s.titulo}</p>
                   <p className="text-xs text-muted-foreground">
@@ -284,6 +336,19 @@ function SimulacoesPage() {
                     >
                       Abrir
                     </Button>
+                    {podeAlterar(s) && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          const novo = window.prompt("Nome da simulação", s.titulo)?.trim();
+                          if (novo && novo !== s.titulo)
+                            renomear.mutate({ id: s.id, titulo: novo.slice(0, 120) });
+                        }}
+                      >
+                        Renomear
+                      </Button>
+                    )}
                     {s.input_snapshot && s.result_snapshot ? (
                       <ExportarSimulacao
                         state={s.input_snapshot as unknown as SimulationState}
@@ -339,7 +404,7 @@ function SimulacoesPage() {
             ))}
             {!simulacoes.isLoading && lista.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
+                <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
                   Nenhuma simulação encontrada.
                 </td>
               </tr>
