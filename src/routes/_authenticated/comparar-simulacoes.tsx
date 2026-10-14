@@ -1,15 +1,21 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo } from "react";
-import { ArrowLeft, Trophy } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { useMemo, useState } from "react";
+import { ArrowLeft, Sparkles, Trophy } from "lucide-react";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { linhasComparacao, type SimulacaoSalva } from "@/lib/comparar-simulacoes";
+import { contextoParaPergunta } from "@/lib/contexto-pergunta";
 import { formatBRL, formatNumero, formatPercent } from "@/lib/format";
+import { perguntarSobreSimulacao } from "@/lib/perguntas.functions";
 import { metaPagina } from "@/lib/seo-head";
 import type { SimulationResult, SimulationState } from "@/types/pricing";
+
+const PERGUNTA_PERDA =
+  "Quanto este produto vai perder de lucro com a Reforma se mantiver o preço de hoje? Responda em no máximo 2 frases curtas: a perda por unidade e em pontos de margem no ano de maior perda, e em 2033.";
 
 const TITULO = "Comparar simulações — Precifica Grancont";
 const DESCRICAO =
@@ -65,6 +71,32 @@ function CompararSimulacoes() {
   const sims = useMemo(() => consulta.data ?? [], [consulta.data]);
   const linhas = useMemo(() => linhasComparacao(sims), [sims]);
   const grupos = [...new Set(linhas.map((l) => l.grupo))];
+
+  const perguntar = useServerFn(perguntarSobreSimulacao);
+  const [respostas, setRespostas] = useState<Record<string, string>>({});
+  const [perguntando, setPerguntando] = useState(false);
+  const perguntarPerdas = async () => {
+    setPerguntando(true);
+    await Promise.all(
+      sims.map(async (s) => {
+        setRespostas((r) => ({ ...r, [s.id]: "Consultando…" }));
+        const contexto = contextoParaPergunta(s.state);
+        if (!contexto) {
+          setRespostas((r) => ({ ...r, [s.id]: "Sem dados suficientes para a projeção." }));
+          return;
+        }
+        try {
+          const res = await perguntar({
+            data: { pergunta: PERGUNTA_PERDA, contexto, historico: [] },
+          });
+          setRespostas((r) => ({ ...r, [s.id]: res.resposta ?? res.erro ?? "Sem resposta." }));
+        } catch {
+          setRespostas((r) => ({ ...r, [s.id]: "Não foi possível consultar agora." }));
+        }
+      }),
+    );
+    setPerguntando(false);
+  };
 
   const fmt = (v: number | string | null, f: string) =>
     v === null
