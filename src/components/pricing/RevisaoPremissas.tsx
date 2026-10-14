@@ -27,7 +27,9 @@ export function RevisaoPremissas({
   const confirmadas = new Set(state.premissasConfirmadas ?? []);
   const confirmar = (ids: string[]) => {
     const validas = new Set(todas.map((p) => p.id));
-    onConfirmar([...new Set([...(state.premissasConfirmadas ?? []), ...ids])].filter((i) => validas.has(i) || !i.includes(":") ));
+    onConfirmar(
+      [...new Set([...(state.premissasConfirmadas ?? []), ...ids])].filter((i) => validas.has(i)),
+    );
     setMarcadas(new Set());
   };
 
@@ -63,7 +65,10 @@ export function RevisaoPremissas({
             return (
               <li key={p.id} className="flex items-start gap-3 rounded-lg bg-card p-3">
                 {ok ? (
-                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-label="Confirmada" />
+                  <CheckCircle2
+                    className="mt-0.5 h-4 w-4 shrink-0 text-primary"
+                    aria-label="Confirmada"
+                  />
                 ) : (
                   <Checkbox
                     id={`prem-${p.id}`}
