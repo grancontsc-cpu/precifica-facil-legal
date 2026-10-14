@@ -174,6 +174,20 @@ export interface SimulationState {
   modoAvancado: boolean;
   /** Contexto fiscal (regime + UFs). Opcional para simulações salvas antes desta versão. */
   operacao?: OperacaoFiscal;
+  /** Tabela editável das etapas da reforma usada na projeção ano a ano. */
+  etapasReforma?: EtapaReforma[];
+}
+
+/** Uma etapa (ano) da transição da Reforma Tributária. */
+export interface EtapaReforma {
+  ano: string;
+  marco: MarcoTemporal;
+  /** Alíquota de CBS em %. */
+  cbs: number;
+  /** Alíquota de IBS em % (UF + município). */
+  ibs: number;
+  /** Percentual da alíquota de ICMS ainda vigente (100 = integral, 0 = extinto). */
+  fatorIcms: number;
 }
 
 /* ------------------------------------------------------------------ */
