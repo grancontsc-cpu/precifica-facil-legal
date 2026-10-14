@@ -126,6 +126,13 @@ export const NAV_ADMIN: ItemNav[] = [
     acesso: "super_admin",
   },
   {
+    to: "/admin/clientes",
+    label: "Clientes",
+    descricao: "Simulações enviadas por cliente e premissas a revisar",
+    icon: LayoutDashboard,
+    acesso: "super_admin",
+  },
+  {
     to: "/admin/usuarios",
     label: "Todos os usuários",
     descricao: "Usuários de todas as empresas",
