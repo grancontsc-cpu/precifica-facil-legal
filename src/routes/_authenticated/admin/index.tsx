@@ -1,7 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { metaPagina } from "@/lib/seo-head";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Building2, ClipboardList, MailPlus, ShieldQuestion, Users } from "lucide-react";
+import {
+  AlertTriangle,
+  Building2,
+  ClipboardList,
+  KeyRound,
+  MailPlus,
+  ShieldQuestion,
+  Users,
+} from "lucide-react";
 
 import { ExigePapel } from "@/components/app/GuardaAcesso";
 import { supabase } from "@/integrations/supabase/client";
@@ -29,7 +37,8 @@ function PainelAdmin() {
   const resumo = useQuery({
     queryKey: ["admin", "resumo"],
     queryFn: async () => {
-      const [empresas, usuarios, convites, simulacoes, solicitacoes] = await Promise.all([
+      const agora = new Date().toISOString();
+      const [empresas, usuarios, convites, simulacoes, solicitacoes, vencidas] = await Promise.all([
         supabase
           .from("organizations")
           .select("id", { count: "exact", head: true })
@@ -48,6 +57,13 @@ function PainelAdmin() {
           .select("id", { count: "exact", head: true })
           .eq("status", "pending")
           .is("simulation_id", null),
+        supabase
+          .from("licenses")
+          .select("id", { count: "exact", head: true })
+          .not("user_id", "is", null)
+          .or(
+            `status.in.(trial_expired,expired,suspended),and(status.eq.trial,trial_ends_at.lte.${agora}),and(status.eq.active,expires_at.lte.${agora})`,
+          ),
       ]);
       return {
         empresas: empresas.count ?? 0,
@@ -55,11 +71,18 @@ function PainelAdmin() {
         convites: convites.count ?? 0,
         simulacoes: simulacoes.count ?? 0,
         solicitacoes: solicitacoes.count ?? 0,
+        vencidas: vencidas.count ?? 0,
       };
     },
   });
 
   const cards = [
+    {
+      rotulo: "Aguardando liberação",
+      valor: resumo.data?.vencidas,
+      icone: KeyRound,
+      para: "/admin/licencas",
+    },
     {
       rotulo: "Empresas ativas",
       valor: resumo.data?.empresas,
@@ -103,7 +126,20 @@ function PainelAdmin() {
         </p>
       </header>
 
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      {(resumo.data?.vencidas ?? 0) > 0 && (
+        <Link
+          to="/admin/licencas"
+          className="flex items-center gap-3 rounded-lg border border-amber-500/50 bg-amber-500/10 p-4 text-sm text-foreground hover:border-amber-500"
+        >
+          <AlertTriangle className="h-5 w-5 shrink-0 text-amber-600" aria-hidden />
+          <span>
+            <strong>{resumo.data?.vencidas} pessoa(s)</strong> com teste ou licença vencida
+            aguardando liberação. <span className="text-primary underline">Liberar agora →</span>
+          </span>
+        </Link>
+      )}
+
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {cards.map((c) => {
           const Icone = c.icone;
           return (
@@ -124,6 +160,7 @@ function PainelAdmin() {
 
       <nav className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
         {[
+          { to: "/admin/licencas", t: "Licenças e testes", d: "Liberar e estender acessos." },
           { to: "/admin/empresas", t: "Empresas", d: "Cadastrar clientes e definir padrões." },
           { to: "/admin/usuarios", t: "Usuários", d: "Papéis, situação e vínculos." },
           { to: "/admin/convites", t: "Convites", d: "Convidar, reenviar e cancelar." },
