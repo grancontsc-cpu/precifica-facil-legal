@@ -15,7 +15,7 @@ import { metaPagina } from "@/lib/seo-head";
 import type { SimulationResult, SimulationState } from "@/types/pricing";
 
 const PERGUNTA_PERDA =
-  "Quanto este produto vai perder de lucro com a Reforma se mantiver o preço de hoje? Responda em no máximo 2 frases curtas: a perda por unidade e em pontos de margem no ano de maior perda, e em 2033.";
+  "Quanto este produto vai perder de lucro com a Reforma se mantiver o preço de hoje? Responda em texto corrido, sem tabelas, listas ou markdown, em no máximo 2 frases curtas: a perda por unidade e em pontos de margem no ano de maior perda e em 2033.";
 
 const TITULO = "Comparar simulações — Precifica Grancont";
 const DESCRICAO =
@@ -219,7 +219,7 @@ function CompararSimulacoes() {
                     className="px-4 py-2 text-left align-top text-sm"
                     aria-live="polite"
                   >
-                    {respostas[s.id] ?? "—"}
+                    {respostas[s.id]?.replace(/\*\*/g, "") ?? "—"}
                   </td>
                 ))}
               </tr>
