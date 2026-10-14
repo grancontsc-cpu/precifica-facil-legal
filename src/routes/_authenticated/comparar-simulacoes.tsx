@@ -62,7 +62,7 @@ function CompararSimulacoes() {
     },
   });
 
-  const sims = consulta.data ?? [];
+  const sims = useMemo(() => consulta.data ?? [], [consulta.data]);
   const linhas = useMemo(() => linhasComparacao(sims), [sims]);
   const grupos = [...new Set(linhas.map((l) => l.grupo))];
 
