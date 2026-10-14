@@ -15,10 +15,10 @@ const TITULO = "Comparar simulações — Precifica Grancont";
 const DESCRICAO =
   "Compare lado a lado simulações salvas de diferentes produtos, regimes e premissas tributárias.";
 
-export const Route = createFileRoute("/_authenticated/simulacoes/comparar")({
+export const Route = createFileRoute("/_authenticated/comparar-simulacoes")({
   validateSearch: z.object({ ids: z.string().optional() }),
   head: () => ({
-    ...metaPagina({ titulo: TITULO, descricao: DESCRICAO, caminho: "/simulacoes/comparar" }),
+    ...metaPagina({ titulo: TITULO, descricao: DESCRICAO, caminho: "/comparar-simulacoes" }),
   }),
   component: CompararSimulacoes,
 });
