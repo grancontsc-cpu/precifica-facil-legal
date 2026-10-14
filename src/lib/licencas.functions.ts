@@ -298,11 +298,20 @@ export const atualizarLicenca = createServerFn({ method: "POST" })
       patch.notes = data.observacao || null;
     }
 
-    const { data: salva, error } = await supabaseAdmin
-      .from("licenses")
-      .upsert({ user_id: data.userId, ...patch }, { onConflict: "user_id" })
-      .select("*")
-      .single();
+    // O índice único de user_id é parcial, então o upsert com onConflict não
+    // funciona no Postgres: atualiza quando existe, insere quando não existe.
+    const { data: salva, error } = atual
+      ? await supabaseAdmin
+          .from("licenses")
+          .update(patch as never)
+          .eq("id", atual.id)
+          .select("*")
+          .single()
+      : await supabaseAdmin
+          .from("licenses")
+          .insert({ user_id: data.userId, ...patch } as never)
+          .select("*")
+          .single();
     if (error || !salva) throw new Error("Não foi possível atualizar a licença.");
 
     await registrarEvento(supabaseAdmin, {
