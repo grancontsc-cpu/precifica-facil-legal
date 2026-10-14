@@ -176,6 +176,8 @@ export interface SimulationState {
   operacao?: OperacaoFiscal;
   /** Tabela editável das etapas da reforma usada na projeção ano a ano. */
   etapasReforma?: EtapaReforma[];
+  /** Premissas de referência revisadas pelo usuário (id:valor), salvas com a simulação. */
+  premissasConfirmadas?: string[];
 }
 
 /** Uma etapa (ano) da transição da Reforma Tributária. */
