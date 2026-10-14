@@ -86,6 +86,7 @@ export function RelatorioSimulacao({ rel }: { rel: Relatorio }) {
       ))}
 
       {rel.comparacao ? <Bloco bloco={rel.comparacao} /> : null}
+      {rel.reforma ? <Bloco bloco={rel.reforma} /> : null}
 
       <section className="rel-bloco mt-5">
         <h3 className="border-b border-border pb-1 text-sm font-semibold uppercase tracking-wide text-primary">

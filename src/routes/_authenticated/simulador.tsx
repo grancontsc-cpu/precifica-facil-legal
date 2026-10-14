@@ -22,6 +22,7 @@ import { CampoNumero, CampoTexto, Ajuda } from "@/components/pricing/CampoNumero
 import { CardTributoCompra } from "@/components/pricing/CardTributoCompra";
 import { CardTributoVenda } from "@/components/pricing/CardTributoVenda";
 import { PainelResultados } from "@/components/pricing/PainelResultados";
+import { ProjecaoReforma } from "@/components/pricing/ProjecaoReforma";
 import { EntendaOCalculo } from "@/components/pricing/EntendaOCalculo";
 import { PainelFronteira } from "@/components/pricing/PainelFronteira";
 import { CalculadoraRateio } from "@/components/pricing/CalculadoraRateio";
@@ -1172,6 +1173,17 @@ function Simulador() {
               )}
 
               <PainelFronteira state={state} resultado={resultado} />
+
+              <Secao
+                numero="Reforma"
+                titulo="Impacto da Reforma Tributária"
+                descricao="Quanto aumentar o preço para manter o lucro e quanto você perde mantendo o preço, de 2026 a 2033."
+              >
+                <ProjecaoReforma
+                  state={state}
+                  onEtapas={(etapasReforma) => setState((s) => ({ ...s, etapasReforma }))}
+                />
+              </Secao>
 
               <EntendaOCalculo
                 state={state}

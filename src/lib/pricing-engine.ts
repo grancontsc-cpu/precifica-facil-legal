@@ -574,6 +574,49 @@ export function resolverPrecoPorPrecoFinal(
   return avaliarPreco(lo.plus(hi).div(2), ctx);
 }
 
+/**
+ * Encontra o preço-base que entrega o lucro por unidade (R$) informado.
+ * O resultado é crescente no preço; devolve null se for inatingível.
+ */
+export function resolverPrecoPorResultado(
+  resultadoAlvo: number | string,
+  ctx: SaleContext,
+): SaleEvaluation | null {
+  const alvo = D(resultadoAlvo);
+  const res = (p: Decimal) => nucleoVenda(p, ctx).resultado;
+  let lo = new Decimal(0);
+  let hi = new Decimal(1);
+  let encontrado = res(lo).gte(alvo);
+  if (encontrado) return avaliarPreco(0, ctx);
+  for (let i = 0; i < 200; i++) {
+    if (res(hi).gte(alvo)) {
+      encontrado = true;
+      break;
+    }
+    if (hi.gte(PRECO_MAXIMO)) break;
+    lo = hi;
+    hi = Decimal.min(hi.times(2), PRECO_MAXIMO);
+  }
+  if (!encontrado) return null;
+  for (let i = 0; i < 400; i++) {
+    if (hi.minus(lo).lte(hi.abs().plus(1).times(TOLERANCIA))) break;
+    const mid = lo.plus(hi).div(2);
+    if (res(mid).gte(alvo)) hi = mid;
+    else lo = mid;
+  }
+  return avaliarPreco(hi, ctx);
+}
+
+/** Contexto de venda de um estado (custo líquido exato + tributos efetivos). */
+export function contextoVenda(state: SimulationState): SaleContext {
+  const compra = calcularCompra(state.produto, tributosCompraEfetivos(state));
+  return {
+    custoLiquidoUnitario: compra.custoLiquidoUnitarioExato,
+    venda: state.venda,
+    tributos: tributosVendaEfetivos(state),
+  };
+}
+
 /* ------------------------------------------------------------------ */
 /* Validações                                                          */
 /* ------------------------------------------------------------------ */
