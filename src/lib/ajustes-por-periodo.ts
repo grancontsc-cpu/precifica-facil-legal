@@ -4,7 +4,13 @@
  * Nenhuma fórmula vive aqui — apenas troca de configuração.
  */
 import { aplicarMarcoTemporal, operacaoPadrao } from "@/lib/pricing-defaults";
-import type { MarcoTemporal, PurchaseTax, SaleTax, ScenarioId, SimulationState } from "@/types/pricing";
+import type {
+  MarcoTemporal,
+  PurchaseTax,
+  SaleTax,
+  ScenarioId,
+  SimulationState,
+} from "@/types/pricing";
 
 export interface AjustePeriodo {
   cenario: ScenarioId;
@@ -18,7 +24,10 @@ export function marcoDe(state: SimulationState): MarcoTemporal {
 }
 
 /** Fotografa a configuração atual do período corrente. */
-export function guardarAjuste(state: SimulationState, memoria: AjustesPorPeriodo): AjustesPorPeriodo {
+export function guardarAjuste(
+  state: SimulationState,
+  memoria: AjustesPorPeriodo,
+): AjustesPorPeriodo {
   return {
     ...memoria,
     [marcoDe(state)]: {
@@ -63,7 +72,9 @@ export function perfilDoPeriodo<
   P extends { organization_id: string | null; marco_temporal?: string | null; updated_at: string },
 >(perfis: P[], orgId: string | null, marco: MarcoTemporal): P | null {
   const candidatos = perfis
-    .filter((p) => p.marco_temporal === marco && (p.organization_id === orgId || !p.organization_id))
+    .filter(
+      (p) => p.marco_temporal === marco && (p.organization_id === orgId || !p.organization_id),
+    )
     .sort((a, b) => {
       const prioridade = Number(b.organization_id === orgId) - Number(a.organization_id === orgId);
       return prioridade || b.updated_at.localeCompare(a.updated_at);

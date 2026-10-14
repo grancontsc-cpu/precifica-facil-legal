@@ -61,6 +61,7 @@ import {
   ajustarCreditosReforma,
   aplicarCenario,
   aplicarMarcoTemporal,
+  MARCOS_TEMPORAIS,
   aplicarRegime,
   estadoExemplo,
   estadoInicial,
@@ -83,6 +84,7 @@ import { registrarNegativa } from "@/lib/registro-seguranca";
 import { supabase } from "@/integrations/supabase/client";
 import {
   aplicarPerfil,
+  linhasDoEstado,
   camposAlterados,
   lockedFieldsOf,
   type TaxProfileLineRow,
@@ -288,10 +290,13 @@ function Simulador() {
   const salvarPerfilPeriodo = useMutation({
     mutationFn: async () => {
       if (!orgId) throw new Error("Selecione uma empresa para salvar o perfil.");
-      const existente = perfilDoPeriodoAtual?.organization_id === orgId ? perfilDoPeriodoAtual : null;
+      const existente =
+        perfilDoPeriodoAtual?.organization_id === orgId ? perfilDoPeriodoAtual : null;
       const nome = `${empresa?.name ?? "Empresa"} — ${NOMES_PERIODO[marcoAtual] ?? marcoAtual}`;
       const cenario = (
-        state.cenario === "transicao2026" || state.cenario === "vigencia2027" ? "transicao" : state.cenario
+        state.cenario === "transicao2026" || state.cenario === "vigencia2027"
+          ? "transicao"
+          : state.cenario
       ) as "atual" | "transicao" | "novo" | "personalizado";
       let id = existente?.id;
       if (id) {
@@ -300,7 +305,10 @@ function Simulador() {
           .update({ scenario: cenario, version: (existente!.version ?? 1) + 1 })
           .eq("id", id);
         if (error) throw error;
-        const { error: e2 } = await supabase.from("tax_profile_lines").delete().eq("tax_profile_id", id);
+        const { error: e2 } = await supabase
+          .from("tax_profile_lines")
+          .delete()
+          .eq("tax_profile_id", id);
         if (e2) throw e2;
       } else {
         const { data, error } = await supabase
@@ -524,7 +532,12 @@ function Simulador() {
     }
     if (patch.marcoTemporal && patch.marcoTemporal !== marcoDe(state)) {
       const novoMarco = patch.marcoTemporal;
-      const base = { ...operacaoPadrao(), ...(state.operacao ?? {}), ...patch, marcoTemporal: marcoDe(state) };
+      const base = {
+        ...operacaoPadrao(),
+        ...(state.operacao ?? {}),
+        ...patch,
+        marcoTemporal: marcoDe(state),
+      };
       const atual = { ...state, operacao: sincronizarOperacao(base, tabela) };
       const r = trocarPeriodo(atual, novoMarco, ajustesRef.current);
       gravarAjustes(r.memoria);
@@ -874,7 +887,10 @@ function Simulador() {
             {podeEditarAtual && orgId && (
               <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm">
                 <p className="text-muted-foreground">
-                  Período <strong className="text-foreground">{NOMES_PERIODO[marcoAtual] ?? marcoAtual}</strong>
+                  Período{" "}
+                  <strong className="text-foreground">
+                    {NOMES_PERIODO[marcoAtual] ?? marcoAtual}
+                  </strong>
                   {perfilDoPeriodoAtual
                     ? ` · perfil salvo: ${perfilDoPeriodoAtual.name} (v${perfilDoPeriodoAtual.version})`
                     : " · sem perfil salvo para esta empresa"}

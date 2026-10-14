@@ -4,7 +4,10 @@ import { perfilDoPeriodo, trocarPeriodo, type AjustesPorPeriodo } from "./ajuste
 
 function comIcms(rate: number) {
   const s = estadoInicial();
-  return { ...s, tributosCompra: s.tributosCompra.map((t) => (t.id === "icms" ? { ...t, rate } : t)) };
+  return {
+    ...s,
+    tributosCompra: s.tributosCompra.map((t) => (t.id === "icms" ? { ...t, rate } : t)),
+  };
 }
 
 describe("ajustes por período", () => {
@@ -23,7 +26,9 @@ describe("ajustes por período", () => {
     const a = trocarPeriodo(estadoInicial(), "vigencia2027", {});
     const ajustado = {
       ...a.state,
-      tributosVenda: a.state.tributosVenda.map((t) => (t.id === "cbsVenda" ? { ...t, rate: 9.3 } : t)),
+      tributosVenda: a.state.tributosVenda.map((t) =>
+        t.id === "cbsVenda" ? { ...t, rate: 9.3 } : t,
+      ),
     };
     const b = trocarPeriodo(ajustado, "definitivo2033", a.memoria);
     const c = trocarPeriodo(b.state, "vigencia2027", b.memoria);
